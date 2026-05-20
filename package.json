@@ -9,7 +9,10 @@
     "web": "expo start --web",
     "prebuild": "expo prebuild --platform android",
     "build:apk": "cd android && ./gradlew assembleRelease",
-    "eas:apk": "eas build -p android --profile preview"
+    "eas:apk": "eas build -p android --profile preview",
+    "build:mac": "bash scripts/build-mac.sh",
+    "desktop": "cd desktop && npm start",
+    "desktop:dev": "cd desktop && AT_DEV=1 npm start"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.1.1",
@@ -17,8 +20,11 @@
     "babel-preset-expo": "~54.0.10",
     "expo": "~54.0.33",
     "expo-background-fetch": "~14.0.9",
+    "expo-constants": "^55.0.16",
+    "expo-device": "^55.0.17",
     "expo-haptics": "~15.0.8",
     "expo-linear-gradient": "~15.0.8",
+    "expo-linking": "~8.0.12",
     "expo-notifications": "~0.32.17",
     "expo-status-bar": "~3.0.9",
     "expo-task-manager": "~14.0.9",

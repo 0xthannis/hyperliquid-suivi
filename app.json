@@ -1,20 +1,22 @@
 {
   "expo": {
-    "name": "Neymo Trades",
-    "slug": "neymo-trades",
-    "version": "1.0.0",
+    "name": "A&T CAPITAL",
+    "slug": "at-capital-terminal-277",
+    "version": "1.1.3",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
+    "scheme": "atcapital",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#0B0F1A"
+      "backgroundColor": "#060608"
     },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.thanh.suivitrades",
+      "associatedDomains": ["applinks:atcapital.fr"],
       "infoPlist": {
         "UIBackgroundModes": ["fetch", "remote-notification"]
       }
@@ -23,21 +25,46 @@
       "package": "com.thanh.suivitrades",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#0B0F1A"
+        "backgroundColor": "#060608"
       },
       "permissions": [
         "RECEIVE_BOOT_COMPLETED",
         "VIBRATE",
-        "POST_NOTIFICATIONS"
+        "POST_NOTIFICATIONS",
+        "WAKE_LOCK",
+        "FOREGROUND_SERVICE"
+      ],
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "atcapital.fr",
+              "pathPrefix": "/app"
+            },
+            {
+              "scheme": "https",
+              "host": "www.atcapital.fr",
+              "pathPrefix": "/app"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
       ],
       "edgeToEdgeEnabled": true
+    },
+    "linking": {
+      "scheme": "atcapital",
+      "prefixes": ["atcapital://", "https://atcapital.fr", "https://www.atcapital.fr"]
     },
     "plugins": [
       [
         "expo-notifications",
         {
           "icon": "./assets/icon.png",
-          "color": "#7C6CFF",
+          "color": "#C9A962",
           "sounds": []
         }
       ],

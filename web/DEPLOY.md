@@ -21,9 +21,28 @@ cd web && npm run build
 
 Les fichiers statiques sont dans `web/dist/`.
 
-## Notifications push (optionnel)
+## Notifications push (web + mobile app fermée)
 
-Le serveur push (`npm run dev` ou `push-api.mjs` sur Railway) doit tourner à part pour les alertes web. Configurer `VITE_PUSH_API` si l'API n'est pas sur le même domaine.
+Le serveur Express (`server.js` sur Railway) lance automatiquement la surveillance Hyperliquid (`push-server.mjs`) :
+
+- **Web** : abonnement via le navigateur (`/api/push/subscribe`).
+- **Mobile** : l'app s'enregistre au lancement sur `/api/push/mobile-subscribe`.
+
+### Railway — variable obligatoire pour Android (APK)
+
+Dans le service **web** sur Railway, ajouter :
+
+| Variable | Description |
+|----------|-------------|
+| `FCM_SERVER_KEY` | Clé serveur Firebase (Cloud Messaging) pour envoyer les notifs quand l'app est **fermée** |
+
+Sans cette clé, seules les notifs **locales** fonctionnent (app ouverte ou en arrière-plan).
+
+Firebase : projet → Paramètres → Cloud Messaging → **Clé serveur** (legacy).
+
+### Vérifier
+
+`GET https://atcapital.fr/api/push/status` → `mobileSubscribers`, `fcmConfigured: true`.
 
 ## APK Android
 

@@ -6,26 +6,50 @@ import webpush from 'web-push';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const VAPID_FILE = path.join(__dirname, '.vapid.json');
 const SUBS_FILE = path.join(__dirname, 'push-subscriptions.json');
+const MOBILE_FILE = path.join(__dirname, 'expo-push-tokens.json');
+const STATE_FILE = path.join(__dirname, 'push-state.json');
 const TRADER_WALLET =
   process.env.VITE_TRADER_WALLET ?? '0x994Ff80b7dA1174a164e0F93121bDfbb68cf7A3F';
 const API_URL = 'https://api.hyperliquid.xyz/info';
-const POLL_MS = 25_000;
+const POLL_MS = Number(process.env.PUSH_POLL_MS) || 25_000;
+const BRAND = 'A&T CAPITAL';
 
-let subscriptions = [];
-let lastCoins = new Set();
+let webSubscriptions = [];
+let mobileTokens = [];
+let state = { initialized: false, coins: [] };
 
-function loadSubs() {
+function loadJson(file, fallback) {
   try {
-    if (fs.existsSync(SUBS_FILE)) {
-      subscriptions = JSON.parse(fs.readFileSync(SUBS_FILE, 'utf8'));
+    if (fs.existsSync(file)) {
+      return JSON.parse(fs.readFileSync(file, 'utf8'));
     }
   } catch {
-    subscriptions = [];
+    /* ignore */
   }
+  return fallback;
 }
 
-function saveSubs() {
-  fs.writeFileSync(SUBS_FILE, JSON.stringify(subscriptions, null, 2));
+function saveJson(file, data) {
+  fs.writeFileSync(file, JSON.stringify(data, null, 2));
+}
+
+function loadSubs() {
+  webSubscriptions = loadJson(SUBS_FILE, []);
+  mobileTokens = loadJson(MOBILE_FILE, []);
+  state = loadJson(STATE_FILE, { initialized: false, coins: [] });
+  if (!Array.isArray(state.coins)) state.coins = [];
+}
+
+function saveWebSubs() {
+  saveJson(SUBS_FILE, webSubscriptions);
+}
+
+function saveMobileTokens() {
+  saveJson(MOBILE_FILE, mobileTokens);
+}
+
+function saveState() {
+  saveJson(STATE_FILE, state);
 }
 
 function getVapidKeys() {
@@ -46,64 +70,197 @@ function getVapidKeys() {
 
 const vapid = getVapidKeys();
 webpush.setVapidDetails(
-  'mailto:neymo9560@gmail.com',
+  'mailto:contact@atcapital.fr',
   vapid.publicKey,
   vapid.privateKey
 );
 
 loadSubs();
 
-async function fetchOpenCoins() {
+async function postInfo(body) {
   const res = await fetch(API_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      type: 'clearinghouseState',
-      user: TRADER_WALLET,
-    }),
+    body: JSON.stringify(body),
   });
-  if (!res.ok) return [];
-  const data = await res.json();
+  if (!res.ok) throw new Error(`HL API ${res.status}`);
+  return res.json();
+}
+
+async function fetchOpenPositions() {
+  const data = await postInfo({
+    type: 'clearinghouseState',
+    user: TRADER_WALLET,
+  });
   return (data.assetPositions ?? [])
-    .map((ap) => ap.position?.coin)
+    .map((ap) => {
+      const p = ap.position;
+      const size = parseFloat(p?.szi ?? '0');
+      if (Math.abs(size) < 1e-12) return null;
+      return {
+        coin: p.coin,
+        isLong: size > 0,
+      };
+    })
     .filter(Boolean);
 }
 
-async function notifyAll(title, body) {
+async function fetchFills() {
+  const data = await postInfo({ type: 'userFills', user: TRADER_WALLET });
+  return Array.isArray(data) ? data : [];
+}
+
+function formatUsd(n) {
+  const sign = n >= 0 ? '+' : '';
+  return `${sign}$${Math.abs(n).toFixed(2)}`;
+}
+
+function closePnlFromFills(fills, coin) {
+  const close = fills
+    .filter((f) => f.coin === coin && String(f.dir).includes('Close'))
+    .sort((a, b) => b.time - a.time)[0];
+  if (!close) return 0;
+  return parseFloat(close.closedPnl ?? 0) - parseFloat(close.fee ?? 0);
+}
+
+async function sendWebPush(title, body) {
   const payload = JSON.stringify({ title, body });
   const dead = [];
 
-  for (let i = 0; i < subscriptions.length; i++) {
+  for (let i = 0; i < webSubscriptions.length; i++) {
     try {
-      await webpush.sendNotification(subscriptions[i], payload);
+      await webpush.sendNotification(webSubscriptions[i], payload);
     } catch (err) {
       if (err.statusCode === 404 || err.statusCode === 410) dead.push(i);
-      else console.warn('[push] envoi échoué:', err.message);
+      else console.warn('[push] web:', err.message);
     }
   }
 
   if (dead.length) {
-    subscriptions = subscriptions.filter((_, i) => !dead.includes(i));
-    saveSubs();
+    webSubscriptions = webSubscriptions.filter((_, i) => !dead.includes(i));
+    saveWebSubs();
   }
+}
+
+async function sendExpoPush(token, title, body) {
+  const res = await fetch('https://exp.host/--/api/v2/push/send', {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      to: token,
+      title,
+      body,
+      sound: 'default',
+      priority: 'high',
+      channelId: 'trades',
+    }),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Expo push ${res.status}: ${text}`);
+  }
+}
+
+async function sendFcmPush(token, title, body) {
+  const key = process.env.FCM_SERVER_KEY;
+  if (!key) {
+    console.warn('[push] FCM_SERVER_KEY manquant — skip FCM');
+    return;
+  }
+  const res = await fetch('https://fcm.googleapis.com/fcm/send', {
+    method: 'POST',
+    headers: {
+      Authorization: `key=${key}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      to: token,
+      priority: 'high',
+      notification: { title, body, sound: 'default', channel_id: 'trades' },
+    }),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`FCM ${res.status}: ${text}`);
+  }
+}
+
+async function sendMobilePush(title, body) {
+  const dead = [];
+
+  for (let i = 0; i < mobileTokens.length; i++) {
+    const entry = mobileTokens[i];
+    try {
+      if (entry.type === 'expo') {
+        await sendExpoPush(entry.token, title, body);
+      } else if (entry.type === 'fcm') {
+        await sendFcmPush(entry.token, title, body);
+      }
+    } catch (err) {
+      console.warn('[push] mobile:', entry.type, err.message);
+      if (
+        String(err.message).includes('DeviceNotRegistered') ||
+        String(err.message).includes('NotRegistered')
+      ) {
+        dead.push(i);
+      }
+    }
+  }
+
+  if (dead.length) {
+    mobileTokens = mobileTokens.filter((_, i) => !dead.includes(i));
+    saveMobileTokens();
+  }
+}
+
+async function notifyAll(title, body) {
+  await Promise.all([sendWebPush(title, body), sendMobilePush(title, body)]);
 }
 
 async function pollPositions() {
   try {
-    const coins = await fetchOpenCoins();
-    const current = new Set(coins);
+    const [positions, fills] = await Promise.all([
+      fetchOpenPositions(),
+      fetchFills(),
+    ]);
+    const currentCoins = positions.map((p) => p.coin);
+    const currentSet = new Set(currentCoins);
 
-    for (const coin of coins) {
-      if (!lastCoins.has(coin)) {
-        await notifyAll(
-          `A&T · ${coin}`,
-          'Nouvelle position ouverte sur Hyperliquid.'
-        );
-        console.log('[push] Nouvelle position:', coin);
+    if (!state.initialized) {
+      state = { initialized: true, coins: currentCoins };
+      saveState();
+      console.log('[push] État initial:', currentCoins.join(', ') || '(aucune)');
+      return;
+    }
+
+    const prevSet = new Set(state.coins);
+
+    for (const p of positions) {
+      if (!prevSet.has(p.coin)) {
+        const side = p.isLong ? 'LONG' : 'SHORT';
+        const title = `${BRAND} · ${p.coin}`;
+        const body = `Position ${side} ouverte.`;
+        await notifyAll(title, body);
+        console.log('[push] Ouverture:', p.coin, side);
       }
     }
 
-    lastCoins = current;
+    for (const coin of state.coins) {
+      if (!currentSet.has(coin)) {
+        const net = closePnlFromFills(fills, coin);
+        const label = net >= 0 ? 'Gain' : 'Perte';
+        const title = `${BRAND} · ${coin}`;
+        const body = `Position fermée · ${label} ${formatUsd(net)}`;
+        await notifyAll(title, body);
+        console.log('[push] Fermeture:', coin, body);
+      }
+    }
+
+    state.coins = currentCoins;
+    saveState();
   } catch (e) {
     console.warn('[push] poll:', e.message);
   }
@@ -121,23 +278,47 @@ export function mountPushRoutes(app, express) {
       res.status(400).json({ error: 'Subscription invalide' });
       return;
     }
-    const exists = subscriptions.some((s) => s.endpoint === sub.endpoint);
+    const exists = webSubscriptions.some((s) => s.endpoint === sub.endpoint);
     if (!exists) {
-      subscriptions.push(sub);
-      saveSubs();
+      webSubscriptions.push(sub);
+      saveWebSubs();
     }
     res.status(201).json({ ok: true });
   });
 
+  app.post('/api/push/mobile-subscribe', express.json(), (req, res) => {
+    const { type, token, platform } = req.body ?? {};
+    if (!token || typeof token !== 'string') {
+      res.status(400).json({ error: 'Token invalide' });
+      return;
+    }
+    const kind = type === 'expo' || type === 'fcm' ? type : 'fcm';
+    const entry = { type: kind, token, platform: platform ?? 'unknown' };
+    const idx = mobileTokens.findIndex((t) => t.token === token);
+    if (idx >= 0) mobileTokens[idx] = entry;
+    else mobileTokens.push(entry);
+    saveMobileTokens();
+    console.log('[push] Mobile enregistré:', kind, platform);
+    res.status(201).json({ ok: true, subscribers: mobileTokens.length });
+  });
+
   app.get('/api/push/status', (_req, res) => {
-    res.json({ subscribers: subscriptions.length, tracking: [...lastCoins] });
+    res.json({
+      webSubscribers: webSubscriptions.length,
+      mobileSubscribers: mobileTokens.length,
+      tracking: state.coins,
+      initialized: state.initialized,
+      fcmConfigured: Boolean(process.env.FCM_SERVER_KEY),
+    });
   });
 }
 
 export function startPushPoller() {
   pollPositions();
   setInterval(pollPositions, POLL_MS);
-  console.log(`[push] Surveillance wallet · ${subscriptions.length} abonné(s)`);
+  console.log(
+    `[push] Surveillance HL · web=${webSubscriptions.length} mobile=${mobileTokens.length} · poll ${POLL_MS}ms`
+  );
 }
 
 /** Standalone API server for Vite dev proxy */

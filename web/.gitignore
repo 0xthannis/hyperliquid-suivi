@@ -5,3 +5,5 @@ dist
 *.log
 .vapid.json
 push-subscriptions.json
+expo-push-tokens.json
+push-state.json
