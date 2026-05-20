@@ -1,10 +1,16 @@
 /** @type {import('expo/config').ExpoConfig} */
 module.exports = () => {
   const base = require('./app.json').expo;
+  const android = { ...base.android };
+  if (require('fs').existsSync('./google-services.json')) {
+    android.googleServicesFile = './google-services.json';
+  }
+
   return {
     expo: {
       ...base,
-      version: '1.1.5',
+      version: '1.1.6',
+      android,
       plugins: [
         [
           'expo-notifications',

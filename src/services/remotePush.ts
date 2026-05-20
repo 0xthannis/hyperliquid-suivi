@@ -13,6 +13,20 @@ export type RemotePushResult =
   | { ok: true; kind: 'expo' | 'fcm' }
   | { ok: false; reason: string };
 
+const REASON_LABELS: Record<string, string> = {
+  permission_denied: 'Autorisez les notifications dans les réglages Android.',
+  no_push_token:
+    'Token FCM indisponible. Réinstallez l’APK buildée avec google-services.json (Firebase).',
+};
+
+export function remotePushErrorMessage(reason: string): string {
+  if (REASON_LABELS[reason]) return REASON_LABELS[reason];
+  if (reason.startsWith('server_')) {
+    return `Serveur injoignable (${reason.replace('server_', '')}).`;
+  }
+  return reason;
+}
+
 function pushApiBase(): string {
   const extra = Constants.expoConfig?.extra as
     | { pushApiUrl?: string }
@@ -71,11 +85,6 @@ export async function registerRemotePush(): Promise<RemotePushResult> {
   const resolved = await resolvePushToken();
   if (!resolved) {
     return { ok: false, reason: 'no_push_token' };
-  }
-
-  const stored = await AsyncStorage.getItem(STORAGE_KEY_PUSH_TOKEN);
-  if (stored === `${resolved.type}:${resolved.token}`) {
-    return { ok: true, kind: resolved.type };
   }
 
   const base = pushApiBase().replace(/\/$/, '');

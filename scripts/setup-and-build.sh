@@ -46,10 +46,19 @@ yes | "$SDKMGR" --sdk_root="$SDK_ROOT" --licenses >/dev/null 2>&1 || true
   "build-tools;36.0.0" \
   "ndk;27.1.12297006"
 
-if [ ! -d "$ROOT/android" ]; then
-  echo "→ Prebuild Android…"
-  npx expo prebuild --platform android --no-install
+if [ ! -f "$ROOT/google-services.json" ]; then
+  echo ""
+  echo "❌ google-services.json manquant à la racine du projet."
+  echo "   Firebase Console → ton projet → Ajouter app Android"
+  echo "   Package : com.thanh.suivitrades"
+  echo "   Télécharge google-services.json → place-le ici :"
+  echo "   $ROOT/google-services.json"
+  echo ""
+  exit 1
 fi
+
+echo "→ Prebuild Android (Firebase / google-services)…"
+npx expo prebuild --platform android --no-install
 
 echo "→ Compilation APK release…"
 cd "$ROOT/android"
@@ -61,7 +70,9 @@ if [ ! -f "$APK_SRC" ]; then
   exit 1
 fi
 
-cp "$APK_SRC" "$DIST/Neymo-Trades.apk"
+cp "$APK_SRC" "$DIST/AT-Capital-Terminal-277.apk"
+cp "$APK_SRC" "$ROOT/web/public/AT-Capital-Terminal-277.apk"
 echo ""
-echo "✅ APK prêt : $DIST/Neymo-Trades.apk"
-ls -lh "$DIST/Neymo-Trades.apk"
+echo "✅ APK prêt : $DIST/AT-Capital-Terminal-277.apk"
+echo "✅ APK web  : $ROOT/web/public/AT-Capital-Terminal-277.apk"
+ls -lh "$DIST/AT-Capital-Terminal-277.apk"

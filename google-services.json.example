@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "REMPLACER",
+    "project_id": "votre-projet-firebase",
+    "storage_bucket": "votre-projet-firebase.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:REMPLACER:android:REMPLACER",
+        "android_client_info": {
+          "package_name": "com.thanh.suivitrades"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "REMPLACER_CLE_API_ANDROID"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

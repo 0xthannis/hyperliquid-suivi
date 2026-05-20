@@ -33,6 +33,9 @@ yarn-error.*
 # local env files
 .env*.local
 
+# Firebase Android (télécharger depuis la console, ne pas committer)
+google-services.json
+
 # typescript
 *.tsbuildinfo
 
@@ -45,6 +48,10 @@ yarn-error.*
 
 # web build output
 web/dist/
+
+# macOS desktop (Electron)
+desktop/node_modules/
+desktop/release/
 
 # editor / AI
 .claude/

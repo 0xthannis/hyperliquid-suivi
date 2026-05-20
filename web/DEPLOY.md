@@ -68,12 +68,14 @@ Redéployer le service après avoir ajouté la variable.
 }
 ```
 
-### App Android (APK)
+### App Android (APK) — obligatoire si `mobileSubscribers: 0`
 
-1. Firebase → ajouter app Android, package : `com.thanh.suivitrades`.
-2. Télécharger `google-services.json` → placer dans `android/app/google-services.json`.
-3. Rebuild : `bash scripts/setup-and-build.sh`.
-4. Installer l'APK, ouvrir l'app une fois, autoriser les notifications.
+1. Firebase → **Ajouter une app** → **Android**, package exact : `com.thanh.suivitrades`.
+2. Télécharger **`google-services.json`**.
+3. Le placer à la **racine du repo** : `hyperliquid-suivi/google-services.json` (pas seulement sur Railway).
+4. Rebuild : `bash scripts/setup-and-build.sh`.
+5. Installer l'APK → onglet **À propos** → **Activer les alertes serveur**.
+6. Vérifier `mobileSubscribers` ≥ 1 sur `/api/push/status`.
 
 ## APK Android
 

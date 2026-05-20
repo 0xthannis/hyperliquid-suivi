@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   View,
   Text,
@@ -17,6 +17,10 @@ import {
   hyperliquidExplorerUrl,
 } from '../constants';
 import { truncateWallet } from '../utils/wallet';
+import {
+  registerRemotePush,
+  remotePushErrorMessage,
+} from '../services/remotePush';
 import { colors, spacing, radius } from '../theme';
 
 type Props = {
@@ -25,6 +29,22 @@ type Props = {
 
 export function AboutScreen({ onReplayTour }: Props) {
   const [installing, setInstalling] = useState(false);
+  const [pushStatus, setPushStatus] = useState<string | null>(null);
+  const [pushLoading, setPushLoading] = useState(false);
+
+  const syncServerPush = useCallback(async () => {
+    setPushLoading(true);
+    try {
+      const r = await registerRemotePush();
+      if (r.ok) {
+        setPushStatus(`Alertes serveur actives (${r.kind.toUpperCase()}).`);
+      } else {
+        setPushStatus(remotePushErrorMessage(r.reason));
+      }
+    } finally {
+      setPushLoading(false);
+    }
+  }, []);
 
   async function openApkDownload() {
     setInstalling(true);
@@ -59,12 +79,30 @@ export function AboutScreen({ onReplayTour }: Props) {
         </Text>
       </View>
 
-      <Text style={styles.sectionTitle}>Notifications</Text>
+      <Text style={styles.sectionTitle}>Notifications (app fermée)</Text>
       <Text style={styles.body}>
-        Avec l'app fermée, les alertes ouverture / fermeture sont envoyées par le serveur{' '}
-        {SITE_URL} (toutes les ~25 s). Ouvrez l'app une fois après installation pour
-        l'enregistrement, et désactivez l'économie d'énergie pour A&amp;T CAPITAL.
+        Les alertes passent par {SITE_URL}. Appuyez ci-dessous pour enregistrer ce
+        téléphone sur le serveur.
       </Text>
+      <Pressable
+        style={styles.secondaryBtn}
+        onPress={() => void syncServerPush()}
+        disabled={pushLoading}
+      >
+        <Text style={styles.secondaryBtnText}>
+          {pushLoading ? 'Enregistrement…' : 'Activer les alertes serveur'}
+        </Text>
+      </Pressable>
+      {pushStatus ? (
+        <Text
+          style={[
+            styles.pushStatus,
+            pushStatus.includes('actives') ? styles.pushOk : styles.pushErr,
+          ]}
+        >
+          {pushStatus}
+        </Text>
+      ) : null}
 
       <Text style={styles.sectionTitle}>Le 277</Text>
       <Text style={styles.body}>
@@ -181,4 +219,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
   },
+  pushStatus: { fontSize: 13, marginTop: spacing.sm, lineHeight: 20 },
+  pushOk: { color: colors.green },
+  pushErr: { color: colors.red },
 });
