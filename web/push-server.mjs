@@ -2,6 +2,12 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import webpush from 'web-push';
+import {
+  getFcmProjectId,
+  isFcmConfigured,
+  loadFcmServiceAccount,
+  sendFcmV1,
+} from './fcm-v1.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const VAPID_FILE = path.join(__dirname, '.vapid.json');
@@ -184,27 +190,7 @@ async function sendExpoPush(token, title, body) {
 }
 
 async function sendFcmPush(token, title, body) {
-  const key = process.env.FCM_SERVER_KEY;
-  if (!key) {
-    console.warn('[push] FCM_SERVER_KEY manquant — skip FCM');
-    return;
-  }
-  const res = await fetch('https://fcm.googleapis.com/fcm/send', {
-    method: 'POST',
-    headers: {
-      Authorization: `key=${key}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      to: token,
-      priority: 'high',
-      notification: { title, body, sound: 'default', channel_id: 'trades' },
-    }),
-  });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`FCM ${res.status}: ${text}`);
-  }
+  await sendFcmV1(token, title, body);
 }
 
 async function sendMobilePush(title, body) {
@@ -220,9 +206,12 @@ async function sendMobilePush(title, body) {
       }
     } catch (err) {
       console.warn('[push] mobile:', entry.type, err.message);
+      const msg = String(err.message);
       if (
-        String(err.message).includes('DeviceNotRegistered') ||
-        String(err.message).includes('NotRegistered')
+        msg.includes('DeviceNotRegistered') ||
+        msg.includes('NotRegistered') ||
+        msg.includes('UNREGISTERED') ||
+        msg.includes('NOT_FOUND')
       ) {
         dead.push(i);
       }
@@ -336,16 +325,19 @@ export function mountPushRoutes(app, express) {
       mobileSubscribers: mobileTokens.length,
       tracking: state.coins,
       initialized: state.initialized,
-      fcmConfigured: Boolean(process.env.FCM_SERVER_KEY),
+      fcmConfigured: isFcmConfigured(),
+      fcmMode: isFcmConfigured() ? 'http-v1' : null,
+      fcmProjectId: getFcmProjectId(),
     });
   });
 }
 
 export function startPushPoller() {
+  loadFcmServiceAccount();
   pollPositions();
   setInterval(pollPositions, POLL_MS);
   console.log(
-    `[push] Surveillance HL · web=${webSubscriptions.length} mobile=${mobileTokens.length} · poll ${POLL_MS}ms`
+    `[push] Surveillance HL · web=${webSubscriptions.length} mobile=${mobileTokens.length} · FCM v1=${isFcmConfigured() ? getFcmProjectId() : 'off'} · poll ${POLL_MS}ms`
   );
 }
 

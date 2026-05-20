@@ -28,21 +28,52 @@ Le serveur Express (`server.js` sur Railway) lance automatiquement la surveillan
 - **Web** : abonnement via le navigateur (`/api/push/subscribe`).
 - **Mobile** : l'app s'enregistre au lancement sur `/api/push/mobile-subscribe`.
 
-### Railway — variable obligatoire pour Android (APK)
+### Firebase — API actuelle (HTTP v1)
 
-Dans le service **web** sur Railway, ajouter :
+L'ancienne API (clé serveur `AAAA...`) est **désactivée** chez Google. Il faut un **compte de service** :
 
-| Variable | Description |
-|----------|-------------|
-| `FCM_SERVER_KEY` | Clé serveur Firebase (Cloud Messaging) pour envoyer les notifs quand l'app est **fermée** |
+1. [Firebase Console](https://console.firebase.google.com) → ton projet.
+2. **⚙️ Paramètres du projet** → onglet **Comptes de service**.
+3. **Générer une nouvelle clé privée** → télécharge un fichier `.json`.
+4. Dans [Google Cloud Console](https://console.cloud.google.com) (même projet), vérifie que l'API **Firebase Cloud Messaging** est **activée** (APIs & Services → Bibliothèque).
 
-Sans cette clé, seules les notifs **locales** fonctionnent (app ouverte ou en arrière-plan).
+### Railway — variable obligatoire (Android, app fermée)
 
-Firebase : projet → Paramètres → Cloud Messaging → **Clé serveur** (legacy).
+Dans le service **web** sur Railway → **Variables** :
+
+| Variable | Valeur |
+|----------|--------|
+| `FCM_SERVICE_ACCOUNT_JSON` | **Tout le contenu** du fichier JSON téléchargé, sur **une ligne** (Railway accepte le JSON minifié) |
+
+Exemple (tronqué) :
+
+```json
+{"type":"service_account","project_id":"mon-projet-123","private_key_id":"...","private_key":"-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n","client_email":"firebase-adminsdk-xxx@mon-projet-123.iam.gserviceaccount.com",...}
+```
+
+**Ne pas** utiliser la « clé API Android » affichée dans Paramètres → Général.
+
+Redéployer le service après avoir ajouté la variable.
 
 ### Vérifier
 
-`GET https://atcapital.fr/api/push/status` → `mobileSubscribers`, `fcmConfigured: true`.
+`GET https://atcapital.fr/api/push/status`
+
+```json
+{
+  "fcmConfigured": true,
+  "fcmMode": "http-v1",
+  "fcmProjectId": "mon-projet-123",
+  "mobileSubscribers": 1
+}
+```
+
+### App Android (APK)
+
+1. Firebase → ajouter app Android, package : `com.thanh.suivitrades`.
+2. Télécharger `google-services.json` → placer dans `android/app/google-services.json`.
+3. Rebuild : `bash scripts/setup-and-build.sh`.
+4. Installer l'APK, ouvrir l'app une fois, autoriser les notifications.
 
 ## APK Android
 
@@ -50,12 +81,10 @@ Après `bash scripts/setup-and-build.sh`, l'APK est publiée sur :
 
 - `https://atcapital.fr/AT-Capital-Terminal-277.apk`
 
-Le bandeau mobile du site propose « Ouvrir l'app » ou « Installer l'APK ».
-
 ### App Links (Android)
 
-Fichier `web/public/.well-known/assetlinks.json` : remplacer `REPLACE_WITH_RELEASE_SHA256` par l'empreinte SHA-256 du certificat de signature release (`keytool -list -v -keystore ...`).
+Fichier `web/public/.well-known/assetlinks.json` : remplacer `REPLACE_WITH_RELEASE_SHA256` par l'empreinte SHA-256 du certificat release.
 
 ## Contact
 
-E-mail affiché sur le site : `contact@atcapital.fr` (à configurer chez le registrar / boîte mail).
+E-mail affiché sur le site : `contact@atcapital.fr`
