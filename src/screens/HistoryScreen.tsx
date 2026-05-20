@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -6,11 +6,17 @@ import {
   RefreshControl,
   StyleSheet,
   ActivityIndicator,
+  Pressable,
 } from 'react-native';
 import { HistoryItem } from '../components/HistoryItem';
-import { HistorySummaryCard } from '../components/HistorySummaryCard';
-import { computeHistorySummary, type HistoryEvent } from '../utils/calculations';
-import { colors, spacing } from '../theme';
+import {
+  computeHistorySummary,
+  filterHistoryByDays,
+  formatUsd,
+  type HistoryEvent,
+} from '../utils/calculations';
+import { shareHistoryCsv } from '../utils/exportCsv';
+import { colors, spacing, radius } from '../theme';
 
 type Props = {
   history: HistoryEvent[];
@@ -20,6 +26,8 @@ type Props = {
   onRefresh: () => void;
 };
 
+type PeriodFilter = 7 | 30;
+
 export function HistoryScreen({
   history,
   allTimePnl,
@@ -27,47 +35,123 @@ export function HistoryScreen({
   refreshing,
   onRefresh,
 }: Props) {
-  const summary = computeHistorySummary(history, allTimePnl);
+  const [periodDays, setPeriodDays] = useState<PeriodFilter>(7);
+
+  const filtered = useMemo(
+    () => filterHistoryByDays(history, periodDays),
+    [history, periodDays]
+  );
+
+  const summary = useMemo(
+    () => computeHistorySummary(filtered, allTimePnl),
+    [filtered, allTimePnl]
+  );
+
+  const winRate =
+    summary.closedCount > 0
+      ? Math.round((summary.winCount / summary.closedCount) * 100)
+      : 0;
+
+  const allTimePositive = summary.allTimePnl >= 0;
+  const periodPositive = summary.fillsClosedNet >= 0;
 
   if (loading && history.length === 0) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="small" color={colors.accent} />
+        <ActivityIndicator size="small" color={colors.gold} />
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Historique</Text>
-      <Text style={styles.subtitle}>
-        Le total All Time correspond au portfolio Hyperliquid.
-      </Text>
+      <View style={styles.header}>
+        <View style={styles.topRow}>
+          <View style={styles.periodToggle}>
+            {([7, 30] as const).map((d) => (
+              <Pressable
+                key={d}
+                style={[
+                  styles.periodBtn,
+                  periodDays === d && styles.periodBtnActive,
+                ]}
+                onPress={() => setPeriodDays(d)}
+              >
+                <Text
+                  style={[
+                    styles.periodBtnText,
+                    periodDays === d && styles.periodBtnTextActive,
+                  ]}
+                >
+                  {d}j
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+          {filtered.length > 0 && (
+            <Pressable
+              style={styles.exportBtn}
+              onPress={() => shareHistoryCsv(filtered)}
+            >
+              <Text style={styles.exportBtnText}>CSV</Text>
+            </Pressable>
+          )}
+        </View>
+
+        <View style={styles.statsRow}>
+          <View style={styles.stat}>
+            <Text style={styles.statLabel}>PnL fermé</Text>
+            <Text
+              style={[
+                styles.statValue,
+                { color: allTimePositive ? colors.green : colors.red },
+              ]}
+            >
+              {formatUsd(summary.allTimePnl, true)}
+            </Text>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.stat}>
+            <Text style={styles.statLabel}>{periodDays}j</Text>
+            <Text
+              style={[
+                styles.statValue,
+                { color: periodPositive ? colors.green : colors.red },
+              ]}
+            >
+              {formatUsd(summary.fillsClosedNet, true)}
+            </Text>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.stat}>
+            <Text style={styles.statLabel}>Réussite</Text>
+            <Text style={styles.statValue}>{winRate}%</Text>
+            <Text style={styles.statHint}>
+              {summary.closedCount} op. · {summary.winCount}G/{summary.lossCount}P
+            </Text>
+          </View>
+        </View>
+      </View>
+
       <FlatList
-        data={history}
+        style={styles.list}
+        data={filtered}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => <HistoryItem event={item} />}
-        contentContainerStyle={styles.list}
-        ListHeaderComponent={
-          <>
-            {summary.closedCount > 0 && <HistorySummaryCard summary={summary} />}
-            {history.length > 0 && (
-              <Text style={styles.listTitle}>Détail des opérations</Text>
-            )}
-          </>
-        }
+        contentContainerStyle={styles.listContent}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor={colors.accent}
+            tintColor={colors.gold}
           />
         }
         ListEmptyComponent={
           <View style={styles.empty}>
-            <Text style={styles.emptyTitle}>Pas encore d'historique</Text>
+            <Text style={styles.emptyTitle}>Aucune opération</Text>
             <Text style={styles.emptyText}>
-              Les trades de Neymo apparaîtront ici.
+              Aucun trade sur {periodDays} jours. Essayez 30j ou attendez une
+              nouvelle clôture.
             </Text>
           </View>
         }
@@ -79,28 +163,108 @@ export function HistoryScreen({
 const styles = StyleSheet.create({
   container: { flex: 1 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  title: {
-    color: colors.text,
-    fontSize: 18,
-    fontWeight: '600',
-    marginHorizontal: spacing.lg,
-    marginTop: spacing.sm,
+  header: {
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.xs,
+    paddingBottom: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.cardBorder,
   },
-  subtitle: {
-    color: colors.textMuted,
-    fontSize: 14,
-    marginHorizontal: spacing.lg,
-    marginBottom: spacing.md,
-    lineHeight: 20,
-  },
-  list: { paddingHorizontal: spacing.lg, paddingBottom: 80 },
-  listTitle: {
-    color: colors.textMuted,
-    fontSize: 12,
-    fontWeight: '600',
+  topRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: spacing.sm,
   },
-  empty: { alignItems: 'center', paddingTop: 48 },
-  emptyTitle: { color: colors.text, fontSize: 16, fontWeight: '500' },
-  emptyText: { color: colors.textMuted, fontSize: 14, marginTop: spacing.sm, textAlign: 'center' },
+  periodToggle: {
+    flexDirection: 'row',
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
+    borderRadius: radius.sm,
+    overflow: 'hidden',
+  },
+  periodBtn: {
+    paddingVertical: 6,
+    paddingHorizontal: spacing.md,
+    backgroundColor: colors.card,
+  },
+  periodBtnActive: {
+    backgroundColor: colors.accentMuted,
+  },
+  periodBtnText: {
+    color: colors.textMuted,
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  periodBtnTextActive: { color: colors.goldLight },
+  exportBtn: {
+    paddingVertical: 6,
+    paddingHorizontal: spacing.sm,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
+    borderRadius: radius.sm,
+    backgroundColor: colors.card,
+  },
+  exportBtnText: {
+    color: colors.goldLight,
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+  },
+  statsRow: {
+    flexDirection: 'row',
+    alignItems: 'stretch',
+    backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
+    borderRadius: radius.sm,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.sm,
+  },
+  stat: { flex: 1, alignItems: 'center' },
+  statDivider: {
+    width: 1,
+    backgroundColor: colors.cardBorder,
+    marginVertical: 2,
+  },
+  statLabel: {
+    color: colors.textMuted,
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
+  },
+  statValue: {
+    color: colors.text,
+    fontSize: 15,
+    fontWeight: '600',
+    marginTop: 2,
+    fontVariant: ['tabular-nums'],
+  },
+  statHint: {
+    color: colors.textMuted,
+    fontSize: 9,
+    marginTop: 1,
+    fontVariant: ['tabular-nums'],
+  },
+  list: { flex: 1 },
+  listContent: {
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.sm,
+    paddingBottom: 96,
+    flexGrow: 1,
+  },
+  empty: {
+    alignItems: 'center',
+    paddingTop: 40,
+    paddingHorizontal: spacing.lg,
+  },
+  emptyTitle: { color: colors.text, fontSize: 15, fontWeight: '500' },
+  emptyText: {
+    color: colors.textMuted,
+    fontSize: 13,
+    marginTop: spacing.xs,
+    textAlign: 'center',
+    lineHeight: 20,
+  },
 });
