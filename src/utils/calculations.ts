@@ -10,22 +10,48 @@ export function pnlAtPrice(
   return (entryPx - exitPrice) * size;
 }
 
+function isTakeProfitOrder(o: TpSlOrder): boolean {
+  return o.orderType.toLowerCase().includes('take profit');
+}
+
+function isStopLossOrder(o: TpSlOrder): boolean {
+  const t = o.orderType.toLowerCase();
+  return t.includes('stop') && !t.includes('take profit');
+}
+
+/** Préfère l'ordre lié à la position (celui créé quand le TP est ajouté après le SL) */
+function pickTpSlOrder(matches: TpSlOrder[]): TpSlOrder | null {
+  if (matches.length === 0) return null;
+  return matches.find((o) => o.isPositionTpsl) ?? matches[0];
+}
+
 export function findTpSlForCoin(
   orders: TpSlOrder[],
   coin: string
 ): { stopLoss: TpSlOrder | null; takeProfit: TpSlOrder | null } {
   const forCoin = orders.filter((o) => o.coin === coin);
-  const stopLoss =
-    forCoin.find((o) => o.orderType.toLowerCase().includes('stop')) ?? null;
-  const takeProfit =
-    forCoin.find((o) => o.orderType.toLowerCase().includes('take profit')) ??
-    null;
-  return { stopLoss, takeProfit };
+  return {
+    stopLoss: pickTpSlOrder(forCoin.filter(isStopLossOrder)),
+    takeProfit: pickTpSlOrder(forCoin.filter(isTakeProfitOrder)),
+  };
 }
 
 /** PnL net d'une opération : gain/perte du trade − frais payés */
 export function computeNetPnlFromFill(closedPnl: number, fee: number): number {
   return closedPnl - fee;
+}
+
+/** Hyperliquid renvoie parfois des secondes, parfois des millisecondes */
+export function normalizeEventTimeMs(time: number): number {
+  return time > 1e12 ? time : time * 1000;
+}
+
+export function filterHistoryByDays(
+  events: HistoryEvent[],
+  days: 7 | 30
+): HistoryEvent[] {
+  const since = Date.now() - days * 24 * 60 * 60 * 1000;
+  return events.filter((e) => normalizeEventTimeMs(e.time) >= since);
 }
 
 export function formatUsd(value: number, signed = false): string {
@@ -202,8 +228,10 @@ export function computePeriodStats(events: HistoryEvent[]): PeriodStats {
   const weekStart = now - 7 * 24 * 60 * 60 * 1000;
 
   const closed = events.filter((e) => e.isClose);
-  const today = closed.filter((e) => e.time >= dayStart.getTime());
-  const week = closed.filter((e) => e.time >= weekStart);
+  const today = closed.filter(
+    (e) => normalizeEventTimeMs(e.time) >= dayStart.getTime()
+  );
+  const week = closed.filter((e) => normalizeEventTimeMs(e.time) >= weekStart);
 
   const winRate = (arr: HistoryEvent[]) => {
     if (arr.length === 0) return 0;
@@ -284,9 +312,9 @@ export function computeHistorySummary(
 }
 
 function simplifyDir(dir: string): string {
-  if (dir.includes('Open Long')) return 'Nouvelle position (hausse)';
-  if (dir.includes('Open Short')) return 'Nouvelle position (baisse)';
-  if (dir.includes('Close Long')) return 'Position fermée (hausse)';
-  if (dir.includes('Close Short')) return 'Position fermée (baisse)';
+  if (dir.includes('Open Long')) return 'Ouverture long';
+  if (dir.includes('Open Short')) return 'Ouverture short';
+  if (dir.includes('Close Long')) return 'Clôture long';
+  if (dir.includes('Close Short')) return 'Clôture short';
   return dir;
 }

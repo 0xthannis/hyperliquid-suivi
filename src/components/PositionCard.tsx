@@ -9,8 +9,10 @@ import {
   pnlPercent,
   computeTargetProgress,
 } from '../utils/calculations';
+import { computeExitMetrics, formatRiskReward } from '../utils/riskMetrics';
+import { TermLabel } from './TermLabel';
 import { TargetProgressBar } from './ui/TargetProgressBar';
-import { colors, spacing } from '../theme';
+import { colors, spacing, radius, typography } from '../theme';
 
 type Props = {
   position: AssetPosition;
@@ -28,6 +30,12 @@ export function PositionCard({ position, orders, currentPrice }: Props) {
 
   const lossAtSl = stopLoss ? pnlAtPrice(position, stopLoss.triggerPx) : null;
   const gainAtTp = takeProfit ? pnlAtPrice(position, takeProfit.triggerPx) : null;
+  const exitMetrics = computeExitMetrics(
+    position,
+    price,
+    stopLoss?.triggerPx ?? null,
+    takeProfit?.triggerPx ?? null
+  );
 
   const targetProgress =
     stopLoss && takeProfit
@@ -40,24 +48,31 @@ export function PositionCard({ position, orders, currentPrice }: Props) {
       : null;
 
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, { borderLeftColor: isLong ? colors.green : colors.red }]}>
       <View style={styles.header}>
-        <Text style={styles.coin}>{coin}</Text>
-        <Text style={styles.leverage}>Levier ×{leverage}</Text>
+        <View style={styles.idRow}>
+          <Text style={styles.coin}>{coin}</Text>
+          <Text style={[styles.sideBadge, { color: isLong ? colors.green : colors.red, borderColor: isLong ? colors.green : colors.red }]}>
+            {isLong ? 'LONG' : 'SHORT'}
+          </Text>
+        </View>
+        <Text style={styles.leverage}>×{leverage}</Text>
       </View>
 
-      <Text style={[styles.direction, { color: isLong ? colors.green : colors.red }]}>
-        {isLong ? 'Neymo est à l\'achat' : 'Neymo est à la vente'}
-      </Text>
-
       <View style={styles.pnlBlock}>
-        <Text style={styles.pnlLabel}>Résultat pour l'instant</Text>
+        <TermLabel term="pnlNonRealise" style={styles.pnlLabel} />
         <Text style={[styles.pnlValue, { color: isWin ? colors.green : colors.red }]}>
           {formatUsd(livePnl, true)}
         </Text>
         <Text style={[styles.pnlPct, { color: isWin ? colors.green : colors.red }]}>
-          {formatPct(pct)} · prix {price.toFixed(4)} $
+          {formatPct(pct)} · Mark {price.toFixed(4)}
         </Text>
+      </View>
+
+      <View style={styles.riskRow}>
+        <RiskChip term="distanceSl" value={exitMetrics.distToSlPct != null ? `${exitMetrics.distToSlPct.toFixed(1)}%` : 'N/A'} />
+        <RiskChip term="distanceTp" value={exitMetrics.distToTpPct != null ? `${exitMetrics.distToTpPct.toFixed(1)}%` : 'N/A'} />
+        <RiskChip term="riskReward" value={formatRiskReward(exitMetrics.riskReward)} />
       </View>
 
       {targetProgress && stopLoss && takeProfit && (
@@ -69,16 +84,16 @@ export function PositionCard({ position, orders, currentPrice }: Props) {
       )}
 
       <View style={styles.infoRow}>
-        <InfoChip label="Prix d'entrée" value={`${entryPx.toFixed(4)} $`} />
-        <InfoChip label="Taille" value={formatUsd(positionValue)} />
+        <InfoChip term="entree" value={`${entryPx.toFixed(4)} $`} />
+        <InfoChip term="notionnel" value={formatUsd(positionValue)} />
       </View>
 
       {(stopLoss || takeProfit) && (
         <View style={styles.scenarioBox}>
-          <Text style={styles.scenarioTitle}>Et si le prix touche…</Text>
+          <Text style={styles.scenarioTitle}>Scénarios de sortie</Text>
           {stopLoss && lossAtSl != null && (
             <ScenarioRow
-              title="Le plancher (stop loss)"
+              title="Stop loss"
               price={stopLoss.triggerPx}
               amount={lossAtSl}
               negative
@@ -86,7 +101,7 @@ export function PositionCard({ position, orders, currentPrice }: Props) {
           )}
           {takeProfit && gainAtTp != null && (
             <ScenarioRow
-              title="L'objectif (take profit)"
+              title="Take profit"
               price={takeProfit.triggerPx}
               amount={gainAtTp}
               negative={false}
@@ -98,10 +113,31 @@ export function PositionCard({ position, orders, currentPrice }: Props) {
   );
 }
 
-function InfoChip({ label, value }: { label: string; value: string }) {
+function RiskChip({
+  term,
+  value,
+}: {
+  term: 'distanceSl' | 'distanceTp' | 'riskReward';
+  value: string;
+}) {
+  return (
+    <View style={styles.riskChip}>
+      <TermLabel term={term} style={styles.chipLabel} />
+      <Text style={styles.chipValue}>{value}</Text>
+    </View>
+  );
+}
+
+function InfoChip({
+  term,
+  value,
+}: {
+  term: 'entree' | 'notionnel';
+  value: string;
+}) {
   return (
     <View style={styles.chip}>
-      <Text style={styles.chipLabel}>{label}</Text>
+      <TermLabel term={term} style={styles.chipLabel} />
       <Text style={styles.chipValue}>{value}</Text>
     </View>
   );
@@ -142,28 +178,52 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
     padding: spacing.lg,
     backgroundColor: colors.card,
-    borderRadius: 8,
+    borderRadius: radius.md,
     borderWidth: 1,
     borderColor: colors.cardBorder,
+    borderLeftWidth: 3,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: spacing.md,
   },
-  coin: { color: colors.text, fontSize: 18, fontWeight: '600' },
-  leverage: { color: colors.textMuted, fontSize: 12 },
-  direction: { fontSize: 13, marginTop: spacing.sm, fontWeight: '500' },
+  idRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  coin: { color: colors.text, fontSize: 18, fontWeight: '700' },
+  sideBadge: {
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 1.2,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderWidth: 1,
+  },
+  leverage: { color: colors.textMuted, fontSize: 14, fontVariant: ['tabular-nums'] },
   pnlBlock: {
     marginTop: spacing.md,
     padding: spacing.md,
     backgroundColor: colors.bgElevated,
-    borderRadius: 8,
+    borderRadius: radius.md,
     alignItems: 'center',
   },
-  pnlLabel: { color: colors.textMuted, fontSize: 12 },
+  pnlLabel: { ...typography.label, fontSize: 11 },
   pnlValue: { fontSize: 28, fontWeight: '600', marginTop: 4, fontVariant: ['tabular-nums'] },
   pnlPct: { fontSize: 14, marginTop: 4, fontVariant: ['tabular-nums'] },
+  riskRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    marginTop: spacing.md,
+    paddingTop: spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: colors.cardBorder,
+  },
+  riskChip: {
+    flex: 1,
+    padding: spacing.sm,
+    backgroundColor: colors.bgElevated,
+    borderRadius: radius.sm,
+  },
   infoRow: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.md },
   chip: {
     flex: 1,

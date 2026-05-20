@@ -19,7 +19,7 @@ function isAndroid(): boolean {
 
 /** Intent Android : ouvre l'app si installée, sinon peut échouer silencieusement */
 function androidIntentUrl(): string {
-  return `intent://atcapital.fr/app#Intent;scheme=https;package=${ANDROID_PACKAGE};S.browser_fallback_url=${encodeURIComponent(APK_DOWNLOAD_URL)};end`;
+  return `intent://${new URL(SITE_URL).host}/app#Intent;scheme=https;package=${ANDROID_PACKAGE};S.browser_fallback_url=${encodeURIComponent(APK_DOWNLOAD_URL)};end`;
 }
 
 export function MobileAppBanner() {

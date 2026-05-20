@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import type { HistoryEvent } from '../utils/calculations';
 import { formatUsd, timeAgo } from '../utils/calculations';
-import { colors, spacing } from '../theme';
+import { colors, spacing, radius } from '../theme';
 
 export function HistoryItem({ event }: { event: HistoryEvent }) {
   const pnlColor =
@@ -30,7 +30,7 @@ export function HistoryItem({ event }: { event: HistoryEvent }) {
 const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.card,
-    borderRadius: 8,
+    borderRadius: radius.md,
     padding: spacing.md,
     marginBottom: spacing.sm,
     borderWidth: 1,

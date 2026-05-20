@@ -1,0 +1,48 @@
+{
+  "name": "at-capital-desktop",
+  "version": "1.1.1",
+  "description": "A&T CAPITAL · Terminal 277 pour macOS",
+  "main": "main.js",
+  "author": "A&T CAPITAL",
+  "scripts": {
+    "start": "electron .",
+    "start:remote": "AT_REMOTE=1 electron .",
+    "dist": "electron-builder --mac --publish never"
+  },
+  "build": {
+    "appId": "fr.atcapital.terminal277",
+    "productName": "Terminal 277",
+    "copyright": "A&T CAPITAL",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": ["main.js", "preload.js"],
+    "extraResources": [
+      {
+        "from": "../web/dist",
+        "to": "web",
+        "filter": ["**/*"]
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.finance",
+      "target": [
+        { "target": "dmg", "arch": ["arm64", "x64"] },
+        { "target": "zip", "arch": ["arm64", "x64"] }
+      ],
+      "icon": "build/icon.icns",
+      "darkModeSupport": true,
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false
+    },
+    "dmg": {
+      "title": "Terminal 277",
+      "backgroundColor": "#060608"
+    }
+  },
+  "devDependencies": {
+    "electron": "^35.0.1",
+    "electron-builder": "^25.1.8"
+  }
+}

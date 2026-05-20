@@ -16,6 +16,8 @@ export type TpSlOrder = {
   orderType: string;
   triggerPx: number;
   size: number;
+  /** Ordre lié à la position (sz souvent 0) — Hyperliquid l'ajoute quand le TP est posé après le SL */
+  isPositionTpsl: boolean;
 };
 
 export type Fill = {
@@ -104,15 +106,15 @@ export async function fetchTpSlOrders(): Promise<TpSlOrder[]> {
   return orders
     .filter(
       (o) =>
-        o.isPositionTpsl === false &&
-        parseFloat(o.sz) > 0 &&
-        (o.orderType.includes('Stop') || o.orderType.includes('Take Profit'))
+        o.orderType.includes('Stop') || o.orderType.includes('Take Profit')
     )
+    .filter((o) => o.isPositionTpsl === true || parseFloat(o.sz) > 0)
     .map((o) => ({
       coin: o.coin,
       orderType: o.orderType,
       triggerPx: parseFloat(o.triggerPx),
       size: parseFloat(o.sz),
+      isPositionTpsl: o.isPositionTpsl,
     }));
 }
 

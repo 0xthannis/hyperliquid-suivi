@@ -1,17 +1,22 @@
-# Déploiement · atcapital.fr
+# Déploiement · Railway
 
-## Domaine
+## URL de production (sans domaine custom)
 
-- Production : **https://atcapital.fr**
-- Configurer chez le registrar les DNS vers Vercel (ou l'hébergeur choisi).
+- Production : **https://atcapital.up.railway.app**
+- Service Railway : **Root Directory** = `web`
 
-### Vercel
+### Railway
 
-1. Importer le repo GitHub.
-2. **Root Directory** : laisser la racine du repo (le `vercel.json` à la racine build `web/`).
-3. **Domains** : ajouter `atcapital.fr` et `www.atcapital.fr` (redirection www → apex recommandée).
-4. Variables d'environnement optionnelles :
-   - `VITE_TRADER_WALLET` : adresse wallet Hyperliquid à suivre.
+1. Repo GitHub connecté, branche `main`.
+2. **Root Directory** : `web`
+3. Variables :
+   - `FCM_SERVICE_ACCOUNT_JSON` (voir ci-dessous)
+   - `PUSH_DATA_DIR` = `/data/push` + volume monté sur `/data/push` (recommandé)
+   - `VITE_TRADER_WALLET` (optionnel) : adresse wallet Hyperliquid à suivre.
+
+### Domaine custom (plus tard)
+
+Quand `atcapital.fr` sera acheté : ajouter le domaine dans Railway et mettre à jour `SITE_URL` dans `src/constants.ts`, `web/src/constants.ts`, `app.config.js`, `web/index.html`.
 
 ## Build local
 
@@ -59,8 +64,8 @@ Redéployer le service après avoir ajouté la variable.
 
 #### Garder les abonnés après un redeploy (recommandé)
 
-1. Railway → ton service **web** → **Volumes** → **Add Volume**
-2. Mount path : `/data/push`
+1. Vue **Architecture** du projet → **⌘K** (ou Ctrl+K) → taper **volume** → **Create Volume**
+2. Attacher au service **web**, mount path : `/data/push`
 3. Variable : `PUSH_DATA_DIR` = `/data/push`
 4. Redéployer
 
@@ -68,7 +73,7 @@ Sinon : ré-enregistrer le **navigateur** (bouton alertes sur le site) et le **t
 
 ### Vérifier
 
-`GET https://atcapital.fr/api/push/status`
+`GET https://atcapital.up.railway.app/api/push/status`
 
 ```json
 {
@@ -92,7 +97,7 @@ Sinon : ré-enregistrer le **navigateur** (bouton alertes sur le site) et le **t
 
 Après `bash scripts/setup-and-build.sh`, l'APK est publiée sur :
 
-- `https://atcapital.fr/AT-Capital-Terminal-277.apk`
+- `https://atcapital.up.railway.app/AT-Capital-Terminal-277.apk`
 
 ### App Links (Android)
 

@@ -1,19 +1,20 @@
-/** Palette inspirée Hyperliquid — sobre, pro, sans effets « arcade » */
+/** Design system A&T CAPITAL — aligné landing / terminal web */
 export const colors = {
-  bg: '#0B0E11',
-  bgElevated: '#111418',
-  card: '#15191E',
-  cardBorder: 'rgba(151, 163, 175, 0.12)',
-  text: '#F0F4F8',
-  textMuted: '#6B7A8C',
-  textDim: '#4A5568',
-  /** Vert Hyperliquid */
-  accent: '#50D2C1',
-  accentMuted: 'rgba(80, 210, 193, 0.12)',
-  green: '#3DD68C',
-  greenMuted: 'rgba(61, 214, 140, 0.1)',
-  red: '#E5484D',
-  redMuted: 'rgba(229, 72, 77, 0.1)',
+  bg: '#060608',
+  bgElevated: '#0E0E12',
+  card: '#141418',
+  cardBorder: 'rgba(201, 169, 98, 0.14)',
+  text: '#F5F0E6',
+  textMuted: '#B8B4AC',
+  textDim: '#7A7670',
+  accent: '#C9A962',
+  accentMuted: 'rgba(201, 169, 98, 0.12)',
+  gold: '#C9A962',
+  goldLight: '#E8D5A3',
+  green: '#4ADE80',
+  greenMuted: 'rgba(74, 222, 128, 0.1)',
+  red: '#F87171',
+  redMuted: 'rgba(248, 113, 113, 0.1)',
   white: '#FFFFFF',
 };
 
@@ -26,17 +27,25 @@ export const spacing = {
 };
 
 export const radius = {
-  sm: 6,
-  md: 8,
-  lg: 12,
+  sm: 2,
+  md: 4,
+  lg: 6,
   pill: 999,
 };
 
 export const typography = {
+  fontSize: {
+    xs: 12,
+    sm: 14,
+    base: 16,
+    lg: 18,
+    xl: 22,
+    xxl: 28,
+  },
   label: {
     fontSize: 11,
-    fontWeight: '500' as const,
-    letterSpacing: 0.6,
+    fontWeight: '600' as const,
+    letterSpacing: 0.8,
     textTransform: 'uppercase' as const,
     color: colors.textMuted,
   },

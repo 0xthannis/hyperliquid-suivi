@@ -9,7 +9,7 @@ module.exports = () => {
   return {
     expo: {
       ...base,
-      version: '1.1.6',
+      version: '1.1.7',
       android,
       plugins: [
         [
@@ -24,7 +24,8 @@ module.exports = () => {
         'expo-background-fetch',
       ],
       extra: {
-        pushApiUrl: process.env.EXPO_PUBLIC_PUSH_API_URL ?? 'https://atcapital.fr',
+        pushApiUrl:
+          process.env.EXPO_PUBLIC_PUSH_API_URL ?? 'https://atcapital.up.railway.app',
         eas: {
           projectId:
             process.env.EXPO_PUBLIC_EAS_PROJECT_ID ?? base.extra?.eas?.projectId,

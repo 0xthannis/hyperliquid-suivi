@@ -6,11 +6,14 @@ import {
   RefreshControl,
   StyleSheet,
   ActivityIndicator,
+  Pressable,
 } from 'react-native';
 import { PositionCard } from '../components/PositionCard';
+import { TermLabel } from '../components/TermLabel';
 import type { TraderSnapshot } from '../hooks/useTraderData';
 import { formatUsd, pnlAtPrice } from '../utils/calculations';
-import { colors, spacing } from '../theme';
+import { TERMINAL_NAME } from '../constants';
+import { colors, spacing, radius } from '../theme';
 
 type Props = Pick<
   TraderSnapshot,
@@ -23,7 +26,10 @@ type Props = Pick<
   | 'lastUpdate'
   | 'refreshing'
   | 'priceTick'
-> & { onRefresh: () => void };
+> & {
+  onRefresh: () => void;
+  onOpenHistory: () => void;
+};
 
 export function LiveScreen({
   positions,
@@ -36,6 +42,7 @@ export function LiveScreen({
   refreshing,
   priceTick,
   onRefresh,
+  onOpenHistory,
 }: Props) {
   const totalPnl = positions.reduce((s, p) => {
     const px = mids[p.coin];
@@ -46,8 +53,8 @@ export function LiveScreen({
   if (loading && positions.length === 0) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="small" color={colors.accent} />
-        <Text style={styles.loadingText}>Chargement des trades…</Text>
+        <ActivityIndicator size="small" color={colors.gold} />
+        <Text style={styles.loadingText}>Chargement du {TERMINAL_NAME}…</Text>
       </View>
     );
   }
@@ -60,18 +67,18 @@ export function LiveScreen({
         <RefreshControl
           refreshing={refreshing}
           onRefresh={onRefresh}
-          tintColor={colors.accent}
+          tintColor={colors.gold}
         />
       }
     >
       <View style={styles.hero}>
-        <Text style={styles.heroLabel}>Compte Neymo</Text>
+        <TermLabel term="valeurCompte" style={styles.heroLabel} />
         <Text style={styles.heroValue}>{formatUsd(accountValue)}</Text>
-        <Text style={styles.heroSub}>Valeur totale sur Hyperliquid</Text>
+        <Text style={styles.heroSub}>Wallet Hyperliquid suivi</Text>
 
         {positions.length > 0 && (
           <View style={styles.heroPnl}>
-            <Text style={styles.heroPnlLabel}>Tous les trades ouverts</Text>
+            <TermLabel term="pnlNonRealise" style={styles.heroPnlLabel} />
             <Text
               style={[
                 styles.heroPnlValue,
@@ -93,22 +100,29 @@ export function LiveScreen({
       {error ? (
         <View style={styles.errorBox}>
           <Text style={styles.errorText}>{error}</Text>
-          <Text style={styles.errorHint}>Tire vers le bas pour réessayer</Text>
+          <Text style={styles.errorHint}>Tirez vers le bas pour réessayer</Text>
         </View>
       ) : null}
 
       <Text style={styles.sectionTitle}>
         {positions.length === 0
-          ? 'Aucun trade en cours'
-          : `${positions.length} trade${positions.length > 1 ? 's' : ''} en cours`}
+          ? 'Aucune position ouverte'
+          : `${positions.length} position${positions.length > 1 ? 's' : ''} ouverte${positions.length > 1 ? 's' : ''}`}
       </Text>
 
       {positions.length === 0 && !loading ? (
         <View style={styles.empty}>
-          <Text style={styles.emptyTitle}>Rien pour l'instant</Text>
+          <Text style={styles.emptyTitle}>Portefeuille sans exposition</Text>
           <Text style={styles.emptyText}>
-            Dès que Neymo ouvre une position, tu recevras une notification et tu
-            la verras ici.
+            Dès qu'une position s'ouvre sur Hyperliquid, elle apparaît ici avec ses
+            stops et take profits.
+          </Text>
+          <Pressable style={styles.emptyBtn} onPress={onOpenHistory}>
+            <Text style={styles.emptyBtnText}>Voir l'historique</Text>
+          </Pressable>
+          <Text style={styles.emptyHint}>
+            Les notifications indiquent chaque ouverture et chaque fermeture avec le
+            gain ou la perte en $.
           </Text>
         </View>
       ) : (
@@ -135,11 +149,11 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
     padding: spacing.lg,
     backgroundColor: colors.card,
-    borderRadius: 8,
+    borderRadius: radius.md,
     borderWidth: 1,
     borderColor: colors.cardBorder,
   },
-  heroLabel: { color: colors.textMuted, fontSize: 13 },
+  heroLabel: { fontSize: 13 },
   heroValue: {
     color: colors.text,
     fontSize: 32,
@@ -154,7 +168,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: colors.cardBorder,
   },
-  heroPnlLabel: { color: colors.textMuted, fontSize: 12 },
+  heroPnlLabel: { fontSize: 12 },
   heroPnlValue: { fontSize: 22, fontWeight: '600', marginTop: 4, fontVariant: ['tabular-nums'] },
   sync: { color: colors.textDim, fontSize: 11, marginTop: spacing.sm },
   sectionTitle: {
@@ -169,7 +183,7 @@ const styles = StyleSheet.create({
     marginHorizontal: spacing.lg,
     padding: spacing.xl,
     backgroundColor: colors.card,
-    borderRadius: 8,
+    borderRadius: radius.md,
     borderWidth: 1,
     borderColor: colors.cardBorder,
   },
@@ -180,12 +194,32 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
     lineHeight: 22,
   },
+  emptyBtn: {
+    marginTop: spacing.lg,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    backgroundColor: colors.gold,
+    alignSelf: 'flex-start',
+  },
+  emptyBtnText: {
+    color: colors.bg,
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
+  },
+  emptyHint: {
+    color: colors.textDim,
+    fontSize: 12,
+    marginTop: spacing.md,
+    lineHeight: 18,
+  },
   errorBox: {
     marginHorizontal: spacing.lg,
     marginBottom: spacing.sm,
     padding: spacing.md,
     backgroundColor: colors.redMuted,
-    borderRadius: 8,
+    borderRadius: radius.md,
   },
   errorText: { color: colors.red, fontSize: 14, fontWeight: '500' },
   errorHint: { color: colors.textMuted, fontSize: 12, marginTop: 4 },

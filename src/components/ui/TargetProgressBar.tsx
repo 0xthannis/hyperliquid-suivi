@@ -20,8 +20,8 @@ export function TargetProgressBar({ progress, stopLabel, tpLabel }: Props) {
   return (
     <View style={styles.wrap}>
       <View style={styles.labels}>
-        <Text style={styles.sl}>🛑 {stopLabel}</Text>
-        <Text style={styles.tp}>🎯 {tpLabel}</Text>
+        <Text style={styles.sl}>SL {stopLabel}</Text>
+        <Text style={styles.tp}>TP {tpLabel}</Text>
       </View>
       <View style={styles.track}>
         <View
@@ -45,9 +45,8 @@ export function TargetProgressBar({ progress, stopLabel, tpLabel }: Props) {
         />
       </View>
       <Text style={styles.hint}>
-        Le prix est à {pctText} du chemin vers l'objectif
-        {progress.zone === 'danger' &&
-          ` · attention, proche du plancher`}
+        Progression vers le take profit : {pctText}
+        {progress.zone === 'danger' && '. Proximité du stop loss.'}
       </Text>
     </View>
   );

@@ -2,11 +2,12 @@ import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { colors, spacing } from '../theme';
 
-export type TabId = 'live' | 'history';
+export type TabId = 'live' | 'history' | 'about';
 
 const TABS: { id: TabId; label: string }[] = [
-  { id: 'live', label: 'En ce moment' },
+  { id: 'live', label: 'Positions' },
   { id: 'history', label: 'Historique' },
+  { id: 'about', label: 'À propos' },
 ];
 
 export function TabBar({
@@ -51,14 +52,20 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     position: 'relative',
   },
-  label: { color: colors.textMuted, fontSize: 14, fontWeight: '500' },
-  labelActive: { color: colors.text, fontWeight: '600' },
+  label: {
+    color: colors.textMuted,
+    fontSize: 12,
+    fontWeight: '600',
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
+  },
+  labelActive: { color: colors.goldLight, fontWeight: '700' },
   indicator: {
     position: 'absolute',
     bottom: 0,
-    left: '15%',
-    right: '15%',
+    left: 0,
+    right: 0,
     height: 2,
-    backgroundColor: colors.accent,
+    backgroundColor: colors.gold,
   },
 });

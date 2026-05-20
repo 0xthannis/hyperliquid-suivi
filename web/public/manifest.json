@@ -4,7 +4,7 @@
   "description": "Suivi gratuit des positions Hyperliquid · A&T CAPITAL",
   "start_url": "/",
   "scope": "/",
-  "id": "https://atcapital.fr/",
+  "id": "https://atcapital.up.railway.app/",
   "display": "standalone",
   "background_color": "#060608",
   "theme_color": "#c9a962",

@@ -22,7 +22,7 @@ export const NEAR_TP_THRESHOLD = 0.15;
 export const BRAND_NAME = 'A&T CAPITAL';
 export const TERMINAL_NAME = 'Terminal 277';
 export const APP_NAME = BRAND_NAME;
-export const SITE_URL = 'https://atcapital.fr';
+export const SITE_URL = 'https://atcapital.up.railway.app';
 /** API push Railway (surveillance wallet 24/7) */
 export const PUSH_API_BASE = SITE_URL;
 export const CONTACT_EMAIL = 'contact@atcapital.fr';

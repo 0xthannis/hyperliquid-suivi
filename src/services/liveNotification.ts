@@ -3,6 +3,7 @@ import * as Notifications from 'expo-notifications';
 import type { WidgetSnapshot } from './widgetStore';
 import { formatUsd } from '../utils/calculations';
 import { isAppInForeground } from './appForeground';
+import { BRAND_NAME, TERMINAL_NAME } from '../constants';
 
 export const LIVE_NOTIFICATION_ID = 'suivi-thanh-live-ticker';
 
@@ -19,7 +20,7 @@ export async function updateLiveNotification(data: WidgetSnapshot | null) {
   await Notifications.scheduleNotificationAsync({
     identifier: LIVE_NOTIFICATION_ID,
     content: {
-      title: 'Neymo Trades',
+      title: `${BRAND_NAME} · ${TERMINAL_NAME}`,
       body: `${data.openCount} pos. · ${formatUsd(data.openPnl, true)} · Jour ${formatUsd(data.todayNetPnl, true)}`,
       sticky: true,
       priority: Notifications.AndroidNotificationPriority.LOW,

@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import type { HistorySummary } from '../utils/calculations';
 import { formatUsd } from '../utils/calculations';
-import { colors, spacing } from '../theme';
+import { colors, spacing, radius } from '../theme';
 
 export function HistorySummaryCard({ summary }: { summary: HistorySummary }) {
   const positive = summary.allTimePnl >= 0;
@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
     padding: spacing.lg,
     backgroundColor: colors.card,
-    borderRadius: 8,
+    borderRadius: radius.md,
     borderWidth: 1,
     borderColor: colors.cardBorder,
   },

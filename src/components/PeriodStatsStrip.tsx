@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import type { PeriodStats } from '../utils/calculations';
 import { formatUsd } from '../utils/calculations';
-import { colors, spacing, typography } from '../theme';
+import { colors, spacing, typography, radius } from '../theme';
 
 export function PeriodStatsStrip({ stats }: { stats: PeriodStats }) {
   const items = [
@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: spacing.md,
     backgroundColor: colors.card,
-    borderRadius: 8,
+    borderRadius: radius.md,
     borderWidth: 1,
     borderColor: colors.cardBorder,
   },
