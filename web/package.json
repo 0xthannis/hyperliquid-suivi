@@ -4,7 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "concurrently -n push,vite -c cyan,green \"node push-api.mjs\" \"vite\"",
+    "dev:vite": "vite",
+    "push-api": "node push-api.mjs",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "start": "node server.js"
@@ -12,12 +14,15 @@
   "dependencies": {
     "express": "^4.21.2",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "react-router-dom": "^7.6.2",
+    "web-push": "^3.6.7"
   },
   "devDependencies": {
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
     "@vitejs/plugin-react": "^4.3.4",
+    "concurrently": "^9.1.2",
     "typescript": "^5.9.2",
     "vite": "^6.0.7"
   },

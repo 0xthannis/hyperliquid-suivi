@@ -1,0 +1,32 @@
+.brand-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.brand-logo-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.25rem;
+  padding: 0.2rem 0.45rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--bg, #060608);
+  background: var(--gold, #c9a962);
+  border-radius: 3px;
+  line-height: 1.2;
+}
+
+.brand-logo-name {
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--gold-light, #e8d5a3);
+}
+
+.brand-logo--compact .brand-logo-mark {
+  min-width: 1.75rem;
+  font-size: 0.625rem;
+}

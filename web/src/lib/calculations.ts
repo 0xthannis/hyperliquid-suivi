@@ -6,14 +6,26 @@ export function pnlAtPrice(position: AssetPosition, exitPrice: number): number {
   return (entryPx - exitPrice) * size;
 }
 
+function isTakeProfitOrder(o: TpSlOrder): boolean {
+  return o.orderType.toLowerCase().includes('take profit');
+}
+
+function isStopLossOrder(o: TpSlOrder): boolean {
+  const t = o.orderType.toLowerCase();
+  return t.includes('stop') && !t.includes('take profit');
+}
+
+function pickTpSlOrder(matches: TpSlOrder[]): TpSlOrder | null {
+  if (matches.length === 0) return null;
+  return matches.find((o) => o.isPositionTpsl) ?? matches[0];
+}
+
 export function findTpSlForCoin(orders: TpSlOrder[], coin: string) {
   const forCoin = orders.filter((o) => o.coin === coin);
-  const stopLoss =
-    forCoin.find((o) => o.orderType.toLowerCase().includes('stop')) ?? null;
-  const takeProfit =
-    forCoin.find((o) => o.orderType.toLowerCase().includes('take profit')) ??
-    null;
-  return { stopLoss, takeProfit };
+  return {
+    stopLoss: pickTpSlOrder(forCoin.filter(isStopLossOrder)),
+    takeProfit: pickTpSlOrder(forCoin.filter(isTakeProfitOrder)),
+  };
 }
 
 export function formatUsd(value: number, signed = false): string {
@@ -167,10 +179,20 @@ export function computeHistorySummary(
   };
 }
 
+export function formatDateTime(ts: number): string {
+  return new Date(ts).toLocaleString('fr-FR', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
 function simplifyDir(dir: string): string {
-  if (dir.includes('Open Long')) return 'Nouvelle position (hausse)';
-  if (dir.includes('Open Short')) return 'Nouvelle position (baisse)';
-  if (dir.includes('Close Long')) return 'Position fermée (hausse)';
-  if (dir.includes('Close Short')) return 'Position fermée (baisse)';
+  if (dir.includes('Open Long')) return 'Ouverture long';
+  if (dir.includes('Open Short')) return 'Ouverture short';
+  if (dir.includes('Close Long')) return 'Clôture long';
+  if (dir.includes('Close Short')) return 'Clôture short';
   return dir;
 }

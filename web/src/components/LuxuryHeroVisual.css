@@ -1,0 +1,195 @@
+.lux-visual {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  min-height: 380px;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 2px;
+  border: 1px solid rgba(201, 169, 98, 0.25);
+  background: linear-gradient(165deg, #0a0a0c 0%, #121218 40%, #1a1510 100%);
+}
+
+.lux-visual--compact {
+  max-width: 280px;
+  min-height: 220px;
+}
+
+.lux-visual--compact .lux-jet {
+  transform: scale(0.65) translate(20px, -10px);
+}
+
+.lux-glow {
+  position: absolute;
+  top: -20%;
+  right: -10%;
+  width: 70%;
+  height: 60%;
+  background: radial-gradient(ellipse, rgba(201, 169, 98, 0.18) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.lux-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(201, 169, 98, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201, 169, 98, 0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: linear-gradient(180deg, black 20%, transparent 90%);
+}
+
+/* Jet silhouette */
+.lux-jet {
+  position: absolute;
+  top: 18%;
+  right: 8%;
+  width: 200px;
+  height: 60px;
+  animation: jet-glide 6s ease-in-out infinite;
+}
+
+@keyframes jet-glide {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(-12px, 6px);
+  }
+}
+
+.jet-body {
+  position: absolute;
+  width: 140px;
+  height: 22px;
+  background: linear-gradient(90deg, #2a2a32 0%, #4a4a58 50%, #c9a962 100%);
+  border-radius: 4px 20px 20px 4px;
+  top: 20px;
+  left: 30px;
+  box-shadow: 0 4px 24px rgba(201, 169, 98, 0.2);
+}
+
+.jet-wing {
+  position: absolute;
+  width: 55px;
+  height: 8px;
+  background: #3d3d48;
+  top: 32px;
+  left: 70px;
+  transform: skewY(-4deg);
+  border-radius: 2px;
+}
+
+.jet-tail {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-top: 18px solid transparent;
+  border-bottom: 18px solid transparent;
+  border-right: 35px solid #3d3d48;
+  left: 0;
+  top: 14px;
+}
+
+.jet-window {
+  position: absolute;
+  width: 12px;
+  height: 8px;
+  background: rgba(201, 169, 98, 0.6);
+  border-radius: 2px;
+  top: 26px;
+  left: 100px;
+  box-shadow:
+    28px 0 0 rgba(201, 169, 98, 0.4),
+    56px 0 0 rgba(201, 169, 98, 0.25);
+}
+
+.jet-trail {
+  position: absolute;
+  width: 80px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(201, 169, 98, 0.3));
+  left: -60px;
+  top: 30px;
+  animation: trail-pulse 2s ease-in-out infinite;
+}
+
+@keyframes trail-pulse {
+  0%,
+  100% {
+    opacity: 0.3;
+    width: 60px;
+  }
+  50% {
+    opacity: 0.7;
+    width: 90px;
+  }
+}
+
+.lux-metrics {
+  position: absolute;
+  left: 1.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  z-index: 2;
+}
+
+.lux-metric {
+  padding: 0.65rem 0.85rem;
+  background: rgba(10, 10, 12, 0.75);
+  border-left: 2px solid rgba(201, 169, 98, 0.4);
+  backdrop-filter: blur(8px);
+}
+
+.lux-metric--gold {
+  border-left-color: #c9a962;
+  background: rgba(201, 169, 98, 0.08);
+}
+
+.lux-metric-label {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(201, 169, 98, 0.85);
+  margin-bottom: 0.25rem;
+  line-height: 1.3;
+}
+
+.lux-metric-value {
+  font-size: 0.8125rem;
+  color: #f5f0e6;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.lux-skyline {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 1rem;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.6) 0%, transparent 100%);
+}
+
+.building {
+  width: calc(18px + var(--b) * 8px);
+  height: calc(40px + var(--b) * 14px);
+  background: linear-gradient(180deg, #1e1e26 0%, #0d0d10 100%);
+  border-top: 1px solid rgba(201, 169, 98, 0.15);
+  opacity: 0.85;
+}
+
+.building:nth-child(odd) {
+  border-top-color: rgba(201, 169, 98, 0.35);
+}

@@ -1,0 +1,80 @@
+.mobile-app-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 90;
+  padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom));
+  background: var(--card);
+  border-top: 1px solid var(--gold);
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.mobile-app-banner-inner {
+  padding-right: 2rem;
+}
+
+.mobile-app-banner-title {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--gold-light);
+}
+
+.mobile-app-banner-text {
+  margin-top: 0.35rem;
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.mobile-app-banner-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  align-items: center;
+}
+
+.mobile-app-btn {
+  padding: 0.5rem 0.85rem;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 1px solid var(--card-border);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.mobile-app-btn--primary {
+  background: var(--gold);
+  color: var(--bg);
+  border-color: var(--gold);
+}
+
+.mobile-app-link {
+  font-size: var(--text-xs);
+  color: var(--gold);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.mobile-app-dismiss {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.25rem;
+}
+
+@media (min-width: 768px) {
+  .mobile-app-banner {
+    display: none;
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "name": "A&T CAPITAL · Terminal 277",
+  "short_name": "Terminal 277",
+  "description": "Suivi gratuit des positions Hyperliquid · A&T CAPITAL",
+  "start_url": "/",
+  "scope": "/",
+  "id": "https://atcapital.fr/",
+  "display": "standalone",
+  "background_color": "#060608",
+  "theme_color": "#c9a962",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

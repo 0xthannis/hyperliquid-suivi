@@ -7,6 +7,11 @@ import {
   pnlAtPrice,
   pnlPercent,
 } from '../lib/calculations';
+import {
+  computeExitMetrics,
+  formatRiskReward,
+} from '../lib/riskMetrics';
+import { TermLabel } from './TermLabel';
 
 type Props = {
   position: AssetPosition;
@@ -26,6 +31,12 @@ export function PositionCard({ position, orders, currentPrice }: Props) {
 
   const lossAtSl = stopLoss ? pnlAtPrice(position, stopLoss.triggerPx) : null;
   const gainAtTp = takeProfit ? pnlAtPrice(position, takeProfit.triggerPx) : null;
+  const exitMetrics = computeExitMetrics(
+    position,
+    price,
+    stopLoss?.triggerPx ?? null,
+    takeProfit?.triggerPx ?? null
+  );
   const progress =
     stopLoss && takeProfit
       ? computeTargetProgress(position, price, stopLoss.triggerPx, takeProfit.triggerPx)
@@ -38,31 +49,70 @@ export function PositionCard({ position, orders, currentPrice }: Props) {
       : `-${Math.abs(progress.pct).toFixed(0)}%`);
 
   return (
-    <article className="card">
-      <div className="card-header">
-        <span className="card-coin">{coin}</span>
-        <span className="card-leverage">Levier ×{leverage}</span>
+    <article className={`position-card ${isLong ? 'position-card--long' : 'position-card--short'}`}>
+      <div className="position-card-head">
+        <div className="position-card-id">
+          <span className="position-coin">{coin}</span>
+          <span className={`position-side ${isLong ? 'positive' : 'negative'}`}>
+            {isLong ? 'LONG' : 'SHORT'}
+          </span>
+        </div>
+        <span className="position-leverage">×{leverage}</span>
       </div>
 
-      <p className={`direction ${isLong ? 'positive' : 'negative'}`}>
-        {isLong ? "Neymo est à l'achat" : 'Neymo est à la vente'}
-      </p>
+      <div className="position-pnl">
+        <div className="position-pnl-main">
+          <TermLabel term="pnlNonRealise" className="metric-label" />
+          <span className={`position-pnl-value tabular ${isWin ? 'positive' : 'negative'}`}>
+            {formatUsd(livePnl, true)}
+          </span>
+        </div>
+        <div className="position-pnl-meta tabular">
+          <span className={isWin ? 'positive' : 'negative'}>{formatPct(pct)}</span>
+          <span className="position-price">
+            <TermLabel term="mark">Mark</TermLabel> {price.toFixed(4)}
+          </span>
+        </div>
+      </div>
 
-      <div className="pnl-block">
-        <p className="pnl-label">Résultat pour l'instant</p>
-        <p className={`pnl-value tabular ${isWin ? 'positive' : 'negative'}`}>
-          {formatUsd(livePnl, true)}
-        </p>
-        <p className={`pnl-pct tabular ${isWin ? 'positive' : 'negative'}`}>
-          {formatPct(pct)} · prix {price.toFixed(4)} $
-        </p>
+      <div className="position-risk-row">
+        <div className="position-risk-cell">
+          <TermLabel term="entree" className="metric-label" />
+          <span className="position-field-value tabular">{entryPx.toFixed(4)}</span>
+        </div>
+        <div className="position-risk-cell">
+          <TermLabel term="notionnel" className="metric-label" />
+          <span className="position-field-value tabular">{formatUsd(positionValue)}</span>
+        </div>
+        <div className="position-risk-cell">
+          <TermLabel term="distanceSl" className="metric-label" />
+          <span className="position-field-value tabular">
+            {exitMetrics.distToSlPct != null
+              ? `${exitMetrics.distToSlPct.toFixed(0)}%`
+              : 'N/A'}
+          </span>
+        </div>
+        <div className="position-risk-cell">
+          <TermLabel term="distanceTp" className="metric-label" />
+          <span className="position-field-value tabular">
+            {exitMetrics.distToTpPct != null
+              ? `${exitMetrics.distToTpPct.toFixed(0)}%`
+              : 'N/A'}
+          </span>
+        </div>
+        <div className="position-risk-cell">
+          <TermLabel term="riskReward" className="metric-label" />
+          <span className="position-field-value tabular">
+            {formatRiskReward(exitMetrics.riskReward)}
+          </span>
+        </div>
       </div>
 
       {progress && stopLoss && takeProfit && pctText && (
         <div className="progress-wrap">
           <div className="progress-labels">
-            <span className="negative">🛑 {formatUsd(lossAtSl ?? 0, true)}</span>
-            <span className="positive">🎯 {formatUsd(gainAtTp ?? 0, true)}</span>
+            <span className="negative">SL {formatUsd(lossAtSl ?? 0, true)}</span>
+            <span className="positive">TP {formatUsd(gainAtTp ?? 0, true)}</span>
           </div>
           <div className="progress-track">
             <div
@@ -70,7 +120,7 @@ export function PositionCard({ position, orders, currentPrice }: Props) {
               style={{
                 width: `${progress.barPct}%`,
                 background:
-                  progress.zone === 'danger' ? 'var(--red)' : 'var(--accent)',
+                  progress.zone === 'danger' ? 'var(--red)' : 'var(--gold)',
               }}
             />
             <div
@@ -78,51 +128,36 @@ export function PositionCard({ position, orders, currentPrice }: Props) {
               style={{
                 left: `${Math.min(99, Math.max(1, progress.barPct))}%`,
                 background:
-                  progress.zone === 'danger' ? 'var(--red)' : 'var(--accent)',
+                  progress.zone === 'danger' ? 'var(--red)' : 'var(--gold)',
               }}
             />
           </div>
           <p className="progress-hint">
-            Le prix est à {pctText} du chemin vers l'objectif
-            {progress.zone === 'danger' && ' · attention, proche du plancher'}
+            <TermLabel term="progressionTp">Progression vers le TP</TermLabel> : {pctText}
+            {progress.zone === 'danger' && '. Proximité du stop loss.'}
           </p>
         </div>
       )}
 
-      <div className="info-row">
-        <div className="chip">
-          <p className="chip-label">Prix d'entrée</p>
-          <p className="chip-value tabular">{entryPx.toFixed(4)} $</p>
-        </div>
-        <div className="chip">
-          <p className="chip-label">Taille</p>
-          <p className="chip-value tabular">{formatUsd(positionValue)}</p>
-        </div>
-      </div>
-
       {(stopLoss || takeProfit) && (
-        <div className="scenario-box">
-          <p className="scenario-title">Et si le prix touche…</p>
+        <div className="exit-grid">
+          <span className="metric-label exit-grid-title">Sorties</span>
           {stopLoss && lossAtSl != null && (
-            <div className="scenario-row">
+            <div className="exit-row">
               <div>
-                <p className="scenario-label">Le plancher (stop loss)</p>
-                <p className="scenario-price">à {stopLoss.triggerPx.toFixed(4)} $</p>
+                <TermLabel term="stopLoss" className="exit-name" />
+                <span className="exit-trigger tabular">{stopLoss.triggerPx.toFixed(4)}</span>
               </div>
-              <span className="scenario-amount tabular negative">
-                {formatUsd(lossAtSl, true)}
-              </span>
+              <span className="exit-pnl tabular negative">{formatUsd(lossAtSl, true)}</span>
             </div>
           )}
           {takeProfit && gainAtTp != null && (
-            <div className="scenario-row">
+            <div className="exit-row">
               <div>
-                <p className="scenario-label">L'objectif (take profit)</p>
-                <p className="scenario-price">à {takeProfit.triggerPx.toFixed(4)} $</p>
+                <TermLabel term="takeProfit" className="exit-name" />
+                <span className="exit-trigger tabular">{takeProfit.triggerPx.toFixed(4)}</span>
               </div>
-              <span className="scenario-amount tabular positive">
-                {formatUsd(gainAtTp, true)}
-              </span>
+              <span className="exit-pnl tabular positive">{formatUsd(gainAtTp, true)}</span>
             </div>
           )}
         </div>

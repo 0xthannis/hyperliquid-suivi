@@ -1,0 +1,145 @@
+.about {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.about-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.about-back,
+.about-cta {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--text-muted);
+}
+
+.about-cta {
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.about-main {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 3rem 2rem 4rem;
+}
+
+.about-eyebrow {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.about-main h1 {
+  margin-top: 0.75rem;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.about-lead {
+  margin-top: 1.25rem;
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: var(--text-muted);
+}
+
+.about-lead strong {
+  color: var(--text);
+}
+
+.about-block {
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--card-border);
+}
+
+.about-block h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.about-people {
+  display: grid;
+  gap: 1.5rem;
+}
+
+@media (min-width: 600px) {
+  .about-people {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.about-people h3 {
+  font-size: 1.125rem;
+  color: var(--gold-light);
+}
+
+.about-role {
+  margin-top: 0.25rem;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.about-people p:last-child {
+  margin-top: 0.75rem;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.about-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.about-list li {
+  padding-left: 1rem;
+  border-left: 2px solid var(--gold);
+  font-size: var(--text-sm);
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+.about-list--muted li {
+  border-left-color: var(--card-border);
+}
+
+.about-link {
+  color: var(--gold);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.about-link:hover {
+  color: var(--gold-light);
+}
+
+.about-footer-links {
+  margin-top: 3rem;
+  font-size: var(--text-sm);
+}
+
+.about-footer-links a {
+  color: var(--gold);
+  text-decoration: none;
+  font-weight: 600;
+}

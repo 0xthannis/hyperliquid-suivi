@@ -1,6 +1,9 @@
+import { Link } from 'react-router-dom';
 import type { AssetPosition, TpSlOrder } from '../api/hyperliquid';
 import { formatUsd, pnlAtPrice } from '../lib/calculations';
+import { getPushSupport } from '../lib/push';
 import { PositionCard } from './PositionCard';
+import { TermLabel } from './TermLabel';
 
 type Props = {
   positions: AssetPosition[];
@@ -9,7 +12,6 @@ type Props = {
   accountValue: number;
   loading: boolean;
   error: string | null;
-  lastUpdate: Date | null;
   priceTick: number;
 };
 
@@ -20,9 +22,10 @@ export function LiveView({
   accountValue,
   loading,
   error,
-  lastUpdate,
   priceTick,
 }: Props) {
+  const pushState = getPushSupport();
+
   const totalPnl = positions.reduce((s, p) => {
     const px = mids[p.coin];
     return s + (px != null ? pnlAtPrice(p, px) : p.unrealizedPnl);
@@ -30,62 +33,77 @@ export function LiveView({
 
   if (loading && positions.length === 0) {
     return (
-      <div className="loading-screen">
+      <div className="terminal-loading">
         <div className="spinner" />
-        <p>Chargement des trades…</p>
+        <p>Chargement du portefeuille…</p>
       </div>
     );
   }
 
   return (
-    <div className="content">
-      <section className="hero">
-        <p className="hero-label">Compte Neymo</p>
-        <p className="hero-value tabular">{formatUsd(accountValue)}</p>
-        <p className="hero-sub">Valeur totale sur Hyperliquid</p>
+    <div className="terminal-panel">
+      <div className="metrics-row">
+        <div className="metric-panel">
+          <TermLabel term="valeurCompte" className="metric-label" />
+          <span className="metric-value tabular">{formatUsd(accountValue)}</span>
+          <span className="metric-hint">Wallet Hyperliquid suivi</span>
+        </div>
+        <div className="metric-panel">
+          <TermLabel term="pnlOuvert" className="metric-label" />
+          <span
+            className={`metric-value tabular ${positions.length === 0 ? '' : totalPnl >= 0 ? 'positive' : 'negative'}`}
+          >
+            {positions.length === 0 ? 'N/A' : formatUsd(totalPnl, true)}
+          </span>
+          <span className="metric-hint">
+            {positions.length === 0
+              ? 'Aucune position'
+              : `${positions.length} position${positions.length > 1 ? 's' : ''}`}
+          </span>
+        </div>
+      </div>
 
-        {positions.length > 0 && (
-          <div className="hero-pnl">
-            <p className="hero-label">Tous les trades ouverts</p>
-            <p
-              className={`hero-pnl-value tabular ${totalPnl >= 0 ? 'positive' : 'negative'}`}
-            >
-              {formatUsd(totalPnl, true)}
-            </p>
-          </div>
-        )}
+      {error && <div className="terminal-alert">{error}</div>}
 
-        {lastUpdate && (
-          <p className="sync">
-            Mis à jour {lastUpdate.toLocaleTimeString('fr-FR')}
-          </p>
-        )}
-      </section>
-
-      {error && <div className="error-box">{error}</div>}
-
-      <h2 className="section-title">
-        {positions.length === 0
-          ? 'Aucun trade en cours'
-          : `${positions.length} trade${positions.length > 1 ? 's' : ''} en cours`}
-      </h2>
+      <div className="panel-head">
+        <h2 className="panel-title">Positions ouvertes</h2>
+        <span className="panel-badge">{positions.length}</span>
+      </div>
 
       {positions.length === 0 ? (
-        <div className="empty">
-          <h3>Rien pour l'instant</h3>
-          <p>
-            Dès que Neymo ouvre une position, elle apparaît ici en temps réel.
+        <div className="terminal-empty">
+          <p className="terminal-empty-title">Aucune position ouverte</p>
+          <p className="terminal-empty-text">
+            Le wallet suivi n'a pas de position en cours sur Hyperliquid. Dès qu'une
+            position s'ouvre, elle s'affichera ici automatiquement.
           </p>
+          <ul className="terminal-empty-tips">
+            {pushState !== 'unsupported' && pushState !== 'denied' && (
+              <li>
+                Activez les alertes depuis la{' '}
+                <Link to="/">page d'accueil</Link> pour être prévenu à l'ouverture.
+              </li>
+            )}
+            <li>
+              Consultez l'onglet Historique pour les trades déjà fermés.
+            </li>
+            <li>
+              <Link to="/methodology">Méthodologie</Link> : périmètre et source des
+              données.
+            </li>
+          </ul>
         </div>
       ) : (
-        positions.map((p) => (
-          <PositionCard
-            key={`${p.coin}-${priceTick}`}
-            position={p}
-            orders={orders}
-            currentPrice={mids[p.coin]}
-          />
-        ))
+        <div className="position-stack">
+          {positions.map((p) => (
+            <PositionCard
+              key={`${p.coin}-${priceTick}`}
+              position={p}
+              orders={orders}
+              currentPrice={mids[p.coin]}
+            />
+          ))}
+        </div>
       )}
     </div>
   );

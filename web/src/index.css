@@ -1,21 +1,13 @@
-:root {
-  --bg: #0b0e11;
-  --bg-elevated: #111418;
-  --card: #15191e;
-  --card-border: rgba(151, 163, 175, 0.12);
-  --text: #f0f4f8;
-  --text-muted: #6b7a8c;
-  --text-dim: #4a5568;
-  --accent: #50d2c1;
-  --green: #3dd68c;
-  --red: #e5484d;
-  --font: 'Inter', system-ui, -apple-system, sans-serif;
-}
+@import './design-system.css';
 
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+}
+
+html {
+  font-size: 16px;
 }
 
 html,
@@ -26,9 +18,12 @@ body,
 
 body {
   font-family: var(--font);
+  font-size: var(--text-base);
+  line-height: var(--leading);
   background: var(--bg);
   color: var(--text);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 button {
@@ -36,6 +31,14 @@ button {
   cursor: pointer;
   border: none;
   background: none;
+}
+
+a,
+button,
+.terminal-tab,
+.btn,
+.btn-export {
+  transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
 }
 
 .tabular {
