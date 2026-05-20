@@ -2,7 +2,7 @@
   "expo": {
     "name": "A&T CAPITAL",
     "slug": "at-capital-terminal-277",
-    "version": "1.1.4",
+    "version": "1.1.5",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
@@ -31,8 +31,7 @@
         "RECEIVE_BOOT_COMPLETED",
         "VIBRATE",
         "POST_NOTIFICATIONS",
-        "WAKE_LOCK",
-        "FOREGROUND_SERVICE"
+        "WAKE_LOCK"
       ],
       "intentFilters": [
         {

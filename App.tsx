@@ -23,8 +23,6 @@ import { registerBackgroundFetch } from './src/background/positionTask';
 import { scheduleDailyWeeklySummaries } from './src/services/alertEngine';
 import { registerRemotePush } from './src/services/remotePush';
 import {
-  onAppStateChange,
-  setAndroidWatchMode,
   startGlobalPositionMonitoring,
   stopGlobalPositionMonitoring,
 } from './src/services/positionMonitor';
@@ -39,7 +37,12 @@ import {
 import { truncateWallet } from './src/utils/wallet';
 import { colors, spacing, typography } from './src/theme';
 
+const LEGACY_WATCH_NOTIFICATION_ID = 'at-capital-watch-service';
+
 async function setupNotifications() {
+  await Notifications.dismissNotificationAsync(LEGACY_WATCH_NOTIFICATION_ID).catch(
+    () => {}
+  );
   if (Platform.OS === 'android') {
     await Notifications.setNotificationChannelAsync('trades', {
       name: 'A&T CAPITAL · Terminal 277',
@@ -88,15 +91,11 @@ export default function App() {
         console.warn('[remotePush] Enregistrement serveur:', remote.reason);
       }
       await registerBackgroundFetch();
-      if (mounted) {
-        startGlobalPositionMonitoring();
-        await onAppStateChange(AppState.currentState);
-      }
+      if (mounted) startGlobalPositionMonitoring();
     }
     void boot();
 
     const appStateSub = AppState.addEventListener('change', (state) => {
-      void onAppStateChange(state);
       if (state === 'active') {
         void registerRemotePush();
       }
@@ -112,7 +111,9 @@ export default function App() {
       appStateSub.remove();
       linkSub.remove();
       stopGlobalPositionMonitoring();
-      void setAndroidWatchMode(false);
+      void Notifications.dismissNotificationAsync(LEGACY_WATCH_NOTIFICATION_ID).catch(
+        () => {}
+      );
     };
   }, [handleDeepLink]);
 

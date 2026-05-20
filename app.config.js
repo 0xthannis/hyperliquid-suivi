@@ -4,7 +4,7 @@ module.exports = () => {
   return {
     expo: {
       ...base,
-      version: '1.1.4',
+      version: '1.1.5',
       plugins: [
         [
           'expo-notifications',
