@@ -13,6 +13,8 @@ export const STORAGE_KEY_LAST_FILL = '@suivi_thanh_last_fill';
 export const STORAGE_KEY_NOTIFIED_FILLS = '@at_capital_notified_fills';
 export const STORAGE_KEY_SUMMARY_DAY = '@suivi_thanh_summary_day';
 export const STORAGE_KEY_PUSH_TOKEN = '@at_capital_push_token';
+export const STORAGE_KEY_POSITION_EVENTS = '@at_capital_position_events';
+export const STORAGE_KEY_REMOTE_PUSH = '@at_capital_remote_push_active';
 
 export const NEAR_STOP_THRESHOLD = 0.22;
 export const NEAR_TP_THRESHOLD = 0.15;

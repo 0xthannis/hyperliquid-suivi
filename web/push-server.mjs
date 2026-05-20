@@ -16,7 +16,7 @@ const BRAND = 'A&T CAPITAL';
 
 let webSubscriptions = [];
 let mobileTokens = [];
-let state = { initialized: false, coins: [] };
+let state = { initialized: false, coins: [], notified: {} };
 
 function loadJson(file, fallback) {
   try {
@@ -36,8 +36,27 @@ function saveJson(file, data) {
 function loadSubs() {
   webSubscriptions = loadJson(SUBS_FILE, []);
   mobileTokens = loadJson(MOBILE_FILE, []);
-  state = loadJson(STATE_FILE, { initialized: false, coins: [] });
+  state = loadJson(STATE_FILE, { initialized: false, coins: [], notified: {} });
   if (!Array.isArray(state.coins)) state.coins = [];
+  if (!state.notified || typeof state.notified !== 'object') state.notified = {};
+}
+
+const NOTIFY_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
+function shouldServerNotify(type, coin) {
+  const key = `${type}:${coin}`;
+  const last = state.notified[key];
+  if (last != null && Date.now() - last < NOTIFY_TTL_MS) return false;
+  state.notified[key] = Date.now();
+  if (type === 'close') delete state.notified[`open:${coin}`];
+  return true;
+}
+
+function pruneNotified() {
+  const now = Date.now();
+  for (const [k, ts] of Object.entries(state.notified)) {
+    if (now - ts >= NOTIFY_TTL_MS) delete state.notified[k];
+  }
 }
 
 function saveWebSubs() {
@@ -229,17 +248,25 @@ async function pollPositions() {
     const currentCoins = positions.map((p) => p.coin);
     const currentSet = new Set(currentCoins);
 
-    if (!state.initialized) {
-      state = { initialized: true, coins: currentCoins };
+    if (
+      !state.initialized ||
+      (state.coins.length === 0 && currentCoins.length > 0)
+    ) {
+      state.initialized = true;
+      state.coins = currentCoins;
+      for (const coin of currentCoins) {
+        state.notified[`open:${coin}`] = Date.now();
+      }
+      pruneNotified();
       saveState();
-      console.log('[push] État initial:', currentCoins.join(', ') || '(aucune)');
+      console.log('[push] Baseline:', currentCoins.join(', ') || '(aucune)');
       return;
     }
 
     const prevSet = new Set(state.coins);
 
     for (const p of positions) {
-      if (!prevSet.has(p.coin)) {
+      if (!prevSet.has(p.coin) && shouldServerNotify('open', p.coin)) {
         const side = p.isLong ? 'LONG' : 'SHORT';
         const title = `${BRAND} · ${p.coin}`;
         const body = `Position ${side} ouverte.`;
@@ -249,7 +276,7 @@ async function pollPositions() {
     }
 
     for (const coin of state.coins) {
-      if (!currentSet.has(coin)) {
+      if (!currentSet.has(coin) && shouldServerNotify('close', coin)) {
         const net = closePnlFromFills(fills, coin);
         const label = net >= 0 ? 'Gain' : 'Perte';
         const title = `${BRAND} · ${coin}`;
@@ -260,6 +287,7 @@ async function pollPositions() {
     }
 
     state.coins = currentCoins;
+    pruneNotified();
     saveState();
   } catch (e) {
     console.warn('[push] poll:', e.message);

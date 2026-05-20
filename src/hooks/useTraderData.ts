@@ -1,6 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import * as Notifications from 'expo-notifications';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   fetchFills,
   fetchMids,
@@ -14,33 +12,12 @@ import {
 import {
   groupFillsToHistory,
   computePeriodStats,
-  computeNetPnlFromFill,
   type HistoryEvent,
   type PeriodStats,
 } from '../utils/calculations';
-import {
-  MIDS_POLL_MS,
-  POLL_BACKUP_MS,
-  STORAGE_KEY_POSITIONS,
-} from '../constants';
+import { MIDS_POLL_MS, POLL_BACKUP_MS } from '../constants';
 import { hyperliquidSocket } from '../services/hyperliquidSocket';
-import {
-  notifyNewPosition,
-  notifyPositionClosed,
-  scheduleDailyWeeklySummaries,
-} from '../services/alertEngine';
 import { saveWidgetSnapshot, type WidgetSnapshot } from '../services/widgetStore';
-import { fillKey, shouldNotifyFill } from '../services/fillDedup';
-
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-    shouldShowBanner: true,
-    shouldShowList: true,
-  }),
-});
 
 export type TraderSnapshot = {
   positions: AssetPosition[];
@@ -92,8 +69,6 @@ export function useTraderData() {
   const positionsRef = useRef<AssetPosition[]>([]);
   const ordersRef = useRef<TpSlOrder[]>([]);
   const fillsRef = useRef<Fill[]>([]);
-  const knownCoinsRef = useRef<Set<string>>(new Set());
-  const initializedRef = useRef(false);
   const midsRef = useRef<Record<string, number>>({});
   const wsConnectedRef = useRef(false);
   const fillRefreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -116,58 +91,6 @@ export function useTraderData() {
     });
   }, []);
 
-  const checkClosedPositions = useCallback(
-    async (newPositions: AssetPosition[]) => {
-      const prev = positionsRef.current;
-      const newCoins = new Set(newPositions.map((p) => p.coin));
-      for (const p of prev) {
-        if (!newCoins.has(p.coin)) {
-          const lastFill = fillsRef.current.find(
-            (f) => f.coin === p.coin && f.dir.includes('Close')
-          );
-          const net = lastFill
-            ? computeNetPnlFromFill(lastFill.closedPnl, lastFill.fee)
-            : p.unrealizedPnl;
-          await notifyPositionClosed(p.coin, net);
-        }
-      }
-      positionsRef.current = newPositions;
-    },
-    []
-  );
-
-  const checkNewPositions = useCallback(async (positions: AssetPosition[]) => {
-    const currentCoins = positions.map((p) => p.coin);
-    const stored = await AsyncStorage.getItem(STORAGE_KEY_POSITIONS);
-    const previous: string[] = stored ? JSON.parse(stored) : [];
-
-    if (!initializedRef.current && previous.length === 0) {
-      knownCoinsRef.current = new Set(currentCoins);
-      initializedRef.current = true;
-      await AsyncStorage.setItem(
-        STORAGE_KEY_POSITIONS,
-        JSON.stringify(currentCoins)
-      );
-      return;
-    }
-
-    const prevSet = new Set(
-      previous.length ? previous : [...knownCoinsRef.current]
-    );
-    for (const p of positions) {
-      if (!prevSet.has(p.coin)) {
-        await notifyNewPosition(p.coin, p.isLong);
-      }
-    }
-
-    knownCoinsRef.current = new Set(currentCoins);
-    await AsyncStorage.setItem(
-      STORAGE_KEY_POSITIONS,
-      JSON.stringify(currentCoins)
-    );
-    initializedRef.current = true;
-  }, []);
-
   const applySnapshot = useCallback(
     async (
       positions: AssetPosition[],
@@ -179,9 +102,6 @@ export function useTraderData() {
     ) => {
       positionsRef.current = positions;
       hyperliquidSocket.setTrackedCoins(positions.map((p) => p.coin));
-
-      await checkClosedPositions(positions);
-      await checkNewPositions(positions);
 
       const history = groupFillsToHistory(fills);
       const periodStats = computePeriodStats(history);
@@ -218,7 +138,7 @@ export function useTraderData() {
         priceTick: s.priceTick + 1,
       }));
     },
-    [checkClosedPositions, checkNewPositions]
+    []
   );
 
   const fetchAll = useCallback(async () => {
@@ -240,6 +160,28 @@ export function useTraderData() {
       portfolio.perpAllTimePnl
     );
   }, [applySnapshot]);
+
+  const refreshHistoryAndPnl = useCallback(async () => {
+    try {
+      const [fills, portfolio] = await Promise.all([
+        fetchFills(),
+        fetchPortfolioPnl(),
+      ]);
+      fillsRef.current = fills;
+      const history = groupFillsToHistory(fills);
+      const periodStats = computePeriodStats(history);
+      setSnapshot((s) => ({
+        ...s,
+        fills,
+        history,
+        periodStats,
+        allTimePnl: portfolio.perpAllTimePnl,
+        lastUpdate: new Date(),
+      }));
+    } catch {
+      /* silencieux */
+    }
+  }, []);
 
   const refreshMidsOnly = useCallback(async () => {
     const coins = positionsRef.current.map((p) => p.coin);
@@ -293,27 +235,17 @@ export function useTraderData() {
   refreshUserRef.current = refreshUser;
 
   useEffect(() => {
-    scheduleDailyWeeklySummaries();
     refreshSilentRef.current();
 
-    const fullPoll = setInterval(() => refreshSilentRef.current(), POLL_BACKUP_MS);
     const midsPoll = setInterval(() => refreshMidsOnly(), MIDS_POLL_MS);
+    const dataPoll = setInterval(() => refreshHistoryAndPnl(), POLL_BACKUP_MS);
 
     hyperliquidSocket.connect(
       (coin, midPx) => {
         wsConnectedRef.current = true;
         applyMidPrice(coin, midPx);
       },
-      async (fill) => {
-        const key = fillKey(fill.coin, fill.time, fill.dir);
-        if (await shouldNotifyFill(key)) {
-          if (fill.dir.includes('Close')) {
-            const net = computeNetPnlFromFill(fill.closedPnl, fill.fee);
-            await notifyPositionClosed(fill.coin, net);
-          } else if (fill.dir.includes('Open')) {
-            await notifyNewPosition(fill.coin, fill.dir.includes('Long'));
-          }
-        }
+      async (_fill) => {
         if (fillRefreshTimerRef.current) {
           clearTimeout(fillRefreshTimerRef.current);
         }
@@ -328,15 +260,15 @@ export function useTraderData() {
     setSnapshot((s) => ({ ...s, wsConnected: true }));
 
     return () => {
-      clearInterval(fullPoll);
       clearInterval(midsPoll);
+      clearInterval(dataPoll);
       if (fillRefreshTimerRef.current) {
         clearTimeout(fillRefreshTimerRef.current);
       }
       hyperliquidSocket.disconnect();
       wsConnectedRef.current = false;
     };
-  }, [applyMidPrice, refreshMidsOnly]);
+  }, [applyMidPrice, refreshMidsOnly, refreshHistoryAndPnl]);
 
   return {
     ...snapshot,

@@ -3,7 +3,11 @@ import Constants from 'expo-constants';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { PUSH_API_BASE, STORAGE_KEY_PUSH_TOKEN } from '../constants';
+import {
+  PUSH_API_BASE,
+  STORAGE_KEY_PUSH_TOKEN,
+  STORAGE_KEY_REMOTE_PUSH,
+} from '../constants';
 
 export type RemotePushResult =
   | { ok: true; kind: 'expo' | 'fcm' }
@@ -90,9 +94,9 @@ export async function registerRemotePush(): Promise<RemotePushResult> {
     return { ok: false, reason: `server_${res.status}:${text}` };
   }
 
-  await AsyncStorage.setItem(
-    STORAGE_KEY_PUSH_TOKEN,
-    `${resolved.type}:${resolved.token}`
-  );
+  await AsyncStorage.multiSet([
+    [STORAGE_KEY_PUSH_TOKEN, `${resolved.type}:${resolved.token}`],
+    [STORAGE_KEY_REMOTE_PUSH, '1'],
+  ]);
   return { ok: true, kind: resolved.type };
 }

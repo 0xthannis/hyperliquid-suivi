@@ -88,8 +88,10 @@ export default function App() {
         console.warn('[remotePush] Enregistrement serveur:', remote.reason);
       }
       await registerBackgroundFetch();
-      if (mounted) startGlobalPositionMonitoring();
-      if (mounted) await onAppStateChange(AppState.currentState);
+      if (mounted) {
+        startGlobalPositionMonitoring();
+        await onAppStateChange(AppState.currentState);
+      }
     }
     void boot();
 
