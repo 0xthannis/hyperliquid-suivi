@@ -55,6 +55,17 @@ Exemple (tronqué) :
 
 Redéployer le service après avoir ajouté la variable.
 
+**Important :** sans volume disque, Railway **efface** les abonnés (web + mobile) à **chaque redéploiement** → les compteurs repassent à 0. C’est normal.
+
+#### Garder les abonnés après un redeploy (recommandé)
+
+1. Railway → ton service **web** → **Volumes** → **Add Volume**
+2. Mount path : `/data/push`
+3. Variable : `PUSH_DATA_DIR` = `/data/push`
+4. Redéployer
+
+Sinon : ré-enregistrer le **navigateur** (bouton alertes sur le site) et le **téléphone** (À propos → Activer les alertes serveur) après chaque deploy.
+
 ### Vérifier
 
 `GET https://atcapital.fr/api/push/status`

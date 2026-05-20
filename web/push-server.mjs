@@ -10,10 +10,15 @@ import {
 } from './fcm-v1.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const VAPID_FILE = path.join(__dirname, '.vapid.json');
-const SUBS_FILE = path.join(__dirname, 'push-subscriptions.json');
-const MOBILE_FILE = path.join(__dirname, 'expo-push-tokens.json');
-const STATE_FILE = path.join(__dirname, 'push-state.json');
+const DATA_DIR = process.env.PUSH_DATA_DIR
+  ? path.resolve(process.env.PUSH_DATA_DIR)
+  : __dirname;
+fs.mkdirSync(DATA_DIR, { recursive: true });
+
+const VAPID_FILE = path.join(DATA_DIR, '.vapid.json');
+const SUBS_FILE = path.join(DATA_DIR, 'push-subscriptions.json');
+const MOBILE_FILE = path.join(DATA_DIR, 'expo-push-tokens.json');
+const STATE_FILE = path.join(DATA_DIR, 'push-state.json');
 const TRADER_WALLET =
   process.env.VITE_TRADER_WALLET ?? '0x994Ff80b7dA1174a164e0F93121bDfbb68cf7A3F';
 const API_URL = 'https://api.hyperliquid.xyz/info';
@@ -337,7 +342,7 @@ export function startPushPoller() {
   pollPositions();
   setInterval(pollPositions, POLL_MS);
   console.log(
-    `[push] Surveillance HL · web=${webSubscriptions.length} mobile=${mobileTokens.length} · FCM v1=${isFcmConfigured() ? getFcmProjectId() : 'off'} · poll ${POLL_MS}ms`
+    `[push] data=${DATA_DIR} · web=${webSubscriptions.length} mobile=${mobileTokens.length} · FCM=${isFcmConfigured() ? getFcmProjectId() : 'off'} · poll ${POLL_MS}ms`
   );
 }
 

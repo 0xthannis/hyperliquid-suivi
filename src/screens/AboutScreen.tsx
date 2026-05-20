@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -45,6 +45,10 @@ export function AboutScreen({ onReplayTour }: Props) {
       setPushLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    void syncServerPush();
+  }, [syncServerPush]);
 
   async function openApkDownload() {
     setInstalling(true);

@@ -5,6 +5,7 @@ import * as Notifications from 'expo-notifications';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   PUSH_API_BASE,
+  SITE_URL,
   STORAGE_KEY_PUSH_TOKEN,
   STORAGE_KEY_REMOTE_PUSH,
 } from '../constants';
@@ -88,15 +89,26 @@ export async function registerRemotePush(): Promise<RemotePushResult> {
   }
 
   const base = pushApiBase().replace(/\/$/, '');
-  const res = await fetch(`${base}/api/push/mobile-subscribe`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      type: resolved.type,
-      token: resolved.token,
-      platform: Platform.OS,
-    }),
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15_000);
+  let res: Response;
+  try {
+    res = await fetch(`${base}/api/push/mobile-subscribe`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: resolved.type,
+        token: resolved.token,
+        platform: Platform.OS,
+      }),
+      signal: controller.signal,
+    });
+  } catch (e) {
+    clearTimeout(timeout);
+    const msg = e instanceof Error ? e.message : 'network';
+    return { ok: false, reason: `network:${msg}` };
+  }
+  clearTimeout(timeout);
 
   if (!res.ok) {
     const text = await res.text().catch(() => '');

@@ -12,8 +12,12 @@ let serviceAccount = null;
 function parseServiceAccount(raw) {
   if (!raw || typeof raw !== 'string') return null;
   try {
-    const sa = JSON.parse(raw);
-    if (sa?.client_email && sa?.private_key && sa?.project_id) return sa;
+    const sa = JSON.parse(raw.trim());
+    if (!sa?.client_email || !sa?.private_key || !sa?.project_id) return null;
+    if (!sa.private_key.includes('\n')) {
+      sa.private_key = sa.private_key.replace(/\\n/g, '\n');
+    }
+    return sa;
   } catch {
     /* ignore */
   }
