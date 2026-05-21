@@ -53,12 +53,17 @@ export function PnlCardModal({ event, fills, onClose }: Props) {
       }
       await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
 
+      const cardEl = node.querySelector('.pnl-card--export') as HTMLElement | null;
+      const exportHeight = Math.ceil(
+        (cardEl?.scrollHeight ?? node.scrollHeight ?? 500) + 8
+      );
+
       const dataUrl = await toPng(node, {
         pixelRatio: 3,
         cacheBust: true,
         backgroundColor: '#060608',
         width: 360,
-        height: 450,
+        height: exportHeight,
         style: {
           margin: '0',
           transform: 'none',

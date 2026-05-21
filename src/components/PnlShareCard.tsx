@@ -15,7 +15,8 @@ type Props = {
   width?: number;
 };
 
-const CARD_RATIO = 5 / 4;
+/** Ratio plus haut pour éviter de rogner le footer (durée / clôture HL). */
+const CARD_RATIO = 1.58;
 
 function fmtCapital(value: number): string {
   return value > 1e-6 ? formatUsd(value) : '—';
@@ -71,7 +72,7 @@ export function PnlShareCard({ data, width = 360 }: Props) {
         ]}
       />
 
-      <View style={[styles.inner, { padding: s(22) }]}>
+      <View style={[styles.inner, { padding: s(22), paddingBottom: s(28) }]}>
         <View style={styles.header}>
           <View style={[styles.brandBlock, { gap: s(5), minHeight: s(34) }]}>
             <Text style={[styles.brand, { fontSize: s(11), lineHeight: s(14) }]}>
@@ -119,27 +120,26 @@ export function PnlShareCard({ data, width = 360 }: Props) {
           </View>
         </View>
 
-        <View style={[styles.notionalRow, { marginTop: s(10), gap: s(8) }]}>
-          <View style={[styles.notionalCell, { padding: s(10) }]}>
-            <Text style={[styles.cellLabel, { fontSize: s(8) }]}>Capital risqué</Text>
-            <Text style={[styles.cellValueSm, { fontSize: s(12), marginTop: s(3) }]}>
+        <View style={[styles.notionalRow, { marginTop: s(10), gap: s(6) }]}>
+          <View style={[styles.notionalCell, { padding: s(8), minHeight: s(58), gap: s(8) }]}>
+            <Text style={[styles.cellLabel, styles.cellLabelStacked, { fontSize: s(7) }]}>
+              Capital{'\n'}risqué
+            </Text>
+            <Text style={[styles.cellValueSm, { fontSize: s(11) }]}>
               {fmtCapital(data.riskedUsd)}
             </Text>
           </View>
-          <View style={[styles.notionalCell, { padding: s(10) }]}>
-            <Text style={[styles.cellLabel, { fontSize: s(8) }]}>Capital sortie</Text>
-            <Text style={[styles.cellValueSm, { fontSize: s(12), marginTop: s(3) }]}>
+          <View style={[styles.notionalCell, { padding: s(8), minHeight: s(58), gap: s(8) }]}>
+            <Text style={[styles.cellLabel, styles.cellLabelStacked, { fontSize: s(7) }]}>
+              Capital{'\n'}sortie
+            </Text>
+            <Text style={[styles.cellValueSm, { fontSize: s(11) }]}>
               {fmtCapital(data.exitCapitalUsd)}
             </Text>
           </View>
-          <View style={[styles.notionalCell, styles.notionalProfit, { padding: s(10) }]}>
-            <Text style={[styles.cellLabel, { fontSize: s(8) }]}>Profit</Text>
-            <Text
-              style={[
-                styles.cellValueSm,
-                { color: pnlColor, fontSize: s(12), marginTop: s(3) },
-              ]}
-            >
+          <View style={[styles.notionalCell, styles.notionalProfit, { padding: s(8), minHeight: s(58), gap: s(8) }]}>
+            <Text style={[styles.cellLabel, { fontSize: s(7) }]}>Profit</Text>
+            <Text style={[styles.cellValueSm, { color: pnlColor, fontSize: s(11) }]}>
               {formatUsd(data.netPnl, true)}
             </Text>
           </View>
@@ -183,6 +183,7 @@ const styles = StyleSheet.create({
   inner: {
     flex: 1,
     zIndex: 1,
+    justifyContent: 'flex-start',
   },
   border: {
     ...StyleSheet.absoluteFillObject,
@@ -257,10 +258,15 @@ const styles = StyleSheet.create({
   },
   notionalCell: {
     flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
     backgroundColor: 'rgba(20, 20, 24, 0.65)',
     borderRadius: radius.md,
     borderWidth: 1,
     borderColor: colors.cardBorder,
+  },
+  cellLabelStacked: {
+    lineHeight: 13,
   },
   notionalProfit: {
     borderColor: 'rgba(201, 169, 98, 0.25)',

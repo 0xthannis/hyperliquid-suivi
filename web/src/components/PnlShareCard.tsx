@@ -69,11 +69,19 @@ export function PnlShareCard({ data, className = '', forExport = false }: Props)
 
       <div className="pnl-card__notionals">
         <div className="pnl-card__cell pnl-card__cell--sm">
-          <span className="pnl-card__label">Capital risqué</span>
+          <span className="pnl-card__label">
+            Capital
+            <br />
+            risqué
+          </span>
           <span className="pnl-card__value-sm tabular">{fmtCapital(data.riskedUsd)}</span>
         </div>
         <div className="pnl-card__cell pnl-card__cell--sm">
-          <span className="pnl-card__label">Capital sortie</span>
+          <span className="pnl-card__label">
+            Capital
+            <br />
+            sortie
+          </span>
           <span className="pnl-card__value-sm tabular">{fmtCapital(data.exitCapitalUsd)}</span>
         </div>
         <div className="pnl-card__cell pnl-card__cell--sm pnl-card__cell--profit">

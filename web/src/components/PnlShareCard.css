@@ -185,8 +185,27 @@
 }
 
 .pnl-card__cell--sm {
-  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 8px;
+  min-height: 64px;
+  padding: 10px 6px;
   background: rgba(20, 20, 24, 0.65);
+}
+
+.pnl-card__notionals .pnl-card__label {
+  font-size: 7px;
+  line-height: 1.45;
+  min-height: 2.6em;
+  margin: 0;
+}
+
+.pnl-card__notionals .pnl-card__value-sm {
+  margin-top: 0;
+  font-size: 11px;
+  line-height: 1.25;
+  flex-shrink: 0;
 }
 
 .pnl-card__cell--profit {
@@ -279,6 +298,25 @@
 
 .pnl-card--export {
   flex-shrink: 0;
+  width: 360px;
+  height: auto;
+  min-height: 500px;
+  aspect-ratio: unset;
+  overflow: visible;
+}
+
+.pnl-card--export .pnl-card__notionals .pnl-card__cell--sm {
+  min-height: 72px;
+  gap: 10px;
+  padding: 10px 5px;
+}
+
+.pnl-card--export .pnl-card__notionals .pnl-card__label {
+  min-height: 3em;
+}
+
+.pnl-card--export .pnl-card__footer {
+  padding-bottom: 4px;
 }
 
 .pnl-card-export-host {
@@ -286,6 +324,7 @@
   left: -9999px;
   top: 0;
   width: 360px;
+  overflow: visible;
   pointer-events: none;
   opacity: 0;
   z-index: -1;
