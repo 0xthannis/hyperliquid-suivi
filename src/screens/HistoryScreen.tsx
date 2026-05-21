@@ -9,6 +9,8 @@ import {
   Pressable,
 } from 'react-native';
 import { HistoryItem } from '../components/HistoryItem';
+import { PnlCardSheet } from '../components/PnlCardSheet';
+import type { Fill } from '../api/hyperliquid';
 import {
   computeHistorySummary,
   filterHistoryByDays,
@@ -16,10 +18,12 @@ import {
   type HistoryEvent,
 } from '../utils/calculations';
 import { shareHistoryCsv } from '../utils/exportCsv';
+import { historyEventToPnlCard, type PnlCardData } from '../utils/pnlCard';
 import { colors, spacing, radius } from '../theme';
 
 type Props = {
   history: HistoryEvent[];
+  fills: Fill[];
   allTimePnl: number;
   loading: boolean;
   refreshing: boolean;
@@ -30,12 +34,14 @@ type PeriodFilter = 7 | 30;
 
 export function HistoryScreen({
   history,
+  fills,
   allTimePnl,
   loading,
   refreshing,
   onRefresh,
 }: Props) {
   const [periodDays, setPeriodDays] = useState<PeriodFilter>(7);
+  const [pnlCardData, setPnlCardData] = useState<PnlCardData | null>(null);
 
   const filtered = useMemo(
     () => filterHistoryByDays(history, periodDays),
@@ -137,7 +143,19 @@ export function HistoryScreen({
         style={styles.list}
         data={filtered}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <HistoryItem event={item} />}
+        renderItem={({ item }) => (
+          <HistoryItem
+            event={item}
+            onSharePnl={
+              item.isClose
+                ? () => {
+                    const card = historyEventToPnlCard(item, fills);
+                    if (card) setPnlCardData(card);
+                  }
+                : undefined
+            }
+          />
+        )}
         contentContainerStyle={styles.listContent}
         refreshControl={
           <RefreshControl
@@ -155,6 +173,12 @@ export function HistoryScreen({
             </Text>
           </View>
         }
+      />
+
+      <PnlCardSheet
+        visible={pnlCardData != null}
+        data={pnlCardData}
+        onClose={() => setPnlCardData(null)}
       />
     </View>
   );

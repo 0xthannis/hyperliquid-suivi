@@ -9,7 +9,7 @@ module.exports = () => {
   return {
     expo: {
       ...base,
-      version: '1.1.7',
+      version: '1.1.8',
       android,
       plugins: [
         [

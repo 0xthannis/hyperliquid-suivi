@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import type { Fill } from '../api/hyperliquid';
 import {
   computeHistorySummary,
   formatDateTime,
@@ -11,10 +12,14 @@ import {
   computeWeeklySummary,
   formatWeeklySummaryLine,
 } from '../lib/weeklySummary';
+import { historyEventToPnlCard, type PnlCardData } from '../lib/pnlCard';
+import { PnlCardModal } from './PnlCardModal';
 import { TermLabel } from './TermLabel';
+import './PnlShareCard.css';
 
 type Props = {
   history: HistoryEvent[];
+  fills: Fill[];
   allTimePnl: number;
   loading: boolean;
 };
@@ -28,10 +33,16 @@ function filterByPeriod(events: HistoryEvent[], period: PeriodFilter): HistoryEv
   return events.filter((e) => e.time >= since);
 }
 
-export function HistoryView({ history, allTimePnl, loading }: Props) {
+export function HistoryView({ history, fills, allTimePnl, loading }: Props) {
   const [coinFilter, setCoinFilter] = useState<string>('all');
   const [period, setPeriod] = useState<PeriodFilter>('all');
   const [search, setSearch] = useState('');
+  const [pnlCardData, setPnlCardData] = useState<PnlCardData | null>(null);
+
+  function openPnlCard(event: HistoryEvent) {
+    const card = historyEventToPnlCard(event, fills);
+    if (card) setPnlCardData(card);
+  }
 
   const coins = useMemo(() => {
     const set = new Set(history.map((e) => e.coin));
@@ -182,6 +193,7 @@ export function HistoryView({ history, allTimePnl, loading }: Props) {
                   <th>Actif</th>
                   <th>Opération</th>
                   <th className="journal-th-right">PnL net</th>
+                  <th className="journal-th-actions" aria-label="Carte PnL" />
                 </tr>
               </thead>
               <tbody>
@@ -201,6 +213,17 @@ export function HistoryView({ history, allTimePnl, loading }: Props) {
                         <span className="journal-na">N/A</span>
                       )}
                     </td>
+                    <td className="journal-th-actions">
+                      {e.isClose && (
+                        <button
+                          type="button"
+                          className="btn-pnl-card"
+                          onClick={() => openPnlCard(e)}
+                        >
+                          Card
+                        </button>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -217,17 +240,32 @@ export function HistoryView({ history, allTimePnl, loading }: Props) {
                   </div>
                   <p className="journal-label">{e.label}</p>
                 </div>
-                {e.isClose && (
-                  <span
-                    className={`journal-pnl tabular ${e.netPnl >= 0 ? 'positive' : 'negative'}`}
-                  >
-                    {formatUsd(e.netPnl, true)}
-                  </span>
-                )}
+                <div className="journal-row-end">
+                  {e.isClose && (
+                    <>
+                      <span
+                        className={`journal-pnl tabular ${e.netPnl >= 0 ? 'positive' : 'negative'}`}
+                      >
+                        {formatUsd(e.netPnl, true)}
+                      </span>
+                      <button
+                        type="button"
+                        className="btn-pnl-card"
+                        onClick={() => openPnlCard(e)}
+                      >
+                        Card
+                      </button>
+                    </>
+                  )}
+                </div>
               </article>
             ))}
           </div>
         </>
+      )}
+
+      {pnlCardData && (
+        <PnlCardModal data={pnlCardData} onClose={() => setPnlCardData(null)} />
       )}
     </div>
   );

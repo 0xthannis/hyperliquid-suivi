@@ -467,6 +467,19 @@
   background: var(--card);
 }
 
+.journal-row-end {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.journal-th-actions {
+  width: 56px;
+  text-align: right;
+}
+
 .journal-top {
   display: flex;
   align-items: center;

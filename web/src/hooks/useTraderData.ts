@@ -6,6 +6,7 @@ import {
   fetchPositions,
   fetchTpSlOrders,
   type AssetPosition,
+  type Fill,
   type TpSlOrder,
 } from '../api/hyperliquid';
 import { groupFillsToHistory, type HistoryEvent } from '../lib/calculations';
@@ -18,6 +19,7 @@ export function useTraderData() {
   const [mids, setMids] = useState<Record<string, number>>({});
   const [accountValue, setAccountValue] = useState(0);
   const [history, setHistory] = useState<HistoryEvent[]>([]);
+  const [fills, setFills] = useState<Fill[]>([]);
   const [allTimePnl, setAllTimePnl] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -56,6 +58,7 @@ export function useTraderData() {
     setOrders(ord);
     setMids({ ...midsRef.current });
     setAccountValue(av);
+    setFills(fills);
     setHistory(groupFillsToHistory(fills));
     setAllTimePnl(portfolio.perpAllTimePnl);
     setLoading(false);
@@ -114,6 +117,7 @@ export function useTraderData() {
     mids,
     accountValue,
     history,
+    fills,
     allTimePnl,
     loading,
     error,

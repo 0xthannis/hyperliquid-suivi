@@ -71,6 +71,7 @@ export function TradesApp() {
           ) : (
             <HistoryView
               history={data.history}
+              fills={data.fills}
               allTimePnl={data.allTimePnl}
               loading={data.loading}
             />

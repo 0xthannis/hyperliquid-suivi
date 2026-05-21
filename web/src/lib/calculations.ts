@@ -74,7 +74,11 @@ export type HistoryEvent = {
   dir: string;
   label: string;
   time: number;
+  grossPnl: number;
+  totalFees: number;
   netPnl: number;
+  avgPx: number;
+  totalSz: number;
   isClose: boolean;
   isWin: boolean;
 };
@@ -105,6 +109,9 @@ export function groupFillsToHistory(fills: Fill[]): HistoryEvent[] {
       j++;
     }
 
+    const totalSz = batch.reduce((s, x) => s + x.sz, 0);
+    const avgPx =
+      batch.reduce((s, x) => s + x.px * x.sz, 0) / (totalSz || 1);
     const grossPnl = batch.reduce((s, x) => s + x.closedPnl, 0);
     const totalFees = batch.reduce((s, x) => s + x.fee, 0);
     const netPnl = grossPnl - totalFees;
@@ -116,7 +123,11 @@ export function groupFillsToHistory(fills: Fill[]): HistoryEvent[] {
       dir: f.dir,
       label: simplifyDir(f.dir),
       time: f.time,
+      grossPnl,
+      totalFees,
       netPnl,
+      avgPx,
+      totalSz,
       isClose,
       isWin: isClose ? netPnl > 0 : false,
     });

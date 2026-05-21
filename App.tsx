@@ -182,6 +182,7 @@ export default function App() {
           ) : tab === 'history' ? (
             <HistoryScreen
               history={data.history}
+              fills={data.fills}
               allTimePnl={data.allTimePnl}
               loading={data.loading}
               refreshing={data.refreshing}
