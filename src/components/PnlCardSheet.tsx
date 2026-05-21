@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Modal,
   View,
@@ -10,20 +10,46 @@ import {
 } from 'react-native';
 import { captureRef } from 'react-native-view-shot';
 import * as Sharing from 'expo-sharing';
+import type { Fill } from '../api/hyperliquid';
+import type { HistoryEvent } from '../utils/calculations';
 import { PnlShareCard } from './PnlShareCard';
-import type { PnlCardData } from '../utils/pnlCard';
-import { pnlCardFilename } from '../utils/pnlCard';
+import {
+  buildPnlCardData,
+  pnlCardFilename,
+  type PnlCardData,
+} from '../utils/pnlCard';
 import { colors, spacing, radius } from '../theme';
 
 type Props = {
-  visible: boolean;
-  data: PnlCardData | null;
+  event: HistoryEvent | null;
+  fills: Fill[];
   onClose: () => void;
 };
 
-export function PnlCardSheet({ visible, data, onClose }: Props) {
+export function PnlCardSheet({ event, fills, onClose }: Props) {
   const cardRef = useRef<View>(null);
+  const [data, setData] = useState<PnlCardData | null>(null);
+  const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    if (!event?.isClose) {
+      setData(null);
+      return;
+    }
+    let cancelled = false;
+    setLoading(true);
+    buildPnlCardData(event, fills)
+      .then((card) => {
+        if (!cancelled) setData(card);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [event, fills]);
 
   async function shareCard() {
     if (!data || !cardRef.current) return;
@@ -54,11 +80,11 @@ export function PnlCardSheet({ visible, data, onClose }: Props) {
     }
   }
 
-  if (!data) return null;
+  if (!event) return null;
 
   return (
     <Modal
-      visible={visible}
+      visible
       animationType="fade"
       transparent
       onRequestClose={onClose}
@@ -71,16 +97,21 @@ export function PnlCardSheet({ visible, data, onClose }: Props) {
           </Text>
 
           <View style={styles.preview} collapsable={false}>
-            <View ref={cardRef} collapsable={false}>
-              <PnlShareCard data={data} width={320} />
-            </View>
+            {loading && (
+              <ActivityIndicator color={colors.gold} style={styles.loader} />
+            )}
+            {data && (
+              <View ref={cardRef} collapsable={false}>
+                <PnlShareCard data={data} width={320} />
+              </View>
+            )}
           </View>
 
           <View style={styles.actions}>
             <Pressable
-              style={[styles.btn, styles.btnPrimary, busy && styles.btnDisabled]}
+              style={[styles.btn, styles.btnPrimary, (busy || !data) && styles.btnDisabled]}
               onPress={shareCard}
-              disabled={busy}
+              disabled={busy || !data || loading}
             >
               {busy ? (
                 <ActivityIndicator color={colors.bg} size="small" />
@@ -127,7 +158,10 @@ const styles = StyleSheet.create({
   preview: {
     alignItems: 'center',
     marginBottom: spacing.md,
+    minHeight: 200,
+    justifyContent: 'center',
   },
+  loader: { marginVertical: 40 },
   actions: { gap: spacing.sm },
   btn: {
     paddingVertical: 12,

@@ -29,6 +29,24 @@ export type Fill = {
   dir: string;
   closedPnl: number;
   fee: number;
+  hash: string;
+  oid: number;
+  tid: number;
+};
+
+export type HistoricalOrder = {
+  order: {
+    coin: string;
+    side: string;
+    oid: number;
+    timestamp: number;
+    triggerPx: string;
+    isTrigger: boolean;
+    orderType: string;
+    children?: HistoricalOrder['order'][];
+  };
+  status: string;
+  statusTimestamp: number;
 };
 
 type ClearinghouseResponse = {
@@ -171,6 +189,9 @@ export async function fetchFills(): Promise<Fill[]> {
       dir: string;
       closedPnl: string;
       fee: string;
+      hash: string;
+      oid: number;
+      tid: number;
     }>
   >({
     type: 'userFills',
@@ -187,5 +208,32 @@ export async function fetchFills(): Promise<Fill[]> {
     dir: f.dir,
     closedPnl: parseFloat(f.closedPnl),
     fee: parseFloat(f.fee),
+    hash: f.hash,
+    oid: f.oid,
+    tid: f.tid,
   }));
+}
+
+export async function fetchHistoricalOrders(): Promise<HistoricalOrder[]> {
+  return postInfo<HistoricalOrder[]>({
+    type: 'historicalOrders',
+    user: TRADER_WALLET,
+  });
+}
+
+/** Levier cross/isolated actuel sur l'actif (approx. pour cartes PnL). */
+export async function fetchAssetLeverage(
+  coin: string
+): Promise<number | null> {
+  try {
+    const data = await postInfo<{ leverage?: { value?: number } }>({
+      type: 'activeAssetData',
+      user: TRADER_WALLET,
+      coin,
+    });
+    const v = data.leverage?.value;
+    return v != null && v > 0 ? v : null;
+  } catch {
+    return null;
+  }
 }

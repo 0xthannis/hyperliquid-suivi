@@ -12,11 +12,14 @@ import { colors, radius } from '../theme';
 
 type Props = {
   data: PnlCardData;
-  /** Largeur de rendu (preview ou capture haute résolution) */
   width?: number;
 };
 
 const CARD_RATIO = 5 / 4;
+
+function fmtCapital(value: number): string {
+  return value > 1e-6 ? formatUsd(value) : '—';
+}
 
 export function PnlShareCard({ data, width = 360 }: Props) {
   const height = width * CARD_RATIO;
@@ -70,18 +73,23 @@ export function PnlShareCard({ data, width = 360 }: Props) {
 
       <View style={[styles.inner, { padding: s(22) }]}>
         <View style={styles.header}>
-          <View>
-            <Text style={[styles.brand, { fontSize: s(11), letterSpacing: s(1.2) }]}>
+          <View style={[styles.brandBlock, { gap: s(5), minHeight: s(34) }]}>
+            <Text style={[styles.brand, { fontSize: s(11), lineHeight: s(14) }]}>
               {BRAND_NAME}
             </Text>
-            <Text style={[styles.terminal, { fontSize: s(9), marginTop: s(2) }]}>
+            <Text style={[styles.terminal, { fontSize: s(9), lineHeight: s(12) }]}>
               {TERMINAL_NAME}
             </Text>
           </View>
-          <View style={[styles.sidePill, { backgroundColor: sideBg, paddingHorizontal: s(10), paddingVertical: s(4) }]}>
-            <Text style={[styles.sideText, { color: sideColor, fontSize: s(10) }]}>
-              {data.side}
-            </Text>
+          <View style={[styles.badges, { gap: s(5) }]}>
+            <View style={[styles.sidePill, { backgroundColor: sideBg, paddingHorizontal: s(10), paddingVertical: s(4) }]}>
+              <Text style={[styles.sideText, { color: sideColor, fontSize: s(10) }]}>
+                {data.side}
+              </Text>
+            </View>
+            {data.leverage != null && (
+              <Text style={[styles.leverage, { fontSize: s(10) }]}>×{data.leverage}</Text>
+            )}
           </View>
         </View>
 
@@ -113,15 +121,15 @@ export function PnlShareCard({ data, width = 360 }: Props) {
 
         <View style={[styles.notionalRow, { marginTop: s(10), gap: s(8) }]}>
           <View style={[styles.notionalCell, { padding: s(10) }]}>
-            <Text style={[styles.cellLabel, { fontSize: s(8) }]}>Capital entrée</Text>
+            <Text style={[styles.cellLabel, { fontSize: s(8) }]}>Capital risqué</Text>
             <Text style={[styles.cellValueSm, { fontSize: s(12), marginTop: s(3) }]}>
-              {formatUsd(data.notionalEntry)}
+              {fmtCapital(data.riskedUsd)}
             </Text>
           </View>
           <View style={[styles.notionalCell, { padding: s(10) }]}>
             <Text style={[styles.cellLabel, { fontSize: s(8) }]}>Capital sortie</Text>
             <Text style={[styles.cellValueSm, { fontSize: s(12), marginTop: s(3) }]}>
-              {formatUsd(data.notionalExit)}
+              {fmtCapital(data.exitCapitalUsd)}
             </Text>
           </View>
           <View style={[styles.notionalCell, styles.notionalProfit, { padding: s(10) }]}>
@@ -137,13 +145,23 @@ export function PnlShareCard({ data, width = 360 }: Props) {
           </View>
         </View>
 
-        <View style={[styles.footer, { marginTop: s(16) }]}>
-          <Text style={[styles.footerMeta, { fontSize: s(10) }]}>
-            Durée · {data.durationLabel}
-          </Text>
-          <Text style={[styles.footerDate, { fontSize: s(10), marginTop: s(2) }]}>
-            {closedLabel}
-          </Text>
+        <View style={[styles.footer, { marginTop: s(16), paddingTop: s(12) }]}>
+          <View style={styles.footerLeft}>
+            <Text style={[styles.footerMeta, { fontSize: s(10) }]}>
+              Durée · {data.durationLabel}
+            </Text>
+            <Text style={[styles.footerDate, { fontSize: s(10), marginTop: s(2) }]}>
+              {closedLabel}
+            </Text>
+          </View>
+          {data.closeProofLabel ? (
+            <View style={styles.footerRight}>
+              <Text style={[styles.proofLabel, { fontSize: s(8) }]}>Clôture HL</Text>
+              <Text style={[styles.proof, { fontSize: s(9), marginTop: s(2) }]}>
+                {data.closeProofLabel}
+              </Text>
+            </View>
+          ) : null}
         </View>
       </View>
 
@@ -177,6 +195,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-start',
   },
+  brandBlock: {
+    flexDirection: 'column',
+    flexShrink: 0,
+  },
   brand: {
     color: colors.goldLight,
     fontWeight: '700',
@@ -187,6 +209,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     letterSpacing: 0.6,
   },
+  badges: {
+    alignItems: 'flex-end',
+    flexShrink: 0,
+  },
   sidePill: {
     borderRadius: radius.pill,
     borderWidth: 1,
@@ -195,6 +221,10 @@ const styles = StyleSheet.create({
   sideText: {
     fontWeight: '800',
     letterSpacing: 1,
+  },
+  leverage: {
+    color: colors.textMuted,
+    fontWeight: '700',
   },
   coin: {
     color: colors.text,
@@ -252,9 +282,18 @@ const styles = StyleSheet.create({
     fontVariant: ['tabular-nums'],
   },
   footer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
     borderTopWidth: 1,
     borderTopColor: colors.cardBorder,
-    paddingTop: 12,
+  },
+  footerLeft: {
+    flex: 1,
+  },
+  footerRight: {
+    alignItems: 'flex-end',
+    maxWidth: '48%',
   },
   footerMeta: {
     color: colors.textMuted,
@@ -262,5 +301,16 @@ const styles = StyleSheet.create({
   },
   footerDate: {
     color: colors.textDim,
+  },
+  proofLabel: {
+    color: colors.textDim,
+    fontWeight: '700',
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
+  },
+  proof: {
+    color: colors.textMuted,
+    fontWeight: '600',
+    fontVariant: ['tabular-nums'],
   },
 });

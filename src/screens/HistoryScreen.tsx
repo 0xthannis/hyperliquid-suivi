@@ -18,7 +18,6 @@ import {
   type HistoryEvent,
 } from '../utils/calculations';
 import { shareHistoryCsv } from '../utils/exportCsv';
-import { historyEventToPnlCard, type PnlCardData } from '../utils/pnlCard';
 import { colors, spacing, radius } from '../theme';
 
 type Props = {
@@ -41,7 +40,7 @@ export function HistoryScreen({
   onRefresh,
 }: Props) {
   const [periodDays, setPeriodDays] = useState<PeriodFilter>(7);
-  const [pnlCardData, setPnlCardData] = useState<PnlCardData | null>(null);
+  const [pnlCardEvent, setPnlCardEvent] = useState<HistoryEvent | null>(null);
 
   const filtered = useMemo(
     () => filterHistoryByDays(history, periodDays),
@@ -147,12 +146,7 @@ export function HistoryScreen({
           <HistoryItem
             event={item}
             onSharePnl={
-              item.isClose
-                ? () => {
-                    const card = historyEventToPnlCard(item, fills);
-                    if (card) setPnlCardData(card);
-                  }
-                : undefined
+              item.isClose ? () => setPnlCardEvent(item) : undefined
             }
           />
         )}
@@ -175,11 +169,13 @@ export function HistoryScreen({
         }
       />
 
-      <PnlCardSheet
-        visible={pnlCardData != null}
-        data={pnlCardData}
-        onClose={() => setPnlCardData(null)}
-      />
+      {pnlCardEvent && (
+        <PnlCardSheet
+          event={pnlCardEvent}
+          fills={fills}
+          onClose={() => setPnlCardEvent(null)}
+        />
+      )}
     </View>
   );
 }

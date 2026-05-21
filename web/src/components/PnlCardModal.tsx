@@ -1,29 +1,68 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { toPng } from 'html-to-image';
+import type { Fill } from '../api/hyperliquid';
+import type { HistoryEvent } from '../lib/calculations';
 import { PnlShareCard } from './PnlShareCard';
-import { pnlCardFilename, type PnlCardData } from '../lib/pnlCard';
+import {
+  buildPnlCardData,
+  pnlCardFilename,
+  type PnlCardData,
+} from '../lib/pnlCard';
 import './PnlShareCard.css';
 
 type Props = {
-  data: PnlCardData | null;
+  event: HistoryEvent | null;
+  fills: Fill[];
   onClose: () => void;
 };
 
-export function PnlCardModal({ data, onClose }: Props) {
-  const cardRef = useRef<HTMLDivElement>(null);
+export function PnlCardModal({ event, fills, onClose }: Props) {
+  const exportRef = useRef<HTMLDivElement>(null);
+  const [data, setData] = useState<PnlCardData | null>(null);
+  const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState(false);
 
-  if (!data) return null;
+  useEffect(() => {
+    if (!event?.isClose) {
+      setData(null);
+      return;
+    }
+    let cancelled = false;
+    setLoading(true);
+    buildPnlCardData(event, fills)
+      .then((card) => {
+        if (!cancelled) setData(card);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [event, fills]);
+
+  if (!event) return null;
 
   async function downloadCard() {
-    const node = cardRef.current;
+    const node = exportRef.current;
     if (!node || !data) return;
     setBusy(true);
     try {
+      if (document.fonts?.ready) {
+        await document.fonts.ready;
+      }
+      await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+
       const dataUrl = await toPng(node, {
         pixelRatio: 3,
         cacheBust: true,
         backgroundColor: '#060608',
+        width: 360,
+        height: 450,
+        style: {
+          margin: '0',
+          transform: 'none',
+        },
       });
       const a = document.createElement('a');
       a.href = dataUrl;
@@ -53,17 +92,25 @@ export function PnlCardModal({ data, onClose }: Props) {
         </p>
 
         <div className="pnl-card-modal__preview">
-          <div ref={cardRef}>
-            <PnlShareCard data={data} />
-          </div>
+          {loading && <p className="pnl-card-modal__loading">Chargement SL / levier…</p>}
+          {data && <PnlShareCard data={data} />}
         </div>
+
+        {/* Copie hors flux modal pour export PNG fidèle */}
+        {data && (
+          <div className="pnl-card-export-host" aria-hidden>
+            <div ref={exportRef}>
+              <PnlShareCard data={data} forExport />
+            </div>
+          </div>
+        )}
 
         <div className="pnl-card-modal__actions">
           <button
             type="button"
             className="pnl-card-modal__btn pnl-card-modal__btn--primary"
             onClick={downloadCard}
-            disabled={busy}
+            disabled={busy || !data || loading}
           >
             {busy ? 'Génération…' : 'Télécharger PNG'}
           </button>

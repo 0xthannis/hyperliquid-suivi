@@ -12,7 +12,6 @@ import {
   computeWeeklySummary,
   formatWeeklySummaryLine,
 } from '../lib/weeklySummary';
-import { historyEventToPnlCard, type PnlCardData } from '../lib/pnlCard';
 import { PnlCardModal } from './PnlCardModal';
 import { TermLabel } from './TermLabel';
 import './PnlShareCard.css';
@@ -37,12 +36,7 @@ export function HistoryView({ history, fills, allTimePnl, loading }: Props) {
   const [coinFilter, setCoinFilter] = useState<string>('all');
   const [period, setPeriod] = useState<PeriodFilter>('all');
   const [search, setSearch] = useState('');
-  const [pnlCardData, setPnlCardData] = useState<PnlCardData | null>(null);
-
-  function openPnlCard(event: HistoryEvent) {
-    const card = historyEventToPnlCard(event, fills);
-    if (card) setPnlCardData(card);
-  }
+  const [pnlCardEvent, setPnlCardEvent] = useState<HistoryEvent | null>(null);
 
   const coins = useMemo(() => {
     const set = new Set(history.map((e) => e.coin));
@@ -218,7 +212,7 @@ export function HistoryView({ history, fills, allTimePnl, loading }: Props) {
                         <button
                           type="button"
                           className="btn-pnl-card"
-                          onClick={() => openPnlCard(e)}
+                          onClick={() => setPnlCardEvent(e)}
                         >
                           Card
                         </button>
@@ -251,7 +245,7 @@ export function HistoryView({ history, fills, allTimePnl, loading }: Props) {
                       <button
                         type="button"
                         className="btn-pnl-card"
-                        onClick={() => openPnlCard(e)}
+                        onClick={() => setPnlCardEvent(e)}
                       >
                         Card
                       </button>
@@ -264,8 +258,12 @@ export function HistoryView({ history, fills, allTimePnl, loading }: Props) {
         </>
       )}
 
-      {pnlCardData && (
-        <PnlCardModal data={pnlCardData} onClose={() => setPnlCardData(null)} />
+      {pnlCardEvent && (
+        <PnlCardModal
+          event={pnlCardEvent}
+          fills={fills}
+          onClose={() => setPnlCardEvent(null)}
+        />
       )}
     </div>
   );

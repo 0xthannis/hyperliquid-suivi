@@ -10,9 +10,15 @@ import './PnlShareCard.css';
 type Props = {
   data: PnlCardData;
   className?: string;
+  /** Carte dédiée à l'export PNG (layout figé) */
+  forExport?: boolean;
 };
 
-export function PnlShareCard({ data, className = '' }: Props) {
+function fmtCapital(value: number): string {
+  return value > 1e-6 ? formatUsd(value) : '—';
+}
+
+export function PnlShareCard({ data, className = '', forExport = false }: Props) {
   const pnlClass = data.isWin ? 'pnl-card--win' : 'pnl-card--loss';
   const sideClass = data.side === 'LONG' ? 'pnl-card__side--long' : 'pnl-card__side--short';
 
@@ -24,18 +30,23 @@ export function PnlShareCard({ data, className = '' }: Props) {
 
   return (
     <article
-      className={`pnl-card ${pnlClass} ${className}`.trim()}
+      className={`pnl-card ${pnlClass} ${forExport ? 'pnl-card--export' : ''} ${className}`.trim()}
       aria-label={`Carte PnL ${data.coin} ${data.side}`}
     >
       <div className="pnl-card__glow pnl-card__glow--pnl" aria-hidden />
       <div className="pnl-card__glow pnl-card__glow--gold" aria-hidden />
 
       <header className="pnl-card__header">
-        <div>
+        <div className="pnl-card__brand-block">
           <p className="pnl-card__brand">{BRAND_NAME}</p>
           <p className="pnl-card__terminal">{TERMINAL_NAME}</p>
         </div>
-        <span className={`pnl-card__side ${sideClass}`}>{data.side}</span>
+        <div className="pnl-card__badges">
+          <span className={`pnl-card__side ${sideClass}`}>{data.side}</span>
+          {data.leverage != null && (
+            <span className="pnl-card__leverage">×{data.leverage}</span>
+          )}
+        </div>
       </header>
 
       <h2 className="pnl-card__coin">{data.coin}</h2>
@@ -58,12 +69,12 @@ export function PnlShareCard({ data, className = '' }: Props) {
 
       <div className="pnl-card__notionals">
         <div className="pnl-card__cell pnl-card__cell--sm">
-          <span className="pnl-card__label">Capital entrée</span>
-          <span className="pnl-card__value-sm tabular">{formatUsd(data.notionalEntry)}</span>
+          <span className="pnl-card__label">Capital risqué</span>
+          <span className="pnl-card__value-sm tabular">{fmtCapital(data.riskedUsd)}</span>
         </div>
         <div className="pnl-card__cell pnl-card__cell--sm">
           <span className="pnl-card__label">Capital sortie</span>
-          <span className="pnl-card__value-sm tabular">{formatUsd(data.notionalExit)}</span>
+          <span className="pnl-card__value-sm tabular">{fmtCapital(data.exitCapitalUsd)}</span>
         </div>
         <div className="pnl-card__cell pnl-card__cell--sm pnl-card__cell--profit">
           <span className="pnl-card__label">Profit</span>
@@ -74,8 +85,16 @@ export function PnlShareCard({ data, className = '' }: Props) {
       </div>
 
       <footer className="pnl-card__footer">
-        <p className="pnl-card__meta">Durée · {data.durationLabel}</p>
-        <p className="pnl-card__date">{closedLabel}</p>
+        <div className="pnl-card__footer-left">
+          <p className="pnl-card__meta">Durée · {data.durationLabel}</p>
+          <p className="pnl-card__date">{closedLabel}</p>
+        </div>
+        {data.closeProofLabel && (
+          <div className="pnl-card__footer-right">
+            <p className="pnl-card__proof-label">Clôture HL</p>
+            <p className="pnl-card__proof tabular">{data.closeProofLabel}</p>
+          </div>
+        )}
       </footer>
     </article>
   );
