@@ -14,7 +14,7 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   color: var(--bg, #060608);
-  background: var(--gold, #c9a962);
+  background: var(--gold, #ffffff);
   border-radius: 3px;
   line-height: 1.2;
 }
@@ -23,7 +23,7 @@
   font-size: 1.125rem;
   font-weight: 700;
   letter-spacing: 0.14em;
-  color: var(--gold-light, #e8d5a3);
+  color: var(--gold-light, #ffffff);
 }
 
 .brand-logo--compact .brand-logo-mark {

@@ -27,11 +27,14 @@ import {
   stopGlobalPositionMonitoring,
 } from './src/services/positionMonitor';
 import { tabFromDeepLink } from './src/services/deepLink';
+import { TerminalUnavailableScreen } from './src/screens/TerminalUnavailableScreen';
 import {
   BRAND_NAME,
+  BRAND_MARK,
   DATA_SCOPE,
   TERMINAL_NAME,
   TRADER_WALLET,
+  WALLET_TRACKING_ENABLED,
   hyperliquidExplorerUrl,
 } from './src/constants';
 import { truncateWallet } from './src/utils/wallet';
@@ -45,7 +48,7 @@ async function setupNotifications() {
   );
   if (Platform.OS === 'android') {
     await Notifications.setNotificationChannelAsync('trades', {
-      name: 'A&T CAPITAL · Terminal 277',
+      name: `${BRAND_NAME} · ${TERMINAL_NAME}`,
       importance: Notifications.AndroidImportance.HIGH,
       vibrationPattern: [0, 250, 120, 250],
       sound: 'default',
@@ -84,6 +87,7 @@ export default function App() {
     let mounted = true;
 
     async function boot() {
+      if (!WALLET_TRACKING_ENABLED) return;
       await setupNotifications();
       await scheduleDailyWeeklySummaries();
       const remote = await registerRemotePush();
@@ -96,7 +100,7 @@ export default function App() {
     void boot();
 
     const appStateSub = AppState.addEventListener('change', (state) => {
-      if (state === 'active') {
+      if (WALLET_TRACKING_ENABLED && state === 'active') {
         void registerRemotePush();
       }
     });
@@ -129,7 +133,7 @@ export default function App() {
           <View style={styles.header}>
             <View style={styles.headerTop}>
               <View>
-                <Text style={styles.brandMark}>A&T</Text>
+                <Text style={styles.brandMark}>{BRAND_MARK}</Text>
                 <Text style={styles.appName}>{BRAND_NAME}</Text>
                 <Text style={styles.tagline}>{TERMINAL_NAME} · Hyperliquid</Text>
               </View>
@@ -142,8 +146,17 @@ export default function App() {
                     },
                   ]}
                 />
-                <Text style={styles.liveText}>
-                  {data.wsConnected ? 'Flux connecté' : 'Synchronisation'}
+                <Text
+                  style={[
+                    styles.liveText,
+                    !WALLET_TRACKING_ENABLED && { color: colors.red },
+                  ]}
+                >
+                  {WALLET_TRACKING_ENABLED
+                    ? data.wsConnected
+                      ? 'Flux connecté'
+                      : 'Synchronisation'
+                    : 'Indisponible'}
                 </Text>
               </View>
             </View>
@@ -151,7 +164,11 @@ export default function App() {
           </View>
 
           <View style={styles.scopeBar}>
-            <Text style={styles.scopeText}>{DATA_SCOPE}</Text>
+            <Text style={styles.scopeText}>
+              {WALLET_TRACKING_ENABLED
+                ? DATA_SCOPE
+                : 'Suivi wallet suspendu — terminal indisponible'}
+            </Text>
             <View style={styles.scopeMeta}>
               <Text style={styles.scopeMetaText}>{syncLabel}</Text>
               <Text style={styles.scopeMetaText}> · API HL</Text>
@@ -165,7 +182,9 @@ export default function App() {
 
           <TabBar active={tab} onChange={setTab} />
 
-          {tab === 'live' ? (
+          {!WALLET_TRACKING_ENABLED && (tab === 'live' || tab === 'history') ? (
+            <TerminalUnavailableScreen />
+          ) : tab === 'live' ? (
             <LiveScreen
               positions={data.positions}
               orders={data.orders}

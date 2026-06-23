@@ -97,7 +97,7 @@ Sinon : ré-enregistrer le **navigateur** (bouton alertes sur le site) et le **t
 
 Après `bash scripts/setup-and-build.sh`, l'APK est publiée sur :
 
-- `https://atcapital.up.railway.app/AT-Capital-Terminal-277.apk`
+- `https://atcapital.up.railway.app/LVDC-Terminal.apk`
 
 ### App Links (Android)
 

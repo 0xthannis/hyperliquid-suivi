@@ -1,4 +1,4 @@
-/* Service worker — notifications push A&T CAPITAL */
+/* Service worker — notifications push La Vie de César */
 self.addEventListener('install', (event) => {
   event.waitUntil(self.skipWaiting());
 });
@@ -9,7 +9,7 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('push', (event) => {
   let data = {
-    title: 'A&T · Terminal 277',
+    title: 'La Vie de César · Terminal LVDC',
     body: 'Nouvelle position ouverte sur Hyperliquid.',
   };
   try {

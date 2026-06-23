@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import type { Fill } from '../api/hyperliquid';
+import { displaySymbol, type Fill } from '../api/hyperliquid';
 import {
   computeHistorySummary,
   formatDateTime,
@@ -145,7 +145,7 @@ export function HistoryView({ history, fills, allTimePnl, loading }: Props) {
             <option value="all">Tous les actifs</option>
             {coins.map((c) => (
               <option key={c} value={c}>
-                {c}
+                {displaySymbol(c)}
               </option>
             ))}
           </select>
@@ -194,7 +194,7 @@ export function HistoryView({ history, fills, allTimePnl, loading }: Props) {
                 {filtered.map((e) => (
                   <tr key={e.id}>
                     <td className="tabular journal-date">{formatDateTime(e.time)}</td>
-                    <td className="journal-coin-cell">{e.coin}</td>
+                    <td className="journal-coin-cell">{displaySymbol(e.coin)}</td>
                     <td>{e.label}</td>
                     <td className="journal-th-right">
                       {e.isClose ? (
@@ -229,7 +229,7 @@ export function HistoryView({ history, fills, allTimePnl, loading }: Props) {
               <article key={e.id} className="journal-row">
                 <div className="journal-main">
                   <div className="journal-top">
-                    <span className="journal-coin">{e.coin}</span>
+                    <span className="journal-coin">{displaySymbol(e.coin)}</span>
                     <span className="journal-time">{timeAgo(e.time)}</span>
                   </div>
                   <p className="journal-label">{e.label}</p>

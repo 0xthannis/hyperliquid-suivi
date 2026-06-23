@@ -15,7 +15,7 @@ import {
   type HistoryEvent,
   type PeriodStats,
 } from '../utils/calculations';
-import { MIDS_POLL_MS, POLL_BACKUP_MS } from '../constants';
+import { MIDS_POLL_MS, POLL_BACKUP_MS, WALLET_TRACKING_ENABLED } from '../constants';
 import { hyperliquidSocket } from '../services/hyperliquidSocket';
 import { saveWidgetSnapshot, type WidgetSnapshot } from '../services/widgetStore';
 
@@ -58,7 +58,7 @@ export function useTraderData() {
     },
     allTimePnl: 0,
     widget: null,
-    loading: true,
+    loading: WALLET_TRACKING_ENABLED,
     error: null,
     lastUpdate: null,
     refreshing: false,
@@ -235,6 +235,8 @@ export function useTraderData() {
   refreshUserRef.current = refreshUser;
 
   useEffect(() => {
+    if (!WALLET_TRACKING_ENABLED) return;
+
     refreshSilentRef.current();
 
     const midsPoll = setInterval(() => refreshMidsOnly(), MIDS_POLL_MS);

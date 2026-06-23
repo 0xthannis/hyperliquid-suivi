@@ -52,28 +52,28 @@ APP_X64=$(find "$DESKTOP/release/mac" -maxdepth 1 -name '*.app' -type d 2>/dev/n
 
 ARCH=$(uname -m)
 if [ "$ARCH" = "arm64" ] && [ -n "$DMG_ARM64" ]; then
-  cp "$DMG_ARM64" "$DIST/AT-Capital-Terminal-277-mac.dmg"
+  cp "$DMG_ARM64" "$DIST/LVDC-Terminal-mac.dmg"
   PRIMARY_APP="$APP_ARM64"
 else
-  cp "${DMG_X64:-$DMG_ARM64}" "$DIST/AT-Capital-Terminal-277-mac.dmg"
+  cp "${DMG_X64:-$DMG_ARM64}" "$DIST/LVDC-Terminal-mac.dmg"
   PRIMARY_APP="${APP_X64:-$APP_ARM64}"
 fi
 
 if [ -n "$DMG_ARM64" ]; then
-  cp "$DMG_ARM64" "$DIST/AT-Capital-Terminal-277-mac-arm64.dmg"
+  cp "$DMG_ARM64" "$DIST/LVDC-Terminal-mac-arm64.dmg"
 fi
 if [ -n "$DMG_X64" ]; then
-  cp "$DMG_X64" "$DIST/AT-Capital-Terminal-277-mac-x64.dmg"
+  cp "$DMG_X64" "$DIST/LVDC-Terminal-mac-x64.dmg"
 fi
 if [ -n "$ZIP_ARM64" ]; then
-  cp "$ZIP_ARM64" "$DIST/AT-Capital-Terminal-277-mac.zip"
+  cp "$ZIP_ARM64" "$DIST/LVDC-Terminal-mac.zip"
 fi
 
 echo ""
-echo "✅ DMG (recommandé sur ce Mac) : $DIST/AT-Capital-Terminal-277-mac.dmg"
-ls -lh "$DIST/AT-Capital-Terminal-277-mac.dmg"
-[ -f "$DIST/AT-Capital-Terminal-277-mac-arm64.dmg" ] && ls -lh "$DIST/AT-Capital-Terminal-277-mac-arm64.dmg"
-[ -f "$DIST/AT-Capital-Terminal-277-mac-x64.dmg" ] && ls -lh "$DIST/AT-Capital-Terminal-277-mac-x64.dmg"
+echo "✅ DMG (recommandé sur ce Mac) : $DIST/LVDC-Terminal-mac.dmg"
+ls -lh "$DIST/LVDC-Terminal-mac.dmg"
+[ -f "$DIST/LVDC-Terminal-mac-arm64.dmg" ] && ls -lh "$DIST/LVDC-Terminal-mac-arm64.dmg"
+[ -f "$DIST/LVDC-Terminal-mac-x64.dmg" ] && ls -lh "$DIST/LVDC-Terminal-mac-x64.dmg"
 
 if [ -n "$PRIMARY_APP" ]; then
   echo ""

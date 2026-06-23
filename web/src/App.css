@@ -1,4 +1,4 @@
-/* Terminal 277 — A&T CAPITAL */
+/* Terminal LVDC — La Vie de César */
 
 .terminal {
   min-height: 100vh;
@@ -9,7 +9,7 @@
 @media (min-width: 768px) {
   .terminal {
     padding: 1.5rem 1rem 2rem;
-    background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(201, 169, 98, 0.06), transparent),
+    background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255, 255, 255, 0.06), transparent),
       var(--bg);
   }
 }
@@ -381,7 +381,7 @@
 
 .progress-track {
   height: 3px;
-  background: rgba(201, 169, 98, 0.12);
+  background: rgba(255, 255, 255, 0.12);
   position: relative;
 }
 
@@ -597,7 +597,7 @@
 
 .sync-badge--warn {
   color: var(--gold);
-  border-color: rgba(201, 169, 98, 0.35);
+  border-color: rgba(255, 255, 255, 0.35);
 }
 
 .sync-badge-dot {

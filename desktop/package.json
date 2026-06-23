@@ -1,9 +1,9 @@
 {
   "name": "at-capital-desktop",
   "version": "1.1.1",
-  "description": "A&T CAPITAL · Terminal 277 pour macOS",
+  "description": "La Vie de César · Terminal LVDC pour macOS",
   "main": "main.js",
-  "author": "A&T CAPITAL",
+  "author": "La Vie de César",
   "scripts": {
     "start": "electron .",
     "start:remote": "AT_REMOTE=1 electron .",
@@ -11,8 +11,8 @@
   },
   "build": {
     "appId": "fr.atcapital.terminal277",
-    "productName": "Terminal 277",
-    "copyright": "A&T CAPITAL",
+    "productName": "La Vie de César",
+    "copyright": "La Vie de César",
     "directories": {
       "output": "release",
       "buildResources": "build"
@@ -37,7 +37,7 @@
       "gatekeeperAssess": false
     },
     "dmg": {
-      "title": "Terminal 277",
+      "title": "La Vie de César",
       "backgroundColor": "#060608"
     }
   },

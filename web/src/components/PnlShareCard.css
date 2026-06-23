@@ -39,7 +39,7 @@
   height: 160px;
   bottom: 40px;
   left: -40px;
-  background: rgba(201, 169, 98, 0.08);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .pnl-card__header {
@@ -209,7 +209,7 @@
 }
 
 .pnl-card__cell--profit {
-  border-color: rgba(201, 169, 98, 0.25);
+  border-color: rgba(255, 255, 255, 0.25);
 }
 
 .pnl-card__label {

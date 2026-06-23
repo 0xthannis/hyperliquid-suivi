@@ -14,62 +14,108 @@ import {
   SITE_URL,
   TERMINAL_NAME,
   TRADER_WALLET,
+  WALLET_TRACKING_ENABLED,
   hyperliquidExplorerUrl,
 } from '../constants';
 import { truncateWallet } from '../lib/wallet';
+import '../components/TerminalUnavailable.css';
 import './LandingPage.css';
 
-const STATS = [
-  { value: '0 €', label: 'Site et terminal gratuits' },
-  { value: '2', label: 'Fondateurs (Annissa & Thanh)' },
-  { value: 'Live', label: 'Positions lues sur Hyperliquid' },
-];
+const STATS = WALLET_TRACKING_ENABLED
+  ? [
+      { value: '0 €', label: 'Site et terminal gratuits' },
+      { value: 'On-chain', label: 'Chaque position vérifiable' },
+      { value: 'Live', label: 'Positions lues sur Hyperliquid' },
+    ]
+  : [
+      { value: '0 €', label: 'Site en accès libre' },
+      { value: 'On-chain', label: 'Activité vérifiable' },
+      { value: 'Off', label: 'Suivi wallet suspendu' },
+    ];
 
 const TEAM = [
   {
-    name: 'Thanh',
-    role: 'Trader principal',
-    text: 'Il exécute les positions sur Hyperliquid. Tout ce qui s\'affiche sur le terminal provient de son wallet : entrées, stops, take profits, tailles.',
+    name: 'Discipline',
+    role: 'Le process avant le résultat',
+    text: 'Chaque position est prise avec un stop et un objectif définis à l\'avance. Pas d\'improvisation, pas de pari émotionnel.',
   },
   {
-    name: 'Annissa',
-    role: 'Co-fondatrice',
-    text: 'Elle structure A&T CAPITAL avec Thanh et porte ce projet de transparence. L\'exécution des trades est assurée par le trader principal ; ils dirigent la structure à deux.',
+    name: 'Transparence',
+    role: 'Rien à dissimuler',
+    text: 'Tout ce qui s\'affiche provient d\'un wallet Hyperliquid public. Les mêmes données que nous, lisibles par tous, sans filtre.',
+  },
+  {
+    name: 'Liberté',
+    role: 'Vous restez maître',
+    text: 'Aucun signal vendu, aucun capital géré pour autrui. Vous observez, vous décidez, vous assumez vos choix.',
   },
 ];
 
-const FEATURES = [
-  {
-    title: 'Positions en temps réel',
-    text: 'Quand une position s\'ouvre, elle apparaît ici avec son sens (long ou short), son levier, son stop loss et son take profit.',
-  },
-  {
-    title: 'Historique des trades fermés',
-    text: 'Liste des opérations clôturées avec le PnL enregistré par Hyperliquid. Export CSV possible.',
-  },
-  {
-    title: 'Alertes optionnelles',
-    text: 'Vous pouvez activer une notification quand une nouvelle position s\'ouvre sur le wallet suivi. Rien n\'est obligatoire.',
-  },
-];
+const FEATURES = WALLET_TRACKING_ENABLED
+  ? [
+      {
+        title: 'Positions en temps réel',
+        text: 'Quand une position s\'ouvre, elle apparaît ici avec son sens (long ou short), son levier, son stop loss et son take profit.',
+      },
+      {
+        title: 'Historique des trades fermés',
+        text: 'Liste des opérations clôturées avec le PnL enregistré par Hyperliquid. Export CSV possible.',
+      },
+      {
+        title: 'Alertes optionnelles',
+        text: 'Vous pouvez activer une notification quand une nouvelle position s\'ouvre sur le wallet suivi. Rien n\'est obligatoire.',
+      },
+    ]
+  : [
+      {
+        title: 'Positions en temps réel',
+        text: 'Indisponible pour le moment. Le terminal n\'affiche plus de positions live.',
+      },
+      {
+        title: 'Historique des trades fermés',
+        text: 'Indisponible pour le moment. Le journal des opérations n\'est plus publié.',
+      },
+      {
+        title: 'Alertes optionnelles',
+        text: 'Désactivées tant que le suivi wallet est suspendu.',
+      },
+    ];
 
-const STEPS = [
-  {
-    n: '01',
-    title: 'Ouvrir le Terminal 277',
-    text: 'Accédez au tableau de bord public : positions ouvertes, PnL, niveaux de sortie.',
-  },
-  {
-    n: '02',
-    title: 'Comprendre ce que vous voyez',
-    text: 'Survolez les termes (notionnel, distance SL, R:R…) pour lire une définition simple. Consultez la page Méthodologie pour le détail technique.',
-  },
-  {
-    n: '03',
-    title: 'Décider de votre côté',
-    text: 'Observer, s\'inspirer ou copier reste votre choix. A&T CAPITAL ne vend pas de signaux et ne gère pas d\'argent pour vous.',
-  },
-];
+const STEPS = WALLET_TRACKING_ENABLED
+  ? [
+      {
+        n: '01',
+        title: 'Ouvrir le Terminal LVDC',
+        text: 'Accédez au tableau de bord public : positions ouvertes, PnL, niveaux de sortie.',
+      },
+      {
+        n: '02',
+        title: 'Comprendre ce que vous voyez',
+        text: 'Survolez les termes (notionnel, distance SL, R:R…) pour lire une définition simple. Consultez la page Méthodologie pour le détail technique.',
+      },
+      {
+        n: '03',
+        title: 'Décider de votre côté',
+        text: 'Observer, s\'inspirer ou copier reste votre choix. La Vie de César ne vend pas de signaux et ne gère pas d\'argent pour vous.',
+      },
+    ]
+  : [
+      {
+        n: '01',
+        title: 'Consulter le statut du terminal',
+        text: 'Le Terminal LVDC affiche un message d\'indisponibilité : le suivi wallet est suspendu.',
+      },
+      {
+        n: '02',
+        title: 'Lire notre méthodologie',
+        text: 'Les pages À propos et Méthodologie expliquent comment fonctionnait le terminal et ses limites.',
+      },
+      {
+        n: '03',
+        title: 'Nous contacter si besoin',
+        text: 'Pour toute question sur la suspension du suivi, écrivez-nous à l\'adresse indiquée en bas de page.',
+      },
+    ];
 
 const NOT_PROMISES = [
   'Pas de gestion de capital pour des tiers',
@@ -81,24 +127,32 @@ const NOT_PROMISES = [
 const FAQ = [
   {
     q: 'C\'est vraiment gratuit ?',
-    a: 'Oui. Le site et le Terminal 277 sont en accès libre, sans inscription ni paiement.',
+    a: 'Oui. Le site et le Terminal LVDC sont en accès libre, sans inscription ni paiement.',
   },
   {
     q: 'Puis-je copier vos trades ?',
-    a: 'Vous pouvez observer et décider par vous-même. A&T CAPITAL ne vous demande pas d\'argent et ne gère pas de compte pour vous.',
+    a: 'Vous pouvez observer et décider par vous-même. La Vie de César ne vous demande pas d\'argent et ne gère pas de compte pour vous.',
   },
   {
     q: 'Qui exécute les positions ?',
-    a: 'Thanh, trader principal, sur un wallet Hyperliquid public. Annissa co-fonde la structure avec lui.',
+    a: 'Le trader derrière La Vie de César, sur un wallet Hyperliquid public. Tout est exécuté sur ce wallet : crypto, indices et matières premières.',
   },
   {
     q: 'Pourquoi seulement Hyperliquid ?',
-    a: 'Le terminal affiche uniquement ce que Hyperliquid enregistre pour ce wallet. L\'activité sur d\'autres exchanges n\'y figure pas.',
+    a: 'Le terminal affiche uniquement ce que Hyperliquid enregistre pour ce wallet, tous marchés confondus. L\'activité sur d\'autres exchanges n\'y figure pas.',
   },
   {
     q: 'Les alertes sont-elles obligatoires ?',
     a: 'Non. Vous pouvez consulter le terminal sans activer les notifications push.',
   },
+  ...(WALLET_TRACKING_ENABLED
+    ? []
+    : [
+        {
+          q: 'Pourquoi le terminal est-il indisponible ?',
+          a: 'Le suivi public du wallet Hyperliquid est suspendu pour le moment. Le site reste en ligne pour présenter La Vie de César et indiquer clairement que les données live ne sont plus publiées.',
+        },
+      ]),
 ];
 
 const LIMITS = [
@@ -140,60 +194,116 @@ export function LandingPage() {
           <span className="landing-logo-sub">{TERMINAL_NAME}</span>
         </div>
         <Link to="/app" className="landing-nav-cta">
-          {TERMINAL_NAME}
+          {WALLET_TRACKING_ENABLED ? TERMINAL_NAME : `${TERMINAL_NAME} — indisponible`}
         </Link>
       </header>
 
       <section className="landing-hero">
         <div className="landing-hero-content">
-          <p className="landing-eyebrow">Structure de trading · Hyperliquid · Accès public</p>
+          {!WALLET_TRACKING_ENABLED && (
+            <div className="landing-unavailable-banner" role="status">
+              <div>
+                <strong>Terminal indisponible</strong>
+                <p>
+                  Le suivi public du wallet Hyperliquid est suspendu. Positions, historique
+                  et alertes ne sont plus publiés sur ce site.
+                </p>
+              </div>
+            </div>
+          )}
+          <p className="landing-eyebrow">
+            {WALLET_TRACKING_ENABLED
+              ? 'Structure de trading · Hyperliquid · Accès public'
+              : 'Structure de trading · Site informatif'}
+          </p>
           <h1>
-            Suivez nos trades crypto
-            <br />
-            <span className="highlight">en direct et gratuitement.</span>
+            {WALLET_TRACKING_ENABLED ? (
+              <>
+                Suivez nos positions
+                <br />
+                <span className="highlight">en direct et gratuitement.</span>
+              </>
+            ) : (
+              <>
+                {BRAND_NAME}
+                <br />
+                <span className="highlight">suivi wallet suspendu.</span>
+              </>
+            )}
           </h1>
           <p className="landing-lead">
-            <strong>{BRAND_NAME}</strong> est une structure privée fondée par{' '}
-            <strong>Annissa</strong> et <strong>Thanh</strong>. Nous publions ici l'activité
-            du wallet Hyperliquid sur lequel <strong>Thanh</strong> trade au quotidien.
-            Le <strong>{TERMINAL_NAME}</strong> permet à n'importe qui de voir les mêmes
-            données que nous, sans payer, sans compte.
+            <strong>{BRAND_NAME}</strong> est une structure de trading privée, guidée
+            par une seule règle : la discipline avant la promesse.
+            {WALLET_TRACKING_ENABLED ? (
+              <>
+                {' '}
+                Nous publions ici l'activité du wallet Hyperliquid sur lequel nous
+                tradons crypto, indices et matières premières. Le{' '}
+                <strong>{TERMINAL_NAME}</strong> permet à n'importe qui de voir les
+                mêmes données que nous, sans payer, sans compte.
+              </>
+            ) : (
+              <>
+                {' '}
+                Le <strong>{TERMINAL_NAME}</strong> ne publie plus les positions ni
+                l'historique du wallet pour le moment. Ce site reste en ligne pour présenter
+                la structure et signaler clairement l'indisponibilité du suivi.
+              </>
+            )}
           </p>
           <ul className="landing-audience">
-            <li>Voir les positions ouvertes et leurs stops / take profits</li>
-            <li>Consulter l'historique des trades fermés sur Hyperliquid</li>
-            <li>Recevoir une alerte quand une nouvelle position s'ouvre (optionnel)</li>
+            {WALLET_TRACKING_ENABLED ? (
+              <>
+                <li>Voir les positions ouvertes et leurs stops / take profits</li>
+                <li>Consulter l'historique des trades fermés sur Hyperliquid</li>
+                <li>Recevoir une alerte quand une nouvelle position s'ouvre (optionnel)</li>
+              </>
+            ) : (
+              <>
+                <li>Positions en temps réel — indisponibles</li>
+                <li>Historique des trades — indisponible</li>
+                <li>Alertes push liées au wallet — désactivées</li>
+              </>
+            )}
           </ul>
           <div className="landing-activity" aria-live="polite">
-            <span className="landing-activity-dot" />
+            <span
+              className={`landing-activity-dot${WALLET_TRACKING_ENABLED ? '' : ' landing-activity-dot--off'}`}
+            />
             <span>{formatLandingActivity(snapshot)}</span>
           </div>
           <div className="landing-hero-actions">
             <Link to="/app" className="btn btn-primary">
-              Ouvrir le {TERMINAL_NAME}
+              {WALLET_TRACKING_ENABLED
+                ? `Ouvrir le ${TERMINAL_NAME}`
+                : 'Voir le statut du terminal'}
             </Link>
-            <a
-              href={hyperliquidExplorerUrl(TRADER_WALLET)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-secondary"
-            >
-              Vérifier sur Hyperliquid
-            </a>
-            {pushState !== 'unsupported' && pushState !== 'denied' && (
-              <button
-                type="button"
+            {WALLET_TRACKING_ENABLED && (
+              <a
+                href={hyperliquidExplorerUrl(TRADER_WALLET)}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="btn btn-secondary"
-                onClick={handlePush}
-                disabled={pushLoading || pushState === 'granted'}
               >
-                {pushState === 'granted'
-                  ? 'Alertes activées'
-                  : pushLoading
-                    ? 'Activation…'
-                    : 'Activer les alertes'}
-              </button>
+                Vérifier sur Hyperliquid
+              </a>
             )}
+            {WALLET_TRACKING_ENABLED &&
+              pushState !== 'unsupported' &&
+              pushState !== 'denied' && (
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={handlePush}
+                  disabled={pushLoading || pushState === 'granted'}
+                >
+                  {pushState === 'granted'
+                    ? 'Alertes activées'
+                    : pushLoading
+                      ? 'Activation…'
+                      : 'Activer les alertes'}
+                </button>
+              )}
           </div>
           {pushMsg && <p className="landing-push-msg">{pushMsg}</p>}
         </div>
@@ -201,12 +311,12 @@ export function LandingPage() {
       </section>
 
       <section className="landing-section landing-about">
-        <h2>Qui sommes-nous ?</h2>
+        <h2>Notre ligne de conduite</h2>
         <p className="landing-section-lead">
-          {BRAND_NAME} (Annissa &amp; Thanh) est une structure de trading à deux. Les
-          positions affichées sur ce site sont celles du <strong>trader principal</strong>{' '}
-          sur un wallet Hyperliquid public. Nous avons créé le {TERMINAL_NAME} pour
-          documenter cette activité de façon claire, sans marketing ni promesse de gains.
+          {BRAND_NAME} est une structure de trading privée. Les positions affichées sur
+          ce site sont celles d'un wallet Hyperliquid public — crypto, indices et matières
+          premières. Nous avons créé le {TERMINAL_NAME} pour documenter cette activité de
+          façon claire, sans marketing ni promesse de gains. Trois principes la gouvernent.
         </p>
         <div className="team-grid">
           {TEAM.map((person) => (
@@ -218,8 +328,9 @@ export function LandingPage() {
           ))}
         </div>
         <p className="landing-about-note">
-          Le chiffre <strong>277</strong> est une référence personnelle pour nous. Le{' '}
-          {TERMINAL_NAME} en est le nom : notre espace de lecture publique des trades.
+          <strong>La Vie de César</strong> : un nom qui rappelle qu'aucune victoire ne
+          tient sans rigueur. Le {TERMINAL_NAME} en est l'expression publique — notre
+          espace de lecture transparente des trades.
         </p>
       </section>
 
@@ -244,8 +355,9 @@ export function LandingPage() {
       <section className="landing-section">
         <h2>Que propose le {TERMINAL_NAME} ?</h2>
         <p className="landing-section-lead">
-          Un tableau de bord en lecture seule, branché sur l'API Hyperliquid. Vous ne
-          tradez pas depuis ce site : vous observez ce qui se passe sur le wallet suivi.
+          {WALLET_TRACKING_ENABLED
+            ? "Un tableau de bord en lecture seule, branché sur l'API Hyperliquid. Vous ne tradez pas depuis ce site : vous observez ce qui se passe sur le wallet suivi."
+            : 'Le terminal était un tableau de bord en lecture seule branché sur Hyperliquid. Ces fonctionnalités sont suspendues pour le moment.'}
         </p>
         <div className="feature-grid">
           {FEATURES.map((f) => (
@@ -309,17 +421,24 @@ export function LandingPage() {
         <div className="cta-inner">
           <LuxuryHeroVisual compact />
           <div className="cta-text">
-            <h2>Prêt à découvrir le {TERMINAL_NAME} ?</h2>
+            <h2>
+              {WALLET_TRACKING_ENABLED
+                ? `Prêt à découvrir le ${TERMINAL_NAME} ?`
+                : `${TERMINAL_NAME} — indisponible`}
+            </h2>
             <p>
-              Accès gratuit, sans inscription. Vous voyez les trades Hyperliquid du wallet
-              suivi par {BRAND_NAME}. Vous restez libre et seul responsable de vos
-              décisions.
+              {WALLET_TRACKING_ENABLED
+                ? `Accès gratuit, sans inscription. Vous voyez les trades Hyperliquid du wallet suivi par ${BRAND_NAME}. Vous restez libre et seul responsable de vos décisions.`
+                : 'Le suivi public du wallet est suspendu. Consultez la page du terminal pour le détail ou contactez-nous si vous avez une question.'}
             </p>
             <div className="cta-buttons">
               <Link to="/app" className="btn btn-primary btn-large">
-                Ouvrir le {TERMINAL_NAME}
+                {WALLET_TRACKING_ENABLED
+                  ? `Ouvrir le ${TERMINAL_NAME}`
+                  : 'Voir le statut du terminal'}
               </Link>
-              {pushState !== 'unsupported' &&
+              {WALLET_TRACKING_ENABLED &&
+                pushState !== 'unsupported' &&
                 pushState !== 'granted' &&
                 pushState !== 'denied' && (
                   <button
@@ -338,7 +457,7 @@ export function LandingPage() {
 
       <footer className="landing-footer">
         <p>
-          {BRAND_NAME} · {TERMINAL_NAME} · Annissa &amp; Thanh
+          {BRAND_NAME} · {TERMINAL_NAME} · Discipline, transparence, liberté
         </p>
         <p className="landing-footer-sub">
           Données Hyperliquid uniquement. Accès gratuit. Pas un conseil en investissement.

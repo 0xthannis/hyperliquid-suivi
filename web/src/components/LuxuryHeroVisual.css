@@ -6,7 +6,7 @@
   margin: 0 auto;
   overflow: hidden;
   border-radius: 2px;
-  border: 1px solid rgba(201, 169, 98, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   background: linear-gradient(165deg, #0a0a0c 0%, #121218 40%, #1a1510 100%);
 }
 
@@ -25,7 +25,7 @@
   right: -10%;
   width: 70%;
   height: 60%;
-  background: radial-gradient(ellipse, rgba(201, 169, 98, 0.18) 0%, transparent 70%);
+  background: radial-gradient(ellipse, rgba(255, 255, 255, 0.18) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -33,8 +33,8 @@
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(201, 169, 98, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(201, 169, 98, 0.04) 1px, transparent 1px);
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
   background-size: 32px 32px;
   mask-image: linear-gradient(180deg, black 20%, transparent 90%);
 }
@@ -63,11 +63,11 @@
   position: absolute;
   width: 140px;
   height: 22px;
-  background: linear-gradient(90deg, #2a2a32 0%, #4a4a58 50%, #c9a962 100%);
+  background: linear-gradient(90deg, #2a2a32 0%, #4a4a58 50%, #ffffff 100%);
   border-radius: 4px 20px 20px 4px;
   top: 20px;
   left: 30px;
-  box-shadow: 0 4px 24px rgba(201, 169, 98, 0.2);
+  box-shadow: 0 4px 24px rgba(255, 255, 255, 0.2);
 }
 
 .jet-wing {
@@ -96,20 +96,20 @@
   position: absolute;
   width: 12px;
   height: 8px;
-  background: rgba(201, 169, 98, 0.6);
+  background: rgba(255, 255, 255, 0.6);
   border-radius: 2px;
   top: 26px;
   left: 100px;
   box-shadow:
-    28px 0 0 rgba(201, 169, 98, 0.4),
-    56px 0 0 rgba(201, 169, 98, 0.25);
+    28px 0 0 rgba(255, 255, 255, 0.4),
+    56px 0 0 rgba(255, 255, 255, 0.25);
 }
 
 .jet-trail {
   position: absolute;
   width: 80px;
   height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(201, 169, 98, 0.3));
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3));
   left: -60px;
   top: 30px;
   animation: trail-pulse 2s ease-in-out infinite;
@@ -141,13 +141,13 @@
 .lux-metric {
   padding: 0.65rem 0.85rem;
   background: rgba(10, 10, 12, 0.75);
-  border-left: 2px solid rgba(201, 169, 98, 0.4);
+  border-left: 2px solid rgba(255, 255, 255, 0.4);
   backdrop-filter: blur(8px);
 }
 
 .lux-metric--gold {
-  border-left-color: #c9a962;
-  background: rgba(201, 169, 98, 0.08);
+  border-left-color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .lux-metric-label {
@@ -156,14 +156,14 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: rgba(201, 169, 98, 0.85);
+  color: rgba(255, 255, 255, 0.85);
   margin-bottom: 0.25rem;
   line-height: 1.3;
 }
 
 .lux-metric-value {
   font-size: 0.8125rem;
-  color: #f5f0e6;
+  color: #ffffff;
   font-weight: 500;
   line-height: 1.45;
 }
@@ -186,10 +186,10 @@
   width: calc(18px + var(--b) * 8px);
   height: calc(40px + var(--b) * 14px);
   background: linear-gradient(180deg, #1e1e26 0%, #0d0d10 100%);
-  border-top: 1px solid rgba(201, 169, 98, 0.15);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
   opacity: 0.85;
 }
 
 .building:nth-child(odd) {
-  border-top-color: rgba(201, 169, 98, 0.35);
+  border-top-color: rgba(255, 255, 255, 0.35);
 }

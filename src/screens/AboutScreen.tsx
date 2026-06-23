@@ -63,23 +63,26 @@ export function AboutScreen({ onReplayTour }: Props) {
     <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
       <Text style={styles.title}>{BRAND_NAME}</Text>
       <Text style={styles.lead}>
-        Structure fondée par Annissa et Thanh. Le {TERMINAL_NAME} affiche l'activité
-        Hyperliquid du trader principal, en lecture seule.
+        Structure de trading privée, guidée par la discipline. Le {TERMINAL_NAME} affiche
+        l'activité Hyperliquid du wallet suivi — crypto, indices et matières premières — en
+        lecture seule.
       </Text>
 
       <View style={styles.card}>
-        <Text style={styles.cardName}>Thanh</Text>
-        <Text style={styles.cardRole}>Trader principal</Text>
+        <Text style={styles.cardName}>Discipline</Text>
+        <Text style={styles.cardRole}>Le process avant le résultat</Text>
         <Text style={styles.cardText}>
-          Exécute les positions sur le wallet suivi. Données lues depuis l'API Hyperliquid.
+          Chaque position a son stop et son objectif. Données lues depuis l'API Hyperliquid,
+          sans retouche.
         </Text>
       </View>
 
       <View style={styles.card}>
-        <Text style={styles.cardName}>Annissa</Text>
-        <Text style={styles.cardRole}>Co-fondatrice</Text>
+        <Text style={styles.cardName}>Transparence</Text>
+        <Text style={styles.cardRole}>Rien à dissimuler</Text>
         <Text style={styles.cardText}>
-          Structure A&T CAPITAL avec Thanh et transparence publique du terminal.
+          Les mêmes chiffres que nous, vérifiables on-chain. Aucun signal vendu, aucun
+          capital géré pour autrui.
         </Text>
       </View>
 
@@ -108,9 +111,10 @@ export function AboutScreen({ onReplayTour }: Props) {
         </Text>
       ) : null}
 
-      <Text style={styles.sectionTitle}>Le 277</Text>
+      <Text style={styles.sectionTitle}>La Vie de César</Text>
       <Text style={styles.body}>
-        Référence personnelle pour nous. Le {TERMINAL_NAME} est notre espace de suivi public.
+        Un nom qui rappelle qu'aucune victoire ne tient sans rigueur. Le {TERMINAL_NAME} en
+        est l'expression publique : notre espace de suivi transparent.
       </Text>
 
       <Text style={styles.sectionTitle}>Liens</Text>

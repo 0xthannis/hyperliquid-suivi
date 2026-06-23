@@ -82,46 +82,108 @@ async function postInfo<T>(body: object): Promise<T> {
   return res.json() as Promise<T>;
 }
 
+/**
+ * Symbole affichable : on retire le préfixe du perp dex builder.
+ * Ex. « xyz:MRVL » → « MRVL », « BTC » → « BTC ».
+ */
+export function displaySymbol(coin: string): string {
+  const i = coin.indexOf(':');
+  return i >= 0 ? coin.slice(i + 1) : coin;
+}
+
+/** Perp dex builder (HIP-3) d'un coin namespacé, sinon dex principal (''). */
+function dexOfCoin(coin: string): string {
+  const i = coin.indexOf(':');
+  return i > 0 ? coin.slice(0, i) : '';
+}
+
+/**
+ * Liste des perp dexs Hyperliquid. Le dex principal (crypto) est représenté
+ * par '' ; les dexs builder (matières premières, indices, actions… ex. « xyz »)
+ * portent leur nom. Mise en cache pour la session.
+ */
+let perpDexNamesCache: string[] | null = null;
+let perpDexNamesPromise: Promise<string[]> | null = null;
+
+export async function fetchPerpDexNames(): Promise<string[]> {
+  if (perpDexNamesCache) return perpDexNamesCache;
+  if (!perpDexNamesPromise) {
+    perpDexNamesPromise = postInfo<Array<[string, string | null] | null>>({
+      type: 'perpDexs',
+    })
+      .then((list) => {
+        const names = (list ?? [])
+          .filter((d): d is [string, string | null] => Array.isArray(d) && !!d[0])
+          .map((d) => d[0]);
+        perpDexNamesCache = names;
+        return names;
+      })
+      .catch(() => {
+        perpDexNamesPromise = null;
+        return [];
+      });
+  }
+  return perpDexNamesPromise;
+}
+
+/** [dex principal, ...dexs builder] → corps de requête `info` par dex. */
+async function allDexBodies(base: object): Promise<object[]> {
+  const names = await fetchPerpDexNames();
+  return ['', ...names].map((dex) => (dex ? { ...base, dex } : base));
+}
+
+function mapPosition(p: ClearinghouseResponse['assetPositions'][number]['position']): AssetPosition | null {
+  const size = parseFloat(p.szi);
+  if (Math.abs(size) < 1e-12) return null;
+  return {
+    coin: p.coin,
+    size: Math.abs(size),
+    entryPx: parseFloat(p.entryPx),
+    positionValue: parseFloat(p.positionValue),
+    unrealizedPnl: parseFloat(p.unrealizedPnl),
+    leverage: p.leverage?.value ?? 1,
+    liquidationPx: p.liquidationPx ? parseFloat(p.liquidationPx) : null,
+    isLong: size > 0,
+  };
+}
+
 export async function fetchPositions(): Promise<{
   positions: AssetPosition[];
   accountValue: number;
 }> {
-  const data = await postInfo<ClearinghouseResponse>({
+  const bodies = await allDexBodies({
     type: 'clearinghouseState',
     user: TRADER_WALLET,
   });
+  const states = await Promise.all(
+    bodies.map((b) => postInfo<ClearinghouseResponse>(b).catch(() => null))
+  );
 
-  const positions: AssetPosition[] = data.assetPositions
-    .map((ap) => {
-      const p = ap.position;
-      const size = parseFloat(p.szi);
-      if (Math.abs(size) < 1e-12) return null;
-      return {
-        coin: p.coin,
-        size: Math.abs(size),
-        entryPx: parseFloat(p.entryPx),
-        positionValue: parseFloat(p.positionValue),
-        unrealizedPnl: parseFloat(p.unrealizedPnl),
-        leverage: p.leverage?.value ?? 1,
-        liquidationPx: p.liquidationPx ? parseFloat(p.liquidationPx) : null,
-        isLong: size > 0,
-      };
-    })
-    .filter((x): x is AssetPosition => x !== null);
+  let accountValue = 0;
+  const positions: AssetPosition[] = [];
+  for (const data of states) {
+    if (!data) continue;
+    accountValue += parseFloat(data.marginSummary.accountValue) || 0;
+    for (const ap of data.assetPositions) {
+      const pos = mapPosition(ap.position);
+      if (pos) positions.push(pos);
+    }
+  }
 
-  return {
-    positions,
-    accountValue: parseFloat(data.marginSummary.accountValue),
-  };
+  return { positions, accountValue };
 }
 
 export async function fetchTpSlOrders(): Promise<TpSlOrder[]> {
-  const orders = await postInfo<OpenOrder[]>({
+  const bodies = await allDexBodies({
     type: 'frontendOpenOrders',
     user: TRADER_WALLET,
   });
+  const lists = await Promise.all(
+    bodies.map((b) => postInfo<OpenOrder[]>(b).catch(() => [] as OpenOrder[]))
+  );
 
-  return orders
+  return lists
+    .flat()
     .filter(
       (o) =>
         o.orderType.includes('Stop') || o.orderType.includes('Take Profit')
@@ -138,11 +200,27 @@ export async function fetchTpSlOrders(): Promise<TpSlOrder[]> {
 
 export async function fetchMids(coins: string[]): Promise<Record<string, number>> {
   if (coins.length === 0) return {};
-  const all = await postInfo<Record<string, string>>({ type: 'allMids' });
-  const out: Record<string, number> = {};
+
+  // Les mids sont propres à chaque perp dex : on regroupe les coins par dex.
+  const byDex = new Map<string, string[]>();
   for (const c of coins) {
-    if (all[c] != null) out[c] = parseFloat(all[c]);
+    const dex = dexOfCoin(c);
+    const arr = byDex.get(dex);
+    if (arr) arr.push(c);
+    else byDex.set(dex, [c]);
   }
+
+  const out: Record<string, number> = {};
+  await Promise.all(
+    [...byDex.entries()].map(async ([dex, dexCoins]) => {
+      const all = await postInfo<Record<string, string>>(
+        dex ? { type: 'allMids', dex } : { type: 'allMids' }
+      ).catch(() => ({}) as Record<string, string>);
+      for (const c of dexCoins) {
+        if (all[c] != null) out[c] = parseFloat(all[c]);
+      }
+    })
+  );
   return out;
 }
 

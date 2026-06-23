@@ -70,9 +70,9 @@ if [ ! -f "$APK_SRC" ]; then
   exit 1
 fi
 
-cp "$APK_SRC" "$DIST/AT-Capital-Terminal-277.apk"
-cp "$APK_SRC" "$ROOT/web/public/AT-Capital-Terminal-277.apk"
+cp "$APK_SRC" "$DIST/LVDC-Terminal.apk"
+cp "$APK_SRC" "$ROOT/web/public/LVDC-Terminal.apk"
 echo ""
-echo "✅ APK prêt : $DIST/AT-Capital-Terminal-277.apk"
-echo "✅ APK web  : $ROOT/web/public/AT-Capital-Terminal-277.apk"
-ls -lh "$DIST/AT-Capital-Terminal-277.apk"
+echo "✅ APK prêt : $DIST/LVDC-Terminal.apk"
+echo "✅ APK web  : $ROOT/web/public/LVDC-Terminal.apk"
+ls -lh "$DIST/LVDC-Terminal.apk"

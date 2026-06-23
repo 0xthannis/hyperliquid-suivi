@@ -23,7 +23,7 @@ const TRADER_WALLET =
   process.env.VITE_TRADER_WALLET ?? '0x994Ff80b7dA1174a164e0F93121bDfbb68cf7A3F';
 const API_URL = 'https://api.hyperliquid.xyz/info';
 const POLL_MS = Number(process.env.PUSH_POLL_MS) || 25_000;
-const BRAND = 'A&T CAPITAL';
+const BRAND = 'La Vie de César';
 
 let webSubscriptions = [];
 let mobileTokens = [];
@@ -117,22 +117,49 @@ async function postInfo(body) {
   return res.json();
 }
 
+/** Symbole affichable : « xyz:MRVL » → « MRVL ». */
+function displaySymbol(coin) {
+  const i = coin.indexOf(':');
+  return i >= 0 ? coin.slice(i + 1) : coin;
+}
+
+/** Noms des perp dexs builder (HIP-3). Le dex principal = ''. Cache session. */
+let perpDexNamesCache = null;
+async function fetchPerpDexNames() {
+  if (perpDexNamesCache) return perpDexNamesCache;
+  try {
+    const list = await postInfo({ type: 'perpDexs' });
+    perpDexNamesCache = (list ?? [])
+      .filter((d) => Array.isArray(d) && d[0])
+      .map((d) => d[0]);
+  } catch {
+    perpDexNamesCache = [];
+  }
+  return perpDexNamesCache;
+}
+
 async function fetchOpenPositions() {
-  const data = await postInfo({
-    type: 'clearinghouseState',
-    user: TRADER_WALLET,
-  });
-  return (data.assetPositions ?? [])
-    .map((ap) => {
+  const names = await fetchPerpDexNames();
+  const bodies = ['', ...names].map((dex) =>
+    dex
+      ? { type: 'clearinghouseState', user: TRADER_WALLET, dex }
+      : { type: 'clearinghouseState', user: TRADER_WALLET }
+  );
+  const states = await Promise.all(
+    bodies.map((b) => postInfo(b).catch(() => null))
+  );
+
+  const positions = [];
+  for (const data of states) {
+    if (!data) continue;
+    for (const ap of data.assetPositions ?? []) {
       const p = ap.position;
       const size = parseFloat(p?.szi ?? '0');
-      if (Math.abs(size) < 1e-12) return null;
-      return {
-        coin: p.coin,
-        isLong: size > 0,
-      };
-    })
-    .filter(Boolean);
+      if (Math.abs(size) < 1e-12) continue;
+      positions.push({ coin: p.coin, isLong: size > 0 });
+    }
+  }
+  return positions;
 }
 
 async function fetchFills() {
@@ -262,7 +289,7 @@ async function pollPositions() {
     for (const p of positions) {
       if (!prevSet.has(p.coin) && shouldServerNotify('open', p.coin)) {
         const side = p.isLong ? 'LONG' : 'SHORT';
-        const title = `${BRAND} · ${p.coin}`;
+        const title = `${BRAND} · ${displaySymbol(p.coin)}`;
         const body = `Position ${side} ouverte.`;
         await notifyAll(title, body);
         console.log('[push] Ouverture:', p.coin, side);
@@ -273,7 +300,7 @@ async function pollPositions() {
       if (!currentSet.has(coin) && shouldServerNotify('close', coin)) {
         const net = closePnlFromFills(fills, coin);
         const label = net >= 0 ? 'Gain' : 'Perte';
-        const title = `${BRAND} · ${coin}`;
+        const title = `${BRAND} · ${displaySymbol(coin)}`;
         const body = `Position fermée · ${label} ${formatUsd(net)}`;
         await notifyAll(title, body);
         console.log('[push] Fermeture:', coin, body);
@@ -338,6 +365,10 @@ export function mountPushRoutes(app, express) {
 }
 
 export function startPushPoller() {
+  if (process.env.WALLET_TRACKING_ENABLED !== 'true') {
+    console.log('[push] wallet tracking disabled — poller skipped');
+    return;
+  }
   loadFcmServiceAccount();
   pollPositions();
   setInterval(pollPositions, POLL_MS);

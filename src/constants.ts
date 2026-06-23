@@ -19,14 +19,18 @@ export const STORAGE_KEY_REMOTE_PUSH = '@at_capital_remote_push_active';
 export const NEAR_STOP_THRESHOLD = 0.22;
 export const NEAR_TP_THRESHOLD = 0.15;
 
-export const BRAND_NAME = 'A&T CAPITAL';
-export const TERMINAL_NAME = 'Terminal 277';
+export const BRAND_NAME = 'La Vie de César';
+export const TERMINAL_NAME = 'Terminal LVDC';
+export const BRAND_MARK = 'LVDC';
 export const APP_NAME = BRAND_NAME;
 export const SITE_URL = 'https://atcapital.up.railway.app';
+
+/** Suivi wallet Hyperliquid (terminal live + historique). Désactivé par défaut. */
+export const WALLET_TRACKING_ENABLED = false;
 /** API push Railway (surveillance wallet 24/7) */
 export const PUSH_API_BASE = SITE_URL;
 export const CONTACT_EMAIL = 'contact@atcapital.fr';
-export const APK_DOWNLOAD_URL = `${SITE_URL}/AT-Capital-Terminal-277.apk`;
+export const APK_DOWNLOAD_URL = `${SITE_URL}/LVDC-Terminal.apk`;
 export const ANDROID_PACKAGE = 'com.thanh.suivitrades';
 
 export const DATA_SCOPE =

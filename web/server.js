@@ -9,7 +9,11 @@ const port = Number(process.env.PORT) || 3000;
 const dist = path.join(__dirname, 'dist');
 
 mountPushRoutes(app, express);
-startPushPoller();
+if (process.env.WALLET_TRACKING_ENABLED === 'true') {
+  startPushPoller();
+} else {
+  console.log('[push] wallet tracking disabled — poller not started');
+}
 
 app.use(express.static(dist, { maxAge: '1h', index: false }));
 
@@ -18,5 +22,5 @@ app.get('*', (_req, res) => {
 });
 
 app.listen(port, '0.0.0.0', () => {
-  console.log(`A&T CAPITAL · Terminal 277 → http://0.0.0.0:${port}`);
+  console.log(`La Vie de César · Terminal LVDC → http://0.0.0.0:${port}`);
 });

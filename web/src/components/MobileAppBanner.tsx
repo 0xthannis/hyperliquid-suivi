@@ -3,6 +3,7 @@ import {
   APK_DOWNLOAD_URL,
   ANDROID_PACKAGE,
   SITE_URL,
+  WALLET_TRACKING_ENABLED,
 } from '../constants';
 import './MobileAppBanner.css';
 
@@ -47,9 +48,11 @@ export function MobileAppBanner() {
   return (
     <div className="mobile-app-banner" role="region" aria-label="Application mobile">
       <div className="mobile-app-banner-inner">
-        <p className="mobile-app-banner-title">Terminal 277 sur mobile</p>
+        <p className="mobile-app-banner-title">Terminal LVDC sur mobile</p>
         <p className="mobile-app-banner-text">
-          Ouvrez l'app A&amp;T CAPITAL si elle est installée, ou téléchargez la dernière APK.
+          {WALLET_TRACKING_ENABLED
+            ? "Ouvrez l'app La Vie de César si elle est installée, ou téléchargez la dernière APK."
+            : "Le suivi wallet est suspendu sur le site et l'app mobile. L'APK reste disponible mais le terminal live n'est plus actif."}
         </p>
         <div className="mobile-app-banner-actions">
           <button type="button" className="mobile-app-btn mobile-app-btn--primary" onClick={openApp}>

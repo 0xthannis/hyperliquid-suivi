@@ -1,0 +1,124 @@
+.terminal-unavailable {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+}
+
+.terminal-unavailable--embedded {
+  padding: 3rem 1.5rem 4rem;
+}
+
+.terminal-unavailable__badge {
+  display: inline-block;
+  margin-bottom: 1rem;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+  background: var(--accent-muted);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+}
+
+.terminal-unavailable__title {
+  margin: 0 0 1rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.25;
+}
+
+.terminal-unavailable__lead {
+  margin: 0 0 1.25rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.terminal-unavailable__list {
+  margin: 0 0 1.25rem;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+  font-size: 0.875rem;
+  color: var(--text-dim);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  background: var(--card);
+}
+
+.terminal-unavailable__list li {
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.terminal-unavailable__list li:last-child {
+  border-bottom: none;
+}
+
+.terminal-unavailable__note {
+  margin: 0 0 1.5rem;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--text-dim);
+}
+
+.terminal-unavailable__note a {
+  color: var(--gold);
+}
+
+.terminal-unavailable__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.terminal-unavailable__btn {
+  display: inline-block;
+  padding: 0.65rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--bg);
+  background: var(--gold);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+}
+
+.terminal-unavailable__btn--ghost {
+  color: var(--text-muted);
+  background: var(--card);
+  border: 1px solid var(--card-border);
+}
+
+.landing-unavailable-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin: 0 0 1.5rem;
+  padding: 1rem 1.125rem;
+  background: rgba(248, 113, 113, 0.08);
+  border: 1px solid rgba(248, 113, 113, 0.25);
+  border-radius: var(--radius-md);
+  text-align: left;
+}
+
+.landing-unavailable-banner strong {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--red);
+}
+
+.landing-unavailable-banner p {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}

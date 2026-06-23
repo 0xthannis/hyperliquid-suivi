@@ -578,6 +578,11 @@
   box-shadow: 0 0 8px var(--green, #3d9a6e);
 }
 
+.landing-activity-dot--off {
+  background: var(--red, #f87171);
+  box-shadow: 0 0 8px rgba(248, 113, 113, 0.45);
+}
+
 .landing-promises {
   position: relative;
   z-index: 1;

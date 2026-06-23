@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { fetchFills, fetchPositions } from '../api/hyperliquid';
+import { WALLET_TRACKING_ENABLED } from '../constants';
 import { timeAgo } from '../lib/calculations';
 
 export type LandingSnapshot = {
@@ -22,6 +23,18 @@ export function useLandingSnapshot(): LandingSnapshot {
   });
 
   useEffect(() => {
+    if (!WALLET_TRACKING_ENABLED) {
+      setState({
+        openCount: 0,
+        openCoins: [],
+        lastActivityTs: null,
+        lastActivityLabel: null,
+        loading: false,
+        error: null,
+      });
+      return;
+    }
+
     let cancelled = false;
 
     async function load() {
@@ -65,6 +78,9 @@ export function useLandingSnapshot(): LandingSnapshot {
 }
 
 export function formatLandingActivity(snapshot: LandingSnapshot): string {
+  if (!WALLET_TRACKING_ENABLED) {
+    return 'Suivi wallet suspendu — terminal indisponible';
+  }
   if (snapshot.loading) return 'Chargement de l\'activité…';
   if (snapshot.error) return 'Activité indisponible pour le moment';
 

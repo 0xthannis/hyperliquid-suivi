@@ -8,6 +8,7 @@ import {
   formatUsd,
   type PnlCardData,
 } from '../utils/pnlCard';
+import { displaySymbol } from '../api/hyperliquid';
 import { colors, radius } from '../theme';
 
 type Props = {
@@ -94,7 +95,7 @@ export function PnlShareCard({ data, width = 360 }: Props) {
           </View>
         </View>
 
-        <Text style={[styles.coin, { fontSize: s(42), marginTop: s(18) }]}>{data.coin}</Text>
+        <Text style={[styles.coin, { fontSize: s(42), marginTop: s(18) }]}>{displaySymbol(data.coin)}</Text>
 
         <View style={[styles.hero, { marginTop: s(20) }]}>
           <Text style={[styles.pnlHero, { color: pnlColor, fontSize: s(38) }]}>

@@ -16,7 +16,7 @@ module.exports = () => {
           'expo-notifications',
           {
             icon: './assets/icon.png',
-            color: '#C9A962',
+            color: '#FFFFFF',
             sounds: [],
             enableBackgroundRemoteNotifications: true,
           },

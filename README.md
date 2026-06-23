@@ -1,12 +1,12 @@
-# A&T CAPITAL · Terminal 277
+# La Vie de César · Terminal LVDC
 
-Site et app **gratuits** pour suivre en direct les positions Hyperliquid du wallet public (A&T CAPITAL).
+Site et app **gratuits** pour suivre en direct les positions Hyperliquid du wallet public (La Vie de César) — crypto, indices et matières premières.
 
 **Site web** : [atcapital.up.railway.app](https://atcapital.up.railway.app) · Déploiement : voir [web/DEPLOY.md](web/DEPLOY.md)
 
-**Android** : `bash scripts/setup-and-build.sh` → `dist/AT-Capital-Terminal-277.apk`
+**Android** : `bash scripts/setup-and-build.sh` → `dist/LVDC-Terminal.apk`
 
-**macOS** : `bash scripts/build-mac.sh` → `dist/AT-Capital-Terminal-277-mac.dmg`
+**macOS** : `bash scripts/build-mac.sh` → `dist/LVDC-Terminal-mac.dmg`
 
 **Important :** seules les données Hyperliquid de ce wallet sont affichées. L'historique remonte à l'activité enregistrée sur HL (souvent une à quelques semaines), pas aux années passées sur Binance, Bybit ou Bitget.
 

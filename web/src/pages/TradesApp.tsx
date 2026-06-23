@@ -1,21 +1,12 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BrandLogo } from '../components/BrandLogo';
-import { DataScopeBar } from '../components/DataScopeBar';
 import { MobileAppBanner } from '../components/MobileAppBanner';
-import { TerminalTour } from '../components/TerminalTour';
-import { useTraderData } from '../hooks/useTraderData';
-import { LiveView } from '../components/LiveView';
-import { HistoryView } from '../components/HistoryView';
+import { TerminalUnavailable } from '../components/TerminalUnavailable';
 import { BRAND_NAME, TERMINAL_NAME } from '../constants';
 import '../App.css';
-
-type Tab = 'live' | 'history';
+import '../components/TerminalUnavailable.css';
 
 export function TradesApp() {
-  const [tab, setTab] = useState<Tab>('live');
-  const data = useTraderData();
-
   return (
     <div className="terminal">
       <div className="terminal-frame">
@@ -27,61 +18,22 @@ export function TradesApp() {
             <BrandLogo compact />
             <div className="terminal-brand-text">
               <span className="terminal-logo">{TERMINAL_NAME}</span>
-              <span className="terminal-sub">{BRAND_NAME} · Hyperliquid</span>
+              <span className="terminal-sub">{BRAND_NAME}</span>
             </div>
           </div>
-          <div
-            className={`terminal-status ${data.wsConnected ? 'terminal-status--on' : ''}`}
-          >
+          <div className="terminal-status">
             <span className="terminal-status-dot" />
-            <span>{data.wsConnected ? 'Flux connecté' : 'Synchronisation'}</span>
+            <span>Indisponible</span>
           </div>
         </header>
 
-        <DataScopeBar lastUpdate={data.lastUpdate} wsConnected={data.wsConnected} />
-
-        <nav className="terminal-tabs" aria-label="Sections du terminal">
-          <button
-            type="button"
-            className={`terminal-tab ${tab === 'live' ? 'is-active' : ''}`}
-            onClick={() => setTab('live')}
-          >
-            Positions
-          </button>
-          <button
-            type="button"
-            className={`terminal-tab ${tab === 'history' ? 'is-active' : ''}`}
-            onClick={() => setTab('history')}
-          >
-            Historique
-          </button>
-        </nav>
-
         <main className="terminal-main">
-          {tab === 'live' ? (
-            <LiveView
-              positions={data.positions}
-              orders={data.orders}
-              mids={data.mids}
-              accountValue={data.accountValue}
-              loading={data.loading}
-              error={data.error}
-              priceTick={data.priceTick}
-            />
-          ) : (
-            <HistoryView
-              history={data.history}
-              fills={data.fills}
-              allTimePnl={data.allTimePnl}
-              loading={data.loading}
-            />
-          )}
+          <TerminalUnavailable embedded />
         </main>
 
         <footer className="terminal-footer">
           <p>
-            Données Hyperliquid uniquement · Accès gratuit · Pas un conseil en
-            investissement
+            Suivi wallet suspendu · Accès gratuit · Pas un conseil en investissement
           </p>
           <p>
             <Link to="/about" className="terminal-footer-link">
@@ -94,7 +46,6 @@ export function TradesApp() {
           </p>
         </footer>
       </div>
-      <TerminalTour />
       <MobileAppBanner />
     </div>
   );

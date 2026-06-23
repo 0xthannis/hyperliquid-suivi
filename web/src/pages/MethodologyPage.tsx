@@ -5,12 +5,15 @@ import {
   DATA_SCOPE,
   TERMINAL_NAME,
   TRADER_WALLET,
+  WALLET_TRACKING_ENABLED,
   hyperliquidExplorerUrl,
 } from '../constants';
 import { truncateWallet } from '../lib/wallet';
+import '../components/TerminalUnavailable.css';
 import './MethodologyPage.css';
 
-const SECTIONS = [
+const SECTIONS = WALLET_TRACKING_ENABLED
+  ? [
   {
     title: 'Objet du service',
     body: `${BRAND_NAME} propose le ${TERMINAL_NAME}, un terminal gratuit de lecture. Il affiche l'activité du wallet Hyperliquid indiqué ci-dessous : positions ouvertes, paramètres de sortie et journal des opérations enregistrées par la plateforme.`,
@@ -35,7 +38,25 @@ const SECTIONS = [
     title: 'Réplication',
     body: 'Toute réplication d\'exécution reste sous la responsabilité du lecteur. Slippage, latence, taille de position et frais peuvent différer. Les scénarios SL/TP affichés reflètent les ordres visibles sur Hyperliquid au moment de la requête.',
   },
-];
+]
+  : [
+      {
+        title: 'Statut actuel',
+        body: `Le suivi public du wallet Hyperliquid est suspendu. Le ${TERMINAL_NAME} n'affiche plus de positions, d'historique ni d'alertes liées au wallet. Cette page documente le fonctionnement habituel du service lorsqu'il est actif.`,
+      },
+      {
+        title: 'Objet du service (lorsque actif)',
+        body: `${BRAND_NAME} proposait le ${TERMINAL_NAME}, un terminal gratuit de lecture affichant l'activité du wallet Hyperliquid indiqué ci-dessous.`,
+      },
+      {
+        title: 'Périmètre des données',
+        body: 'Seules les données exposées par l\'API Hyperliquid pour ce wallet étaient affichées. L\'historique détaillé correspondait à l\'activité enregistrée sur Hyperliquid (souvent une à quelques semaines).',
+      },
+      {
+        title: 'Ce que le service n\'est pas',
+        body: `Pas de gestion pour compte tiers. Pas de conseil en investissement. Pas de promesse de performance. Pas de relation contractuelle entre l'utilisateur et ${BRAND_NAME}.`,
+      },
+    ];
 
 export function MethodologyPage() {
   return (
@@ -49,14 +70,29 @@ export function MethodologyPage() {
           À propos
         </Link>
         <Link to="/app" className="methodology-cta">
-          {TERMINAL_NAME}
+          {WALLET_TRACKING_ENABLED ? TERMINAL_NAME : `${TERMINAL_NAME} — indisponible`}
         </Link>
       </header>
 
       <main className="methodology-main">
         <p className="methodology-eyebrow">Documentation</p>
         <h1>Méthodologie</h1>
-        <p className="methodology-lead">{DATA_SCOPE}</p>
+        <p className="methodology-lead">
+          {WALLET_TRACKING_ENABLED
+            ? DATA_SCOPE
+            : 'Suivi wallet suspendu. La documentation ci-dessous décrit le service lorsqu\'il était actif.'}
+        </p>
+
+        {!WALLET_TRACKING_ENABLED && (
+          <div className="landing-unavailable-banner" role="status">
+            <div>
+              <strong>Terminal indisponible</strong>
+              <p>
+                Aucune donnée live n&apos;est publiée pour le wallet indiqué ci-dessous.
+              </p>
+            </div>
+          </div>
+        )}
 
         <div className="methodology-wallet">
           <span className="metric-label">Wallet suivi</span>
