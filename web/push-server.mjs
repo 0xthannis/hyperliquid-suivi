@@ -129,9 +129,10 @@ async function fetchPerpDexNames() {
   if (perpDexNamesCache) return perpDexNamesCache;
   try {
     const list = await postInfo({ type: 'perpDexs' });
+    // perpDexs renvoie des objets { name } (ou parfois des tuples [name, ...]).
     perpDexNamesCache = (list ?? [])
-      .filter((d) => Array.isArray(d) && d[0])
-      .map((d) => d[0]);
+      .map((d) => (Array.isArray(d) ? d[0] : d && typeof d === 'object' ? d.name : null))
+      .filter((n) => typeof n === 'string' && n.length > 0);
   } catch {
     perpDexNamesCache = [];
   }

@@ -107,13 +107,22 @@ let perpDexNamesPromise: Promise<string[]> | null = null;
 export async function fetchPerpDexNames(): Promise<string[]> {
   if (perpDexNamesCache) return perpDexNamesCache;
   if (!perpDexNamesPromise) {
-    perpDexNamesPromise = postInfo<Array<[string, string | null] | null>>({
+    // perpDexs renvoie soit des objets { name }, soit des tuples [name, ...] ;
+    // le 1er élément (dex principal/crypto) est null. On gère les deux formats.
+    perpDexNamesPromise = postInfo<Array<unknown>>({
       type: 'perpDexs',
     })
       .then((list) => {
         const names = (list ?? [])
-          .filter((d): d is [string, string | null] => Array.isArray(d) && !!d[0])
-          .map((d) => d[0]);
+          .map((d) => {
+            if (Array.isArray(d)) return typeof d[0] === 'string' ? d[0] : null;
+            if (d && typeof d === 'object' && 'name' in d) {
+              const n = (d as { name?: unknown }).name;
+              return typeof n === 'string' ? n : null;
+            }
+            return null;
+          })
+          .filter((n): n is string => !!n);
         perpDexNamesCache = names;
         return names;
       })
