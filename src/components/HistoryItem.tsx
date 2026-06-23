@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import type { HistoryEvent } from '../utils/calculations';
 import { formatUsd, timeAgo } from '../utils/calculations';
+import { displaySymbol } from '../api/hyperliquid';
 import { colors, spacing, radius } from '../theme';
 
 type Props = {
@@ -17,7 +18,7 @@ export function HistoryItem({ event, onSharePnl }: Props) {
     <View style={styles.card}>
       <View style={styles.row}>
         <View style={styles.main}>
-          <Text style={styles.coin}>{event.coin}</Text>
+          <Text style={styles.coin}>{displaySymbol(event.coin)}</Text>
           <Text style={styles.label}>{event.label}</Text>
         </View>
         <View style={styles.right}>

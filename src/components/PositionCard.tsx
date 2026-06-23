@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import type { AssetPosition, TpSlOrder } from '../api/hyperliquid';
+import { displaySymbol, type AssetPosition, type TpSlOrder } from '../api/hyperliquid';
 import {
   findTpSlForCoin,
   formatPct,
@@ -51,7 +51,7 @@ export function PositionCard({ position, orders, currentPrice }: Props) {
     <View style={[styles.card, { borderLeftColor: isLong ? colors.green : colors.red }]}>
       <View style={styles.header}>
         <View style={styles.idRow}>
-          <Text style={styles.coin}>{coin}</Text>
+          <Text style={styles.coin}>{displaySymbol(coin)}</Text>
           <Text style={[styles.sideBadge, { color: isLong ? colors.green : colors.red, borderColor: isLong ? colors.green : colors.red }]}>
             {isLong ? 'LONG' : 'SHORT'}
           </Text>

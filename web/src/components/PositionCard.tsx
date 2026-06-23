@@ -1,4 +1,4 @@
-import type { AssetPosition, TpSlOrder } from '../api/hyperliquid';
+import { displaySymbol, type AssetPosition, type TpSlOrder } from '../api/hyperliquid';
 import {
   computeTargetProgress,
   findTpSlForCoin,
@@ -52,7 +52,7 @@ export function PositionCard({ position, orders, currentPrice }: Props) {
     <article className={`position-card ${isLong ? 'position-card--long' : 'position-card--short'}`}>
       <div className="position-card-head">
         <div className="position-card-id">
-          <span className="position-coin">{coin}</span>
+          <span className="position-coin">{displaySymbol(coin)}</span>
           <span className={`position-side ${isLong ? 'positive' : 'negative'}`}>
             {isLong ? 'LONG' : 'SHORT'}
           </span>

@@ -1,5 +1,6 @@
 import type { Fill, HistoricalOrder } from '../api/hyperliquid';
 import {
+  displaySymbol,
   fetchAssetLeverage,
   fetchHistoricalOrders,
 } from '../api/hyperliquid';
@@ -261,7 +262,7 @@ export async function buildPnlCardData(
 
 export function pnlCardFilename(data: PnlCardData): string {
   const date = new Date(data.closedAt).toISOString().slice(0, 10);
-  return `AT-Capital-${data.coin}-${data.side}-${date}.png`;
+  return `AT-Capital-${displaySymbol(data.coin)}-${data.side}-${date}.png`;
 }
 
 export { formatUsd, formatPct };

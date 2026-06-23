@@ -1,4 +1,5 @@
 import { BRAND_NAME, TERMINAL_NAME } from '../constants';
+import { displaySymbol } from '../api/hyperliquid';
 import {
   formatPct,
   formatTradePrice,
@@ -31,7 +32,7 @@ export function PnlShareCard({ data, className = '', forExport = false }: Props)
   return (
     <article
       className={`pnl-card ${pnlClass} ${forExport ? 'pnl-card--export' : ''} ${className}`.trim()}
-      aria-label={`Carte PnL ${data.coin} ${data.side}`}
+      aria-label={`Carte PnL ${displaySymbol(data.coin)} ${data.side}`}
     >
       <div className="pnl-card__glow pnl-card__glow--pnl" aria-hidden />
       <div className="pnl-card__glow pnl-card__glow--gold" aria-hidden />
@@ -49,7 +50,7 @@ export function PnlShareCard({ data, className = '', forExport = false }: Props)
         </div>
       </header>
 
-      <h2 className="pnl-card__coin">{data.coin}</h2>
+      <h2 className="pnl-card__coin">{displaySymbol(data.coin)}</h2>
 
       <div className="pnl-card__hero">
         <p className="pnl-card__pnl tabular">{formatUsd(data.netPnl, true)}</p>

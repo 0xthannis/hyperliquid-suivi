@@ -55,3 +55,9 @@ desktop/release/
 
 # editor / AI
 .claude/
+
+# build artifacts / binaires lourds — jamais committés (distribués hors git)
+web.zip
+web/public/LVDC-Terminal.apk
+*.aab
+*.dmg
