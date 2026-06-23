@@ -1,23 +1,43 @@
-/* Design system A&T CAPITAL — web & landing */
+/* Design system A&T CAPITAL — maison de trading, monochrome premium */
 :root {
-  --bg: #060608;
-  --bg-elevated: #0e0e12;
-  --card: #141418;
-  --card-border: rgba(201, 169, 98, 0.14);
-  --text: #f5f0e6;
-  --text-muted: #b8b4ac;
-  --text-dim: #7a7670;
-  --gold: #c9a962;
-  --gold-light: #e8d5a3;
-  --accent: #c9a962;
-  --accent-muted: rgba(201, 169, 98, 0.12);
-  --green: #4ade80;
-  --red: #f87171;
+  /* Surfaces — noir absolu, étagement minimal */
+  --bg: #000000;
+  --bg-elevated: #070708;
+  --card: #0c0c0e;
+  --card-2: #121214;
+  --card-border: rgba(255, 255, 255, 0.08);
+  --line: rgba(255, 255, 255, 0.06);
+  --line-strong: rgba(255, 255, 255, 0.16);
+
+  /* Texte — platine / graphite */
+  --text: #f6f6f7;
+  --text-muted: #9b9ea4;
+  --text-dim: #5a5d63;
+  --text-faint: #3a3d42;
+
+  /* Accent monochrome (aucune couleur de marque) */
+  --gold: #ededf0;
+  --gold-light: #ffffff;
+  --accent: #ffffff;
+  --accent-muted: rgba(255, 255, 255, 0.06);
+
+  /* P&L — vert/rouge institutionnels, désaturés */
+  --green: #5cb98a;
+  --red: #e0726c;
+
   --font: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-serif: 'Fraunces', 'Times New Roman', Georgia, serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
   --text-base: 1rem;
   --text-sm: 0.875rem;
   --text-xs: 0.75rem;
-  --leading: 1.55;
-  --radius-sm: 2px;
-  --radius-md: 4px;
+  --leading: 1.65;
+
+  /* Coins quasi droits — rigueur institutionnelle */
+  --radius-sm: 1px;
+  --radius-md: 2px;
+
+  /* Micro-label : petites capitales très espacées */
+  --label-spacing: 0.22em;
 }
