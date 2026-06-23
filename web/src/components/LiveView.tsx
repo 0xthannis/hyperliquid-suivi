@@ -14,6 +14,7 @@ import {
   pnlPercent,
   type HistoryEvent,
 } from '../lib/calculations';
+import { computeExitMetrics, formatRiskReward } from '../lib/riskMetrics';
 import { getPushSupport } from '../lib/push';
 
 type Props = {
@@ -203,28 +204,66 @@ export function LiveView({
             const pct = pnlPercent(p, px);
             const { stopLoss, takeProfit } = findTpSlForCoin(orders, p.coin);
             const win = live >= 0;
+            const lossAtSl = stopLoss ? pnlAtPrice(p, stopLoss.triggerPx) : null;
+            const gainAtTp = takeProfit ? pnlAtPrice(p, takeProfit.triggerPx) : null;
+            const { riskReward } = computeExitMetrics(
+              p,
+              px,
+              stopLoss?.triggerPx ?? null,
+              takeProfit?.triggerPx ?? null
+            );
             return (
-              <div className="tx-row" key={p.coin}>
-                <span className="tx-sym">
-                  {displaySymbol(p.coin)}
-                  {(stopLoss || takeProfit) && (
-                    <span className="tx-sym-exits">
-                      {stopLoss && <em>SL {stopLoss.triggerPx}</em>}
-                      {takeProfit && <em>TP {takeProfit.triggerPx}</em>}
-                    </span>
-                  )}
-                </span>
-                <span className={p.isLong ? 'pos' : 'neg'}>
-                  {p.isLong ? 'LONG' : 'SHORT'}
-                </span>
-                <span className="r tabular">{p.leverage}×</span>
-                <span className="r tabular dim">{p.entryPx}</span>
-                <span className="r tabular">{px}</span>
-                <span className="r tabular dim">{formatUsd(p.positionValue)}</span>
-                <span className={`r tabular ${win ? 'pos' : 'neg'}`}>
-                  {formatUsd(live, true)}
-                  <em className="tx-row-pct"> {formatPct(pct)}</em>
-                </span>
+              <div className="tx-pos" key={p.coin}>
+                <div className="tx-row">
+                  <span className="tx-sym">{displaySymbol(p.coin)}</span>
+                  <span className={p.isLong ? 'pos' : 'neg'}>
+                    {p.isLong ? 'LONG' : 'SHORT'}
+                  </span>
+                  <span className="r tabular">{p.leverage}×</span>
+                  <span className="r tabular dim">{p.entryPx}</span>
+                  <span className="r tabular">{px}</span>
+                  <span className="r tabular dim">{formatUsd(p.positionValue)}</span>
+                  <span className={`r tabular ${win ? 'pos' : 'neg'}`}>
+                    {formatUsd(live, true)}
+                    <em className="tx-row-pct"> {formatPct(pct)}</em>
+                  </span>
+                </div>
+                {(stopLoss || takeProfit) && (
+                  <div className="tx-risk">
+                    <div className="tx-risk-cell">
+                      <span className="tx-risk-label">Stop loss</span>
+                      <span className="tx-risk-main tabular">
+                        {stopLoss ? (
+                          <>
+                            {stopLoss.triggerPx}
+                            <em className="neg"> risque {formatUsd(lossAtSl ?? 0, true)}</em>
+                          </>
+                        ) : (
+                          <em className="dim">non placé</em>
+                        )}
+                      </span>
+                    </div>
+                    <div className="tx-risk-cell">
+                      <span className="tx-risk-label">Take profit</span>
+                      <span className="tx-risk-main tabular">
+                        {takeProfit ? (
+                          <>
+                            {takeProfit.triggerPx}
+                            <em className="pos"> gain {formatUsd(gainAtTp ?? 0, true)}</em>
+                          </>
+                        ) : (
+                          <em className="dim">non placé</em>
+                        )}
+                      </span>
+                    </div>
+                    <div className="tx-risk-cell">
+                      <span className="tx-risk-label">Risk / Reward</span>
+                      <span className="tx-risk-main tabular tx-rr">
+                        {formatRiskReward(riskReward)}
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })}

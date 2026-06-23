@@ -1003,6 +1003,43 @@
 .tx-sym-exits em { font-style: normal; font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-dim); }
 .tx-row-pct { font-style: normal; font-size: 0.66rem; opacity: 0.65; }
 
+.tx-pos { border-bottom: 1px solid var(--line); }
+.tx-pos:last-child { border-bottom: none; }
+.tx-pos .tx-row { border-bottom: none; }
+
+.tx-risk {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--line);
+  margin: 0 0.75rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  min-width: 520px;
+}
+@media (max-width: 640px) { .tx-risk { grid-template-columns: 1fr; } }
+.tx-risk-cell {
+  background: var(--bg-3);
+  padding: 0.6rem 0.95rem;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.tx-risk-label {
+  font-size: 0.54rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+.tx-risk-main {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+.tx-risk-main em { font-style: normal; font-size: 0.74rem; }
+.tx-rr { color: var(--accent-2); font-weight: 600; }
+
 .tx-empty {
   padding: 2.5rem 1.5rem;
   text-align: center;
