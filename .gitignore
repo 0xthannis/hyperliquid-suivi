@@ -55,3 +55,11 @@ desktop/release/
 
 # editor / AI
 .claude/
+
+# build artifacts / binaries — distribués hors git (jamais committés)
+*.apk
+*.aab
+*.dmg
+*.ipa
+web.zip
+web/public/*.apk
