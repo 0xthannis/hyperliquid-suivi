@@ -17,45 +17,33 @@ import {
 import { truncateWallet } from '../lib/wallet';
 import './LandingPage.css';
 
-const TICKER = [
-  { sym: 'OR', cat: 'Métaux précieux' },
-  { sym: 'ARGENT', cat: 'Métaux précieux' },
-  { sym: 'CUIVRE', cat: 'Métaux' },
-  { sym: 'ALUMINIUM', cat: 'Métaux' },
-  { sym: 'BRENT', cat: 'Énergie' },
-  { sym: 'WTI', cat: 'Énergie' },
-  { sym: 'GAZ NAT.', cat: 'Énergie' },
-  { sym: 'BLÉ', cat: 'Agricole' },
-  { sym: 'AAPL', cat: 'Actions' },
-  { sym: 'NVDA', cat: 'Actions' },
-  { sym: 'MSFT', cat: 'Actions' },
-  { sym: 'TSLA', cat: 'Actions' },
-  { sym: 'AMZN', cat: 'Actions' },
-  { sym: 'MRVL', cat: 'Actions' },
+const MARKETS_TICKER = [
+  'OR', 'ARGENT', 'CUIVRE', 'ALUMINIUM', 'BRENT', 'WTI', 'GAZ NAT.',
+  'BLÉ', 'AAPL', 'NVDA', 'MSFT', 'TSLA', 'AMZN', 'MRVL', 'MU', 'AMD',
 ];
 
 const STATS = [
-  { value: '100%', label: 'On-chain · vérifiable' },
-  { value: '2', label: 'Marchés · matières premières & actions' },
+  { value: '100%', label: 'Vérifiable on-chain' },
+  { value: '2', label: 'Classes d’actifs réels' },
   { value: '0 €', label: 'Terminal en accès libre' },
-  { value: 'Live', label: 'Exécution en temps réel' },
+  { value: '24/7', label: 'Exécution & suivi' },
 ];
 
 const DOCTRINE = [
   {
-    k: 'I',
+    k: '01',
     title: 'Conviction',
-    text: "Peu de positions, prises avec intention. On n'entre pas pour suivre le bruit — on entre quand la thèse est claire et le risque borné.",
+    text: 'Peu de lignes, prises avec intention. On entre quand la thèse est nette et le risque borné. Jamais pour suivre le bruit.',
   },
   {
-    k: 'II',
+    k: '02',
     title: 'Discipline',
-    text: 'Chaque ligne a son stop et son objectif définis avant l’exécution. Le process passe avant le résultat, toujours.',
+    text: 'Stop et objectif définis avant chaque exécution. Le process commande, le résultat suit. Aucune position laissée au hasard.',
   },
   {
-    k: 'III',
+    k: '03',
     title: 'Transparence',
-    text: 'Tout est lisible on-chain, en temps réel. Les mêmes chiffres que nous, pour tout le monde — sans filtre, sans promesse.',
+    text: 'Tout est inscrit on-chain, en temps réel. Les mêmes chiffres que nous, pour tous, sans filtre ni récit arrangé.',
   },
 ];
 
@@ -64,47 +52,47 @@ const MARKETS = [
     tag: '01',
     title: 'Matières premières',
     sub: 'Métaux · énergie · agricoles',
-    text: "Or, argent, cuivre, aluminium, Brent, WTI, gaz naturel, céréales. Les actifs réels qui font tourner l’économie mondiale, opérés avec un mandat de risque strict.",
+    text: 'Or, argent, cuivre, aluminium, Brent, WTI, gaz naturel, céréales. Les actifs qui font tourner l’économie réelle, opérés sous mandat de risque strict.',
   },
   {
     tag: '02',
     title: 'Actions d’entreprises',
     sub: 'Large caps mondiales',
-    text: "Les leaders cotés — technologie, industrie, consommation. On suit la qualité et le momentum des entreprises qui pèsent, pas les modes.",
+    text: 'Les leaders cotés en technologie, industrie et consommation. On suit la qualité et le momentum des entreprises qui pèsent, pas les modes.',
   },
 ];
 
 const TERMINAL_FEATURES = [
   {
     title: 'Positions en direct',
-    text: 'Sens, levier, prix d’entrée, stop, take-profit et PnL non réalisé — actualisés en continu.',
+    text: 'Sens, levier, entrée, stop, take-profit et PnL non réalisé, actualisés en continu depuis la plateforme d’exécution.',
   },
   {
     title: 'Journal vérifiable',
-    text: 'Chaque opération clôturée, avec son résultat enregistré on-chain. Export possible.',
+    text: 'Chaque opération clôturée avec son résultat enregistré on-chain. Recoupable, exportable, sans retouche.',
   },
   {
-    title: 'Alertes discrètes',
-    text: 'Une notification à l’ouverture d’une position, si vous le souhaitez. Rien d’imposé.',
+    title: 'Alertes silencieuses',
+    text: 'Une notification à l’ouverture d’une position, si vous le souhaitez. Discret par défaut.',
   },
 ];
 
 const FAQ = [
   {
-    q: 'Que tradez-vous, exactement ?',
-    a: 'Uniquement des matières premières (métaux, énergie, agricoles) et des actions d’entreprises cotées. Pas de crypto à l’avant — des actifs réels, opérés en conviction.',
+    q: 'Que tradez-vous exactement ?',
+    a: 'Uniquement des matières premières (métaux, énergie, agricoles) et des actions d’entreprises cotées. Des actifs réels, opérés en conviction. Pas de bruit.',
   },
   {
-    q: 'Comment puis-je vérifier que c’est réel ?',
-    a: 'Tout est exécuté sur un wallet public et lisible on-chain. Le Terminal 277 affiche exactement ce que la plateforme enregistre — vous pouvez recouper chaque chiffre.',
+    q: 'Comment vérifier que c’est réel ?',
+    a: 'Tout est exécuté sur un wallet public, lisible on-chain. Le Terminal 277 affiche exactement ce que la plateforme enregistre : vous recoupez chaque chiffre.',
   },
   {
     q: 'C’est payant ?',
-    a: 'Non. Le site et le Terminal 277 sont en accès libre, sans inscription ni paiement. Aucun signal vendu, aucun capital géré pour des tiers.',
+    a: 'Non. Le site et le Terminal 277 sont en accès libre, sans inscription. Aucun signal vendu, aucun capital géré pour des tiers.',
   },
   {
-    q: 'Puis-je répliquer vos positions ?',
-    a: 'Vous observez et décidez par vous-même. A&T CAPITAL ne vous demande rien et ne gère pas de compte pour vous. Vous restez seul responsable de vos choix.',
+    q: 'Pourquoi “277” ?',
+    a: 'C’est une référence personnelle à Annissa & Thanh. Le terminal en porte le nom : notre table de lecture publique, ouverte à tous.',
   },
 ];
 
@@ -123,99 +111,158 @@ export function LandingPage() {
   }
 
   return (
-    <div className="lx">
-      <header className="lx-nav">
-        <div className="lx-nav-inner">
-          <Link to="/" className="lx-wordmark">
-            <span className="lx-wordmark-name">{BRAND_NAME}</span>
-            <span className="lx-wordmark-desc">Commodities &amp; Equities</span>
+    <div className="hx">
+      <div className="hx-aura" aria-hidden />
+
+      <header className="hx-nav">
+        <div className="hx-nav-inner">
+          <Link to="/" className="hx-wordmark">
+            <span className="hx-wordmark-name">{BRAND_NAME}</span>
+            <span className="hx-wordmark-desc">Commodities &amp; Equities</span>
           </Link>
-          <nav className="lx-nav-links" aria-label="Navigation">
+          <nav className="hx-nav-links" aria-label="Navigation">
             <a href="#maison">La maison</a>
             <a href="#marches">Marchés</a>
             <a href="#terminal">Terminal</a>
           </nav>
-          <Link to="/app" className="lx-nav-cta">
+          <Link to="/app" className="hx-btn hx-btn--primary hx-btn--sm">
             Ouvrir le Terminal
           </Link>
         </div>
       </header>
 
-      <div className="lx-ticker" aria-hidden>
-        <div className="lx-ticker-track">
-          {[...TICKER, ...TICKER].map((t, i) => (
-            <span className="lx-ticker-item" key={i}>
-              <span className="lx-ticker-sym">{t.sym}</span>
-              <span className="lx-ticker-cat">{t.cat}</span>
-            </span>
+      <section className="hx-hero">
+        <div className="hx-hero-copy">
+          <span className="hx-pill">
+            <span className="hx-pill-dot" />
+            Maison de trading privée · Annissa &amp; Thanh
+          </span>
+          <h1 className="hx-hero-title">
+            Les marchés réels,
+            <br />
+            opérés en <span className="hx-accent">conviction</span>.
+          </h1>
+          <p className="hx-hero-lead">
+            {BRAND_NAME} engage son propre capital sur les matières premières et les
+            actions d’entreprises mondiales. Exécution réelle, risque maîtrisé,
+            chaque position prouvée on-chain. Pas de gestion pour tiers. La donnée
+            parle d’elle-même.
+          </p>
+          <div className="hx-hero-actions">
+            <Link to="/app" className="hx-btn hx-btn--primary">
+              Ouvrir le Terminal 277
+            </Link>
+            <a
+              href={hyperliquidExplorerUrl(TRADER_WALLET)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hx-btn hx-btn--ghost"
+            >
+              Vérifier on-chain →
+            </a>
+          </div>
+          <div className="hx-hero-live">
+            <span className="hx-hero-live-dot" />
+            {formatLandingActivity(snapshot)}
+          </div>
+          {pushMsg && <p className="hx-push-msg">{pushMsg}</p>}
+        </div>
+
+        <div className="hx-hero-visual" aria-hidden>
+          <div className="hx-app">
+            <div className="hx-app-bar">
+              <span className="hx-app-dots">
+                <i /><i /><i />
+              </span>
+              <span className="hx-app-title">{BRAND_NAME} · {TERMINAL_NAME}</span>
+              <span className="hx-app-live">
+                <span className="hx-app-live-dot" /> LIVE
+              </span>
+            </div>
+            <div className="hx-app-body">
+              <div className="hx-app-acct">
+                <span className="hx-app-acct-label">Valeur du compte</span>
+                <span className="hx-app-acct-value">$478.48</span>
+                <span className="hx-app-acct-delta">▲ 1.93% · 30J</span>
+              </div>
+              <svg className="hx-curve" viewBox="0 0 320 80" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="hxfill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#7c9cff" stopOpacity="0.35" />
+                    <stop offset="100%" stopColor="#7c9cff" stopOpacity="0" />
+                  </linearGradient>
+                </defs>
+                <path
+                  d="M0,62 L26,58 L52,63 L78,49 L104,53 L130,40 L156,44 L182,31 L208,35 L234,24 L260,28 L286,16 L320,12 L320,80 L0,80 Z"
+                  fill="url(#hxfill)"
+                />
+                <path
+                  d="M0,62 L26,58 L52,63 L78,49 L104,53 L130,40 L156,44 L182,31 L208,35 L234,24 L260,28 L286,16 L320,12"
+                  fill="none"
+                  stroke="#7c9cff"
+                  strokeWidth="1.5"
+                />
+              </svg>
+              <div className="hx-app-kpis">
+                <div><span>PnL all-time</span><b className="pos">+$1,284</b></div>
+                <div><span>Win rate</span><b>61%</b></div>
+                <div><span>Exposition</span><b>$2,370</b></div>
+              </div>
+              <div className="hx-app-table">
+                <div className="hx-app-row hx-app-row--head">
+                  <span>Marché</span><span>Sens</span><span>Lev</span><span className="r">PnL</span>
+                </div>
+                <div className="hx-app-row">
+                  <span className="hx-app-sym">MRVL</span>
+                  <span className="neg">SHORT</span><span>3×</span>
+                  <span className="r pos">+$9.06</span>
+                </div>
+                <div className="hx-app-row">
+                  <span className="hx-app-sym">GOLD</span>
+                  <span className="pos">LONG</span><span>5×</span>
+                  <span className="r pos">+$41.20</span>
+                </div>
+                <div className="hx-app-row">
+                  <span className="hx-app-sym">BRENT</span>
+                  <span className="neg">SHORT</span><span>4×</span>
+                  <span className="r neg">−$12.40</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="hx-ticker" aria-hidden>
+        <div className="hx-ticker-track">
+          {[...MARKETS_TICKER, ...MARKETS_TICKER].map((s, i) => (
+            <span className="hx-ticker-item" key={i}>{s}</span>
           ))}
         </div>
       </div>
 
-      <section className="lx-hero">
-        <p className="lx-eyebrow">Maison de trading privée</p>
-        <h1 className="lx-hero-title">
-          Matières premières &amp; actions,
-          <br />
-          <em>tradées en conviction.</em>
-        </h1>
-        <p className="lx-hero-lead">
-          {BRAND_NAME} opère les marchés réels — métaux, énergie, agricoles et
-          actions d’entreprises mondiales. Capital propre, exécution réelle, chaque
-          position lisible on-chain. Pas de gestion pour tiers, pas de promesse :
-          la donnée parle d’elle-même.
-        </p>
-
-        <div className="lx-hero-actions">
-          <Link to="/app" className="lx-btn lx-btn--primary">
-            Ouvrir le Terminal 277
-          </Link>
-          <a
-            href={hyperliquidExplorerUrl(TRADER_WALLET)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="lx-btn lx-btn--ghost"
-          >
-            Vérifier on-chain
-          </a>
-        </div>
-
-        <div className="lx-hero-live" aria-live="polite">
-          <span className="lx-hero-live-dot" />
-          <span>{formatLandingActivity(snapshot)}</span>
-        </div>
-        {pushMsg && <p className="lx-push-msg">{pushMsg}</p>}
-      </section>
-
-      <section className="lx-stats">
+      <section className="hx-stats">
         {STATS.map((s) => (
-          <div className="lx-stat" key={s.label}>
-            <span className="lx-stat-value">{s.value}</span>
-            <span className="lx-stat-label">{s.label}</span>
+          <div className="hx-stat" key={s.label}>
+            <span className="hx-stat-value">{s.value}</span>
+            <span className="hx-stat-label">{s.label}</span>
           </div>
         ))}
       </section>
 
-      <section className="lx-section" id="maison">
-        <div className="lx-section-head">
-          <span className="lx-kicker">La maison</span>
-          <h2 className="lx-h2">
-            Un capital opéré par deux, avec la rigueur d’une institution.
-          </h2>
-        </div>
-        <p className="lx-section-lead">
-          {BRAND_NAME} est une structure privée tenue par <strong>Annissa</strong>{' '}
-          et <strong>Thanh</strong>. Deux personnes, un mandat clair : faire
-          travailler un capital propre sur les marchés réels, avec la discipline
-          d’une salle des marchés et l’exigence de tout rendre vérifiable. Aucune
-          levée auprès de tiers, aucun client à servir — seulement la performance,
-          exposée au grand jour.
+      <section className="hx-section" id="maison">
+        <span className="hx-kicker">La maison</span>
+        <h2 className="hx-h2">Un capital opéré par deux.<br />La rigueur d’une institution.</h2>
+        <p className="hx-lead">
+          {BRAND_NAME} est une structure privée fondée par <strong>Annissa</strong>{' '}
+          et <strong>Thanh</strong>. Aucune levée auprès de tiers, aucun client à
+          servir : un capital propre, engagé sur les marchés réels, avec la
+          discipline d’une salle des marchés et l’exigence de tout rendre vérifiable.
         </p>
-
-        <div className="lx-doctrine">
+        <div className="hx-cards hx-cards--3">
           {DOCTRINE.map((d) => (
-            <article className="lx-doctrine-card" key={d.k}>
-              <span className="lx-doctrine-num">{d.k}</span>
+            <article className="hx-card" key={d.k}>
+              <span className="hx-card-num">{d.k}</span>
               <h3>{d.title}</h3>
               <p>{d.text}</p>
             </article>
@@ -223,59 +270,47 @@ export function LandingPage() {
         </div>
       </section>
 
-      <section className="lx-section lx-section--alt" id="marches">
-        <div className="lx-section-head">
-          <span className="lx-kicker">Univers d’investissement</span>
-          <h2 className="lx-h2">Deux marchés. Des actifs réels. Pas de bruit.</h2>
-        </div>
-
-        <div className="lx-markets">
+      <section className="hx-section hx-section--band" id="marches">
+        <span className="hx-kicker">Univers d’investissement</span>
+        <h2 className="hx-h2">Deux classes d’actifs réels.</h2>
+        <div className="hx-cards hx-cards--2">
           {MARKETS.map((m) => (
-            <article className="lx-market" key={m.tag}>
-              <span className="lx-market-tag">{m.tag}</span>
-              <h3 className="lx-market-title">{m.title}</h3>
-              <p className="lx-market-sub">{m.sub}</p>
-              <p className="lx-market-text">{m.text}</p>
+            <article className="hx-market" key={m.tag}>
+              <span className="hx-market-tag">{m.tag}</span>
+              <h3>{m.title}</h3>
+              <span className="hx-market-sub">{m.sub}</span>
+              <p>{m.text}</p>
             </article>
           ))}
         </div>
-        <p className="lx-market-note">
-          Pas de crypto à l’avant. Pas de tokens à la mode. Des matières premières
-          et des entreprises que l’on comprend.
-        </p>
+        <p className="hx-note">Pas de crypto à l’avant. Pas de tokens à la mode. Des actifs que l’on comprend.</p>
       </section>
 
-      <section className="lx-section" id="terminal">
-        <div className="lx-section-head">
-          <span className="lx-kicker">{TERMINAL_NAME}</span>
-          <h2 className="lx-h2">
-            La salle des marchés, ouverte à tous — en lecture seule.
-          </h2>
-        </div>
-        <p className="lx-section-lead">
-          Le {TERMINAL_NAME} est notre tableau de bord public. Vous y voyez les
-          mêmes positions que nous, en temps réel, branchées directement sur la
-          plateforme d’exécution. Aucun compte, aucun frais.
+      <section className="hx-section" id="terminal">
+        <span className="hx-kicker">{TERMINAL_NAME}</span>
+        <h2 className="hx-h2">La salle des marchés, ouverte à tous.</h2>
+        <p className="hx-lead">
+          Le {TERMINAL_NAME} est notre table de lecture publique : les mêmes
+          positions que nous, en temps réel, branchées sur la plateforme
+          d’exécution. Aucun compte, aucun frais.
         </p>
-
-        <div className="lx-features">
+        <div className="hx-features">
           {TERMINAL_FEATURES.map((f) => (
-            <article className="lx-feature" key={f.title}>
-              <div className="lx-feature-rule" />
+            <article className="hx-feature" key={f.title}>
+              <div className="hx-feature-rule" />
               <h3>{f.title}</h3>
               <p>{f.text}</p>
             </article>
           ))}
         </div>
-
-        <div className="lx-terminal-cta">
-          <Link to="/app" className="lx-btn lx-btn--primary lx-btn--lg">
+        <div className="hx-cta-row">
+          <Link to="/app" className="hx-btn hx-btn--primary hx-btn--lg">
             Entrer dans le Terminal
           </Link>
           {pushState !== 'unsupported' && pushState !== 'denied' && (
             <button
               type="button"
-              className="lx-btn lx-btn--ghost lx-btn--lg"
+              className="hx-btn hx-btn--ghost hx-btn--lg"
               onClick={handlePush}
               disabled={pushLoading || pushState === 'granted'}
             >
@@ -289,14 +324,12 @@ export function LandingPage() {
         </div>
       </section>
 
-      <section className="lx-section lx-section--alt">
-        <div className="lx-section-head">
-          <span className="lx-kicker">Questions fréquentes</span>
-          <h2 className="lx-h2">Ce qu’il faut savoir avant d’entrer.</h2>
-        </div>
-        <div className="lx-faq">
+      <section className="hx-section hx-section--band">
+        <span className="hx-kicker">Questions fréquentes</span>
+        <h2 className="hx-h2">Avant d’entrer.</h2>
+        <div className="hx-faq">
           {FAQ.map((item) => (
-            <details className="lx-faq-item" key={item.q}>
+            <details className="hx-faq-item" key={item.q}>
               <summary>{item.q}</summary>
               <p>{item.a}</p>
             </details>
@@ -304,16 +337,16 @@ export function LandingPage() {
         </div>
       </section>
 
-      <footer className="lx-footer">
-        <div className="lx-footer-top">
-          <span className="lx-footer-mark">{BRAND_NAME}</span>
-          <span className="lx-footer-desc">Commodities &amp; Equities · Annissa &amp; Thanh</span>
+      <footer className="hx-footer">
+        <div className="hx-footer-brand">
+          <span className="hx-footer-mark">{BRAND_NAME}</span>
+          <span className="hx-footer-desc">Commodities &amp; Equities · Annissa &amp; Thanh</span>
         </div>
-        <p className="lx-footer-legal">
+        <p className="hx-footer-legal">
           Données on-chain uniquement · Accès libre · Aucune sollicitation, aucune
           promesse de performance, pas un conseil en investissement.
         </p>
-        <p className="lx-footer-links">
+        <p className="hx-footer-links">
           <Link to="/about">La maison</Link>
           <span aria-hidden> · </span>
           <Link to="/methodology">Méthodologie</Link>
@@ -322,7 +355,7 @@ export function LandingPage() {
           <span aria-hidden> · </span>
           <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
         </p>
-        <p className="lx-footer-wallet">
+        <p className="hx-footer-wallet">
           <a href={SITE_URL}>{SITE_URL.replace('https://', '')}</a>
           <span aria-hidden> · </span>
           Wallet {truncateWallet(TRADER_WALLET)}

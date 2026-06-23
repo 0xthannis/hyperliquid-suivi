@@ -1,32 +1,49 @@
-/* Design system A&T CAPITAL — maison de trading, monochrome premium */
+/* A&T CAPITAL — design system fintech premium, sombre & profond */
 :root {
-  /* Surfaces — noir absolu, étagement minimal */
-  --bg: #000000;
-  --bg-elevated: #070708;
-  --card: #0c0c0e;
-  --card-2: #121214;
-  --card-border: rgba(255, 255, 255, 0.08);
-  --line: rgba(255, 255, 255, 0.06);
+  /* Fond : noir bleuté profond, avec étagement de surfaces */
+  --bg: #05060a;
+  --bg-2: #080a10;
+  --bg-3: #0c0e16;
+  --card: #0e1119;
+  --card-2: #141826;
+  --card-border: rgba(255, 255, 255, 0.09);
+  --line: rgba(255, 255, 255, 0.07);
   --line-strong: rgba(255, 255, 255, 0.16);
+  --glass: rgba(20, 24, 38, 0.6);
 
-  /* Texte — platine / graphite */
-  --text: #f6f6f7;
-  --text-muted: #9b9ea4;
-  --text-dim: #5a5d63;
-  --text-faint: #3a3d42;
+  /* Texte */
+  --text: #f3f5f9;
+  --text-muted: #9aa0b0;
+  --text-dim: #5e6474;
+  --text-faint: #3a3f4d;
 
-  /* Accent monochrome (aucune couleur de marque) */
-  --gold: #ededf0;
-  --gold-light: #ffffff;
-  --accent: #ffffff;
-  --accent-muted: rgba(255, 255, 255, 0.06);
+  /* Accent : bleu institutionnel lumineux (l'aura) */
+  --accent: #7c9cff;
+  --accent-2: #aeb9ff;
+  --accent-soft: rgba(124, 156, 255, 0.14);
+  --accent-line: rgba(124, 156, 255, 0.4);
+  --accent-glow: rgba(124, 156, 255, 0.35);
 
-  /* P&L — vert/rouge institutionnels, désaturés */
-  --green: #5cb98a;
-  --red: #e0726c;
+  /* compat ancien nommage (utilisé par terminal/pages internes) */
+  --gold: var(--accent);
+  --gold-light: var(--accent-2);
+  --accent-muted: var(--accent-soft);
+  --bg-elevated: var(--bg-2);
+
+  /* P&L */
+  --green: #34d39e;
+  --red: #ff6b6b;
+
+  /* Dégradés de profondeur */
+  --depth-radial: radial-gradient(
+      1200px 600px at 70% -10%,
+      rgba(124, 156, 255, 0.12),
+      transparent 60%
+    ),
+    radial-gradient(900px 500px at 10% 10%, rgba(124, 156, 255, 0.06), transparent 55%);
 
   --font: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-serif: 'Fraunces', 'Times New Roman', Georgia, serif;
+  --font-display: 'Sora', 'Inter', system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 
   --text-base: 1rem;
@@ -34,10 +51,10 @@
   --text-xs: 0.75rem;
   --leading: 1.65;
 
-  /* Coins quasi droits — rigueur institutionnelle */
-  --radius-sm: 1px;
-  --radius-md: 2px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
 
-  /* Micro-label : petites capitales très espacées */
-  --label-spacing: 0.22em;
+  --label-spacing: 0.18em;
 }

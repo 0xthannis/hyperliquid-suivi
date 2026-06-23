@@ -242,6 +242,22 @@ export async function fetchPortfolioPnl(): Promise<{ perpAllTimePnl: number }> {
   return { perpAllTimePnl };
 }
 
+/** Courbe de valeur du compte (équité) pour le sparkline du terminal. */
+export async function fetchAccountValueHistory(
+  period: 'day' | 'week' | 'month' | 'allTime' = 'month'
+): Promise<number[]> {
+  const data = await postInfo<
+    Array<[string, { accountValueHistory?: Array<[number, string]> }]>
+  >({
+    type: 'portfolio',
+    user: TRADER_WALLET,
+  });
+
+  const block = data.find(([p]) => p === period)?.[1];
+  const hist = block?.accountValueHistory ?? [];
+  return hist.map(([, v]) => parseFloat(v)).filter((n) => Number.isFinite(n));
+}
+
 export async function fetchFills(): Promise<Fill[]> {
   const fills = await postInfo<
     Array<{

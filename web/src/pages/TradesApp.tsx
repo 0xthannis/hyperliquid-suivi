@@ -64,6 +64,8 @@ export function TradesApp() {
               orders={data.orders}
               mids={data.mids}
               accountValue={data.accountValue}
+              allTimePnl={data.allTimePnl}
+              history={data.history}
               loading={data.loading}
               error={data.error}
               priceTick={data.priceTick}
