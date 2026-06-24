@@ -1,4 +1,4 @@
-/* Service worker — notifications push Anthan */
+/* Service worker — notifications push AT Trading */
 self.addEventListener('install', (event) => {
   event.waitUntil(self.skipWaiting());
 });
@@ -9,7 +9,7 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('push', (event) => {
   let data = {
-    title: 'Anthan · Terminal 277',
+    title: 'AT Trading · Terminal 277',
     body: 'Nouvelle position ouverte sur Hyperliquid.',
   };
   try {

@@ -1,60 +1,53 @@
-/* Anthan — design system fintech premium, sombre & profond */
+/* AT Trading — design system noir & blanc, esprit Trade Republic */
 :root {
-  /* Fond : noir bleuté profond, avec étagement de surfaces */
-  --bg: #05060a;
-  --bg-2: #080a10;
-  --bg-3: #0c0e16;
-  --card: #0e1119;
-  --card-2: #141826;
-  --card-border: rgba(255, 255, 255, 0.09);
-  --line: rgba(255, 255, 255, 0.07);
-  --line-strong: rgba(255, 255, 255, 0.16);
-  --glass: rgba(20, 24, 38, 0.6);
+  /* Surfaces : noir absolu, étagement minimal */
+  --bg: #000000;
+  --bg-2: #0a0a0a;
+  --bg-3: #0e0e0e;
+  --card: #0c0c0c;
+  --card-2: #161616;
+  --card-border: rgba(255, 255, 255, 0.10);
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.20);
+  --glass: rgba(12, 12, 12, 0.7);
 
   /* Texte */
-  --text: #f3f5f9;
-  --text-muted: #9aa0b0;
-  --text-dim: #5e6474;
-  --text-faint: #3a3f4d;
+  --text: #ffffff;
+  --text-muted: #8a8d93;
+  --text-dim: #5a5d63;
+  --text-faint: #3a3d42;
 
-  /* Accent : bleu institutionnel lumineux (l'aura) */
-  --accent: #7c9cff;
-  --accent-2: #aeb9ff;
-  --accent-soft: rgba(124, 156, 255, 0.14);
-  --accent-line: rgba(124, 156, 255, 0.4);
-  --accent-glow: rgba(124, 156, 255, 0.35);
+  /* Accent = blanc (aucune couleur de marque). Alias gold pour compat. */
+  --accent: #ffffff;
+  --accent-2: #ffffff;
+  --accent-soft: rgba(255, 255, 255, 0.10);
+  --accent-line: rgba(255, 255, 255, 0.22);
+  --accent-glow: transparent;
+  --gold: #ffffff;
+  --gold-light: #ffffff;
+  --accent-muted: rgba(255, 255, 255, 0.08);
+  --bg-elevated: #0a0a0a;
 
-  /* compat ancien nommage (utilisé par terminal/pages internes) */
-  --gold: var(--accent);
-  --gold-light: var(--accent-2);
-  --accent-muted: var(--accent-soft);
-  --bg-elevated: var(--bg-2);
+  /* Variations P&L (seule couleur autorisée), tons Trade Republic */
+  --green: #16d195;
+  --red: #ff4d4d;
 
-  /* P&L */
-  --green: #34d39e;
-  --red: #ff6b6b;
+  /* Pas de profondeur colorée */
+  --depth-radial: none;
 
-  /* Dégradés de profondeur */
-  --depth-radial: radial-gradient(
-      1200px 600px at 70% -10%,
-      rgba(124, 156, 255, 0.12),
-      transparent 60%
-    ),
-    radial-gradient(900px 500px at 10% 10%, rgba(124, 156, 255, 0.06), transparent 55%);
-
-  --font: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-display: 'Sora', 'Inter', system-ui, sans-serif;
-  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --font: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Manrope', system-ui, sans-serif;
+  --font-mono: 'Manrope', ui-monospace, monospace;
 
   --text-base: 1rem;
   --text-sm: 0.875rem;
   --text-xs: 0.75rem;
-  --leading: 1.65;
+  --leading: 1.6;
 
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
-  --radius-xl: 22px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 26px;
 
-  --label-spacing: 0.18em;
+  --label-spacing: 0.02em;
 }

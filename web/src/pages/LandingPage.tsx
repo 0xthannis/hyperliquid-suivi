@@ -188,8 +188,8 @@ export function LandingPage() {
               <svg className="hx-curve" viewBox="0 0 320 80" preserveAspectRatio="none">
                 <defs>
                   <linearGradient id="hxfill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#7c9cff" stopOpacity="0.35" />
-                    <stop offset="100%" stopColor="#7c9cff" stopOpacity="0" />
+                    <stop offset="0%" stopColor="#16d195" stopOpacity="0.35" />
+                    <stop offset="100%" stopColor="#16d195" stopOpacity="0" />
                   </linearGradient>
                 </defs>
                 <path
@@ -199,7 +199,7 @@ export function LandingPage() {
                 <path
                   d="M0,62 L26,58 L52,63 L78,49 L104,53 L130,40 L156,44 L182,31 L208,35 L234,24 L260,28 L286,16 L320,12"
                   fill="none"
-                  stroke="#7c9cff"
+                  stroke="#16d195"
                   strokeWidth="1.5"
                 />
               </svg>

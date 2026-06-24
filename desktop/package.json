@@ -1,9 +1,9 @@
 {
   "name": "at-capital-desktop",
   "version": "1.1.1",
-  "description": "Anthan · Terminal 277 pour macOS",
+  "description": "AT Trading · Terminal 277 pour macOS",
   "main": "main.js",
-  "author": "Anthan",
+  "author": "AT Trading",
   "scripts": {
     "start": "electron .",
     "start:remote": "AT_REMOTE=1 electron .",
@@ -12,7 +12,7 @@
   "build": {
     "appId": "fr.atcapital.terminal277",
     "productName": "Terminal 277",
-    "copyright": "Anthan",
+    "copyright": "AT Trading",
     "directories": {
       "output": "release",
       "buildResources": "build"

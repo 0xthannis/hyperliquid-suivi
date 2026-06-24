@@ -49,7 +49,7 @@ export function MobileAppBanner() {
       <div className="mobile-app-banner-inner">
         <p className="mobile-app-banner-title">Terminal 277 sur mobile</p>
         <p className="mobile-app-banner-text">
-          Ouvrez l'app Anthan si elle est installée, ou téléchargez la dernière APK.
+          Ouvrez l'app AT Trading si elle est installée, ou téléchargez la dernière APK.
         </p>
         <div className="mobile-app-banner-actions">
           <button type="button" className="mobile-app-btn mobile-app-btn--primary" onClick={openApp}>

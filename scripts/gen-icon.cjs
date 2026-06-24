@@ -1,4 +1,4 @@
-/* Génère l'icône Anthan (monogramme A, dégradé bleu sur noir) en PNG 1024². */
+/* Génère l'icône AT Trading (monogramme A, dégradé bleu sur noir) en PNG 1024². */
 const fs = require('fs');
 const path = require('path');
 const { PNG } = require('pngjs');

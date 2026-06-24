@@ -1,6 +1,6 @@
-# Anthan · Terminal 277
+# AT Trading · Terminal 277
 
-Site et app **gratuits** pour suivre en direct les positions Hyperliquid du wallet public (Anthan).
+Site et app **gratuits** pour suivre en direct les positions Hyperliquid du wallet public (AT Trading).
 
 **Site web** : [atcapital.up.railway.app](https://atcapital.up.railway.app) · Déploiement : voir [web/DEPLOY.md](web/DEPLOY.md)
 

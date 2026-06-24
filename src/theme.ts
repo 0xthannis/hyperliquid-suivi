@@ -1,26 +1,26 @@
 import { Platform } from 'react-native';
 
-/** Design system Anthan — fintech premium, sombre & accent bleu (aligné web) */
+/** Design system AT Trading — noir & blanc, esprit Trade Republic */
 export const colors = {
-  bg: '#05060a',
-  bgElevated: '#0a0c12',
-  card: '#0e1119',
-  card2: '#141826',
-  cardBorder: 'rgba(255, 255, 255, 0.09)',
-  line: 'rgba(255, 255, 255, 0.07)',
-  text: '#f3f5f9',
-  textMuted: '#9aa0b0',
-  textDim: '#5e6474',
-  // Accent bleu institutionnel (remplace l'or). Les alias gold/goldLight
-  // pointent dessus pour que tous les composants existants suivent.
-  accent: '#7c9cff',
-  accentMuted: 'rgba(124, 156, 255, 0.14)',
-  gold: '#7c9cff',
-  goldLight: '#aeb9ff',
-  green: '#34d39e',
-  greenMuted: 'rgba(52, 211, 158, 0.12)',
-  red: '#ff6b6b',
-  redMuted: 'rgba(255, 107, 107, 0.12)',
+  bg: '#000000',
+  bgElevated: '#0a0a0a',
+  card: '#0c0c0c',
+  card2: '#161616',
+  cardBorder: 'rgba(255, 255, 255, 0.10)',
+  line: 'rgba(255, 255, 255, 0.08)',
+  text: '#ffffff',
+  textMuted: '#8a8d93',
+  textDim: '#5a5d63',
+  // Accent = blanc (aucune couleur de marque). gold/goldLight = alias blanc
+  // pour que les composants existants suivent.
+  accent: '#ffffff',
+  accentMuted: 'rgba(255, 255, 255, 0.10)',
+  gold: '#ffffff',
+  goldLight: '#ffffff',
+  green: '#16d195',
+  greenMuted: 'rgba(22, 209, 149, 0.12)',
+  red: '#ff4d4d',
+  redMuted: 'rgba(255, 77, 77, 0.12)',
   white: '#FFFFFF',
 };
 

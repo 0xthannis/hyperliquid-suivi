@@ -29,20 +29,27 @@ type Props = {
   priceTick: number;
 };
 
-function curvePaths(values: number[], w: number, h: number) {
-  if (values.length < 2) return null;
+type Period = 'day' | 'week' | 'month' | 'allTime';
+const PERIODS: [Period, string][] = [
+  ['day', '1J'],
+  ['week', '1S'],
+  ['month', '1M'],
+  ['allTime', 'MAX'],
+];
+
+function linePath(values: number[], w: number, h: number) {
+  if (values.length < 2) return '';
   const min = Math.min(...values);
   const max = Math.max(...values);
   const span = max - min || 1;
-  const pad = h * 0.12;
-  const pts = values.map((v, i) => {
-    const x = (i / (values.length - 1)) * w;
-    const y = h - pad - ((v - min) / span) * (h - pad * 2);
-    return [x, y] as const;
-  });
-  const line = pts.map(([x, y], i) => `${i ? 'L' : 'M'}${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
-  const area = `${line} L${w},${h} L0,${h} Z`;
-  return { line, area };
+  const pad = h * 0.14;
+  return values
+    .map((v, i) => {
+      const x = (i / (values.length - 1)) * w;
+      const y = h - pad - ((v - min) / span) * (h - pad * 2);
+      return `${i ? 'L' : 'M'}${x.toFixed(1)},${y.toFixed(1)}`;
+    })
+    .join(' ');
 }
 
 export function LiveView({
@@ -57,18 +64,18 @@ export function LiveView({
   priceTick,
 }: Props) {
   const pushState = getPushSupport();
+  const [period, setPeriod] = useState<Period>('month');
   const [equity, setEquity] = useState<number[]>([]);
 
   useEffect(() => {
     let cancelled = false;
-    fetchAccountValueHistory('month')
+    fetchAccountValueHistory(period)
       .then((s) => !cancelled && setEquity(s))
       .catch(() => {});
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [accountValue]);
+  }, [period, accountValue]);
 
   const totalPnl = useMemo(
     () =>
@@ -78,132 +85,113 @@ export function LiveView({
       }, 0),
     [positions, mids, priceTick]
   );
-
   const exposure = useMemo(
     () => positions.reduce((s, p) => s + p.positionValue, 0),
     [positions]
   );
-
   const winRate = useMemo(() => {
     const closed = history.filter((e) => e.isClose);
-    if (closed.length === 0) return null;
-    const wins = closed.filter((e) => e.isWin).length;
-    return Math.round((wins / closed.length) * 100);
+    if (!closed.length) return null;
+    return Math.round((closed.filter((e) => e.isWin).length / closed.length) * 100);
   }, [history]);
 
-  const curve = curvePaths(equity, 600, 120);
-  const equityDelta =
-    equity.length >= 2 && equity[0] !== 0
-      ? ((equity[equity.length - 1] - equity[0]) / Math.abs(equity[0])) * 100
+  const first = equity[0];
+  const last = equity[equity.length - 1];
+  const changeAbs = first != null && last != null ? last - first : null;
+  const changePct =
+    first != null && last != null && first !== 0
+      ? ((last - first) / Math.abs(first)) * 100
       : null;
+  const up = (changeAbs ?? 0) >= 0;
+  const lineColor = up ? 'var(--green)' : 'var(--red)';
 
-  if (loading && positions.length === 0) {
+  if (loading && positions.length === 0 && equity.length === 0) {
     return (
-      <div className="tx-loading">
-        <div className="tx-spinner" />
-        <p>Connexion à la salle des marchés…</p>
+      <div className="tr-loading">
+        <div className="tr-spinner" />
       </div>
     );
   }
 
   return (
-    <div className="tx">
-      <section className="tx-equity">
-        <div className="tx-equity-head">
-          <div>
-            <span className="tx-eyebrow">Valeur du compte</span>
-            <div className="tx-equity-value tabular">{formatUsd(accountValue)}</div>
-            {equityDelta != null && (
-              <span
-                className={`tx-equity-delta tabular ${equityDelta >= 0 ? 'pos' : 'neg'}`}
-              >
-                {equityDelta >= 0 ? '▲' : '▼'} {formatPct(equityDelta)} · 30J
-              </span>
-            )}
+    <div className="tr">
+      <div className="tr-hero">
+        <span className="tr-label">Valeur du compte</span>
+        <div className="tr-value">{formatUsd(accountValue)}</div>
+        {changeAbs != null && (
+          <div className={`tr-change ${up ? 'pos' : 'neg'}`}>
+            {up ? '↑' : '↓'} {formatUsd(Math.abs(changeAbs))}
+            {changePct != null && <> · {formatPct(changePct)}</>}
           </div>
-          <div className="tx-pnl-open">
-            <span className="tx-eyebrow">PnL ouvert</span>
-            <div
-              className={`tx-pnl-open-value tabular ${positions.length === 0 ? '' : totalPnl >= 0 ? 'pos' : 'neg'}`}
-            >
-              {positions.length === 0 ? formatUsd(0) : formatUsd(totalPnl, true)}
-            </div>
-          </div>
-        </div>
-
-        {curve && (
-          <svg className="tx-curve" viewBox="0 0 600 120" preserveAspectRatio="none">
-            <defs>
-              <linearGradient id="txfill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#7c9cff" stopOpacity="0.28" />
-                <stop offset="100%" stopColor="#7c9cff" stopOpacity="0" />
-              </linearGradient>
-            </defs>
-            <path d={curve.area} fill="url(#txfill)" />
-            <path d={curve.line} fill="none" stroke="#7c9cff" strokeWidth="1.5" />
-          </svg>
         )}
+      </div>
 
-        <div className="tx-kpis">
-          <div className="tx-kpi">
-            <span>PnL all-time</span>
-            <b className={`tabular ${allTimePnl >= 0 ? 'pos' : 'neg'}`}>
-              {formatUsd(allTimePnl, true)}
-            </b>
-          </div>
-          <div className="tx-kpi">
-            <span>Win rate</span>
-            <b className="tabular">{winRate != null ? `${winRate}%` : 'n/a'}</b>
-          </div>
-          <div className="tx-kpi">
-            <span>Exposition</span>
-            <b className="tabular">{formatUsd(exposure)}</b>
-          </div>
-          <div className="tx-kpi">
-            <span>Positions</span>
-            <b className="tabular">{positions.length}</b>
-          </div>
+      {equity.length >= 2 && (
+        <svg className="tr-chart" viewBox="0 0 400 120" preserveAspectRatio="none">
+          <path d={linePath(equity, 400, 120)} fill="none" stroke={lineColor} strokeWidth="2" />
+        </svg>
+      )}
+
+      <div className="tr-periods">
+        {PERIODS.map(([p, label]) => (
+          <button
+            key={p}
+            type="button"
+            className={`tr-period ${period === p ? 'is-active' : ''}`}
+            onClick={() => setPeriod(p)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      <div className="tr-stats">
+        <div className="tr-stat">
+          <span>PnL ouvert</span>
+          <b className={positions.length ? (totalPnl >= 0 ? 'pos' : 'neg') : ''}>
+            {positions.length ? formatUsd(totalPnl, true) : formatUsd(0)}
+          </b>
         </div>
-      </section>
+        <div className="tr-stat">
+          <span>PnL total</span>
+          <b className={allTimePnl >= 0 ? 'pos' : 'neg'}>{formatUsd(allTimePnl, true)}</b>
+        </div>
+        <div className="tr-stat">
+          <span>Réussite</span>
+          <b>{winRate != null ? `${winRate}%` : 'n/a'}</b>
+        </div>
+        <div className="tr-stat">
+          <span>Exposition</span>
+          <b>{formatUsd(exposure)}</b>
+        </div>
+      </div>
 
-      {error && <div className="tx-alert">{error}</div>}
+      {error && <div className="tr-alert">{error}</div>}
 
-      <div className="tx-section-head">
-        <span className="tx-section-title">Positions ouvertes</span>
-        <span className="tx-section-badge tabular">{positions.length}</span>
+      <div className="tr-section-label">
+        Positions <span className="tr-count">{positions.length}</span>
       </div>
 
       {positions.length === 0 ? (
-        <div className="tx-empty">
-          <p className="tx-empty-title">Aucune position ouverte</p>
-          <p className="tx-empty-text">
-            La maison n'a pas d'exposition en cours. Dès qu'une position s'ouvre,
-            elle apparaît ici en temps réel.
+        <div className="tr-empty">
+          <p className="tr-empty-title">Aucune position ouverte</p>
+          <p className="tr-empty-text">
+            Dès qu'une position s'ouvre, elle apparaît ici en temps réel.
           </p>
           {pushState !== 'unsupported' && pushState !== 'denied' && (
-            <p className="tx-empty-text">
-              Activez les alertes depuis la <Link to="/">page d'accueil</Link> pour
-              être prévenu à l'ouverture.
+            <p className="tr-empty-text">
+              Activez les alertes depuis la <Link to="/">page d'accueil</Link>.
             </p>
           )}
         </div>
       ) : (
-        <div className="tx-table" key={priceTick}>
-          <div className="tx-row tx-row--head">
-            <span>Marché</span>
-            <span>Sens</span>
-            <span className="r">Levier</span>
-            <span className="r">Entrée</span>
-            <span className="r">Mark</span>
-            <span className="r">Notionnel</span>
-            <span className="r">PnL</span>
-          </div>
+        <div className="tr-list" key={priceTick}>
           {positions.map((p) => {
             const px = mids[p.coin] ?? p.entryPx;
             const live = mids[p.coin] != null ? pnlAtPrice(p, px) : p.unrealizedPnl;
             const pct = pnlPercent(p, px);
-            const { stopLoss, takeProfit } = findTpSlForCoin(orders, p.coin);
             const win = live >= 0;
+            const { stopLoss, takeProfit } = findTpSlForCoin(orders, p.coin);
             const lossAtSl = stopLoss ? pnlAtPrice(p, stopLoss.triggerPx) : null;
             const gainAtTp = takeProfit ? pnlAtPrice(p, takeProfit.triggerPx) : null;
             const { riskReward } = computeExitMetrics(
@@ -213,60 +201,38 @@ export function LiveView({
               takeProfit?.triggerPx ?? null
             );
             return (
-              <div className="tx-pos" key={p.coin}>
-                <div className="tx-row">
-                  <span className="tx-sym">{displaySymbol(p.coin)}</span>
-                  <span data-label="Sens" className={p.isLong ? 'pos' : 'neg'}>
-                    {p.isLong ? 'LONG' : 'SHORT'}
-                  </span>
-                  <span data-label="Levier" className="r tabular">{p.leverage}×</span>
-                  <span data-label="Entrée" className="r tabular dim">{p.entryPx}</span>
-                  <span data-label="Mark" className="r tabular">{px}</span>
-                  <span data-label="Notionnel" className="r tabular dim">
-                    {formatUsd(p.positionValue)}
-                  </span>
-                  <span
-                    data-label="PnL"
-                    className={`r tabular ${win ? 'pos' : 'neg'}`}
-                  >
-                    {formatUsd(live, true)}
-                    <em className="tx-row-pct"> {formatPct(pct)}</em>
-                  </span>
+              <div className="tr-pos" key={p.coin}>
+                <div className="tr-pos-row">
+                  <div className="tr-pos-id">
+                    <span className="tr-pos-sym">{displaySymbol(p.coin)}</span>
+                    <span className="tr-pos-sub">
+                      {p.isLong ? 'Long' : 'Short'} · {p.leverage}× · entrée {p.entryPx}
+                    </span>
+                  </div>
+                  <div className="tr-pos-fig">
+                    <span className="tr-pos-val">{formatUsd(p.positionValue)}</span>
+                    <span className={`tr-pos-pnl ${win ? 'pos' : 'neg'}`}>
+                      {formatUsd(live, true)} · {formatPct(pct)}
+                    </span>
+                  </div>
                 </div>
                 {(stopLoss || takeProfit) && (
-                  <div className="tx-risk">
-                    <div className="tx-risk-cell">
-                      <span className="tx-risk-label">Stop loss</span>
-                      <span className="tx-risk-main tabular">
-                        {stopLoss ? (
-                          <>
-                            {stopLoss.triggerPx}
-                            <em className="neg"> risque {formatUsd(lossAtSl ?? 0, true)}</em>
-                          </>
-                        ) : (
-                          <em className="dim">non placé</em>
-                        )}
-                      </span>
-                    </div>
-                    <div className="tx-risk-cell">
-                      <span className="tx-risk-label">Take profit</span>
-                      <span className="tx-risk-main tabular">
-                        {takeProfit ? (
-                          <>
-                            {takeProfit.triggerPx}
-                            <em className="pos"> gain {formatUsd(gainAtTp ?? 0, true)}</em>
-                          </>
-                        ) : (
-                          <em className="dim">non placé</em>
-                        )}
-                      </span>
-                    </div>
-                    <div className="tx-risk-cell">
-                      <span className="tx-risk-label">Risk / Reward</span>
-                      <span className="tx-risk-main tabular tx-rr">
-                        {formatRiskReward(riskReward)}
-                      </span>
-                    </div>
+                  <div className="tr-pos-risk">
+                    <span>
+                      SL {stopLoss ? stopLoss.triggerPx : '—'}
+                      {lossAtSl != null && (
+                        <em className="neg"> {formatUsd(lossAtSl, true)}</em>
+                      )}
+                    </span>
+                    <span>
+                      TP {takeProfit ? takeProfit.triggerPx : '—'}
+                      {gainAtTp != null && (
+                        <em className="pos"> {formatUsd(gainAtTp, true)}</em>
+                      )}
+                    </span>
+                    <span>
+                      R:R <em>{formatRiskReward(riskReward)}</em>
+                    </span>
                   </div>
                 )}
               </div>

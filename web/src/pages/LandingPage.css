@@ -1,4 +1,4 @@
-/* Anthan — landing fintech premium */
+/* AT Trading — landing fintech premium */
 
 .hx {
   position: relative;
@@ -73,9 +73,9 @@
 .hx-btn--primary {
   background: #ffffff;
   color: #05060a;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 10px 30px rgba(124, 156, 255, 0.18);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 10px 30px transparent;
 }
-.hx-btn--primary:hover { transform: translateY(-1px); box-shadow: 0 0 0 1px rgba(255,255,255,0.1), 0 14px 40px rgba(124, 156, 255, 0.3); }
+.hx-btn--primary:hover { transform: translateY(-1px); box-shadow: 0 0 0 1px rgba(255,255,255,0.1), 0 14px 40px transparent; }
 
 .hx-btn--ghost { background: rgba(255,255,255,0.02); color: var(--text); border-color: var(--line-strong); }
 .hx-btn--ghost:hover:not(:disabled) { border-color: var(--accent-line); color: #fff; }
@@ -149,9 +149,9 @@
   border: 1px solid var(--card-border);
   border-radius: var(--radius-lg);
   background:
-    linear-gradient(180deg, rgba(124,156,255,0.06), transparent 40%),
+    linear-gradient(180deg, transparent, transparent 40%),
     var(--card);
-  box-shadow: 0 40px 120px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.02), 0 0 80px rgba(124,156,255,0.08);
+  box-shadow: 0 40px 120px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.02), 0 0 80px transparent;
   overflow: hidden;
 }
 
