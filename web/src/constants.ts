@@ -7,7 +7,7 @@ export const WS_URL = 'wss://api.hyperliquid.xyz/ws';
 
 export const POLL_BACKUP_MS = 30_000;
 export const MIDS_POLL_MS = 2_000;
-export const BRAND_NAME = 'A&T CAPITAL';
+export const BRAND_NAME = 'Anthan';
 export const TERMINAL_NAME = 'Terminal 277';
 export const APP_NAME = BRAND_NAME;
 export const SITE_URL = 'https://atcapital.up.railway.app';

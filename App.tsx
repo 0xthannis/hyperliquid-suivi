@@ -45,7 +45,7 @@ async function setupNotifications() {
   );
   if (Platform.OS === 'android') {
     await Notifications.setNotificationChannelAsync('trades', {
-      name: 'A&T CAPITAL · Terminal 277',
+      name: 'Anthan · Terminal 277',
       importance: Notifications.AndroidImportance.HIGH,
       vibrationPattern: [0, 250, 120, 250],
       sound: 'default',
@@ -129,7 +129,7 @@ export default function App() {
           <View style={styles.header}>
             <View style={styles.headerTop}>
               <View>
-                <Text style={styles.brandMark}>A&T</Text>
+                <Text style={styles.brandMark}>Anthan</Text>
                 <Text style={styles.appName}>{BRAND_NAME}</Text>
                 <Text style={styles.tagline}>{TERMINAL_NAME} · Hyperliquid</Text>
               </View>
@@ -171,6 +171,8 @@ export default function App() {
               orders={data.orders}
               mids={data.mids}
               accountValue={data.accountValue}
+              allTimePnl={data.allTimePnl}
+              history={data.history}
               loading={data.loading}
               error={data.error}
               lastUpdate={data.lastUpdate}

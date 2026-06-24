@@ -93,7 +93,7 @@ export function PnlCardSheet({ event, fills, onClose }: Props) {
         <View style={styles.sheet}>
           <Text style={styles.title}>Carte PnL</Text>
           <Text style={styles.subtitle}>
-            Image brandée A&amp;T · sans lien · prête pour les réseaux
+            Image brandée Anthan · sans lien · prête pour les réseaux
           </Text>
 
           <View style={styles.preview} collapsable={false}>

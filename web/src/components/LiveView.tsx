@@ -216,14 +216,19 @@ export function LiveView({
               <div className="tx-pos" key={p.coin}>
                 <div className="tx-row">
                   <span className="tx-sym">{displaySymbol(p.coin)}</span>
-                  <span className={p.isLong ? 'pos' : 'neg'}>
+                  <span data-label="Sens" className={p.isLong ? 'pos' : 'neg'}>
                     {p.isLong ? 'LONG' : 'SHORT'}
                   </span>
-                  <span className="r tabular">{p.leverage}×</span>
-                  <span className="r tabular dim">{p.entryPx}</span>
-                  <span className="r tabular">{px}</span>
-                  <span className="r tabular dim">{formatUsd(p.positionValue)}</span>
-                  <span className={`r tabular ${win ? 'pos' : 'neg'}`}>
+                  <span data-label="Levier" className="r tabular">{p.leverage}×</span>
+                  <span data-label="Entrée" className="r tabular dim">{p.entryPx}</span>
+                  <span data-label="Mark" className="r tabular">{px}</span>
+                  <span data-label="Notionnel" className="r tabular dim">
+                    {formatUsd(p.positionValue)}
+                  </span>
+                  <span
+                    data-label="PnL"
+                    className={`r tabular ${win ? 'pos' : 'neg'}`}
+                  >
                     {formatUsd(live, true)}
                     <em className="tx-row-pct"> {formatPct(pct)}</em>
                   </span>

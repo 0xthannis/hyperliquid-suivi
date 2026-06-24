@@ -23,7 +23,7 @@ const TRADER_WALLET =
   process.env.VITE_TRADER_WALLET ?? '0x994Ff80b7dA1174a164e0F93121bDfbb68cf7A3F';
 const API_URL = 'https://api.hyperliquid.xyz/info';
 const POLL_MS = Number(process.env.PUSH_POLL_MS) || 25_000;
-const BRAND = 'A&T CAPITAL';
+const BRAND = 'Anthan';
 
 let webSubscriptions = [];
 let mobileTokens = [];

@@ -93,7 +93,7 @@ export function PnlCardModal({ event, fills, onClose }: Props) {
           Carte PnL
         </h2>
         <p className="pnl-card-modal__sub">
-          Image brandée A&amp;T · sans lien · prête pour les réseaux
+          Image brandée Anthan · sans lien · prête pour les réseaux
         </p>
 
         <div className="pnl-card-modal__preview">

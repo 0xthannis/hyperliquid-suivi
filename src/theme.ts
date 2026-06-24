@@ -1,22 +1,35 @@
-/** Design system A&T CAPITAL — aligné landing / terminal web */
+import { Platform } from 'react-native';
+
+/** Design system Anthan — fintech premium, sombre & accent bleu (aligné web) */
 export const colors = {
-  bg: '#060608',
-  bgElevated: '#0E0E12',
-  card: '#141418',
-  cardBorder: 'rgba(201, 169, 98, 0.14)',
-  text: '#F5F0E6',
-  textMuted: '#B8B4AC',
-  textDim: '#7A7670',
-  accent: '#C9A962',
-  accentMuted: 'rgba(201, 169, 98, 0.12)',
-  gold: '#C9A962',
-  goldLight: '#E8D5A3',
-  green: '#4ADE80',
-  greenMuted: 'rgba(74, 222, 128, 0.1)',
-  red: '#F87171',
-  redMuted: 'rgba(248, 113, 113, 0.1)',
+  bg: '#05060a',
+  bgElevated: '#0a0c12',
+  card: '#0e1119',
+  card2: '#141826',
+  cardBorder: 'rgba(255, 255, 255, 0.09)',
+  line: 'rgba(255, 255, 255, 0.07)',
+  text: '#f3f5f9',
+  textMuted: '#9aa0b0',
+  textDim: '#5e6474',
+  // Accent bleu institutionnel (remplace l'or). Les alias gold/goldLight
+  // pointent dessus pour que tous les composants existants suivent.
+  accent: '#7c9cff',
+  accentMuted: 'rgba(124, 156, 255, 0.14)',
+  gold: '#7c9cff',
+  goldLight: '#aeb9ff',
+  green: '#34d39e',
+  greenMuted: 'rgba(52, 211, 158, 0.12)',
+  red: '#ff6b6b',
+  redMuted: 'rgba(255, 107, 107, 0.12)',
   white: '#FFFFFF',
 };
+
+/** Police mono pour les chiffres (feel terminal). */
+export const mono = Platform.select({
+  ios: 'Menlo',
+  android: 'monospace',
+  default: 'monospace',
+}) as string;
 
 export const spacing = {
   xs: 4,
@@ -27,9 +40,9 @@ export const spacing = {
 };
 
 export const radius = {
-  sm: 2,
-  md: 4,
-  lg: 6,
+  sm: 10,
+  md: 16,
+  lg: 20,
   pill: 999,
 };
 

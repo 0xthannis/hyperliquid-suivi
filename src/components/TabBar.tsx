@@ -25,12 +25,11 @@ export function TabBar({
           <Pressable
             key={tab.id}
             onPress={() => onChange(tab.id)}
-            style={styles.tab}
+            style={[styles.tab, selected && styles.tabActive]}
           >
             <Text style={[styles.label, selected && styles.labelActive]}>
               {tab.label}
             </Text>
-            {selected && <View style={styles.indicator} />}
           </Pressable>
         );
       })}
@@ -43,29 +42,30 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginHorizontal: spacing.lg,
     marginBottom: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.cardBorder,
+    padding: 4,
+    backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
+    borderRadius: 999,
+    gap: 4,
   },
   tab: {
     flex: 1,
     alignItems: 'center',
-    paddingVertical: spacing.sm,
-    position: 'relative',
+    paddingVertical: 9,
+    borderRadius: 999,
+  },
+  tabActive: {
+    backgroundColor: colors.accentMuted,
+    borderWidth: 1,
+    borderColor: 'rgba(124, 156, 255, 0.4)',
   },
   label: {
     color: colors.textMuted,
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
     letterSpacing: 0.8,
     textTransform: 'uppercase',
   },
-  labelActive: { color: colors.goldLight, fontWeight: '700' },
-  indicator: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 2,
-    backgroundColor: colors.gold,
-  },
+  labelActive: { color: '#ffffff', fontWeight: '700' },
 });

@@ -13,7 +13,7 @@ import { TermLabel } from '../components/TermLabel';
 import type { TraderSnapshot } from '../hooks/useTraderData';
 import { formatUsd, pnlAtPrice } from '../utils/calculations';
 import { TERMINAL_NAME } from '../constants';
-import { colors, spacing, radius } from '../theme';
+import { colors, spacing, radius, mono } from '../theme';
 
 type Props = Pick<
   TraderSnapshot,
@@ -21,6 +21,8 @@ type Props = Pick<
   | 'orders'
   | 'mids'
   | 'accountValue'
+  | 'allTimePnl'
+  | 'history'
   | 'loading'
   | 'error'
   | 'lastUpdate'
@@ -31,11 +33,30 @@ type Props = Pick<
   onOpenHistory: () => void;
 };
 
+function Kpi({
+  label,
+  value,
+  color,
+}: {
+  label: string;
+  value: string;
+  color?: string;
+}) {
+  return (
+    <View style={styles.kpi}>
+      <Text style={styles.kpiLabel}>{label}</Text>
+      <Text style={[styles.kpiValue, color ? { color } : null]}>{value}</Text>
+    </View>
+  );
+}
+
 export function LiveScreen({
   positions,
   orders,
   mids,
   accountValue,
+  allTimePnl,
+  history,
   loading,
   error,
   lastUpdate,
@@ -49,6 +70,12 @@ export function LiveScreen({
     return s + (px != null ? pnlAtPrice(p, px) : p.unrealizedPnl);
   }, 0);
   const totalPositive = totalPnl >= 0;
+  const exposure = positions.reduce((s, p) => s + p.positionValue, 0);
+  const closed = history.filter((e) => e.isClose);
+  const winRate =
+    closed.length > 0
+      ? `${Math.round((closed.filter((e) => e.isWin).length / closed.length) * 100)}%`
+      : 'n/a';
 
   if (loading && positions.length === 0) {
     return (
@@ -74,27 +101,32 @@ export function LiveScreen({
       <View style={styles.hero}>
         <TermLabel term="valeurCompte" style={styles.heroLabel} />
         <Text style={styles.heroValue}>{formatUsd(accountValue)}</Text>
-        <Text style={styles.heroSub}>Wallet Hyperliquid suivi</Text>
-
-        {positions.length > 0 && (
-          <View style={styles.heroPnl}>
-            <TermLabel term="pnlNonRealise" style={styles.heroPnlLabel} />
-            <Text
-              style={[
-                styles.heroPnlValue,
-                { color: totalPositive ? colors.green : colors.red },
-              ]}
-            >
-              {formatUsd(totalPnl, true)}
-            </Text>
-          </View>
-        )}
-
         {lastUpdate && (
           <Text style={styles.sync}>
             Mis à jour {lastUpdate.toLocaleTimeString('fr-FR')}
           </Text>
         )}
+
+        <View style={styles.kpiGrid}>
+          <Kpi
+            label="PnL ouvert"
+            value={positions.length ? formatUsd(totalPnl, true) : formatUsd(0)}
+            color={
+              positions.length
+                ? totalPositive
+                  ? colors.green
+                  : colors.red
+                : colors.text
+            }
+          />
+          <Kpi
+            label="PnL all-time"
+            value={formatUsd(allTimePnl, true)}
+            color={allTimePnl >= 0 ? colors.green : colors.red}
+          />
+          <Kpi label="Win rate" value={winRate} />
+          <Kpi label="Exposition" value={formatUsd(exposure)} />
+        </View>
       </View>
 
       {error ? (
@@ -156,21 +188,43 @@ const styles = StyleSheet.create({
   heroLabel: { fontSize: 13 },
   heroValue: {
     color: colors.text,
-    fontSize: 32,
+    fontSize: 36,
     fontWeight: '600',
-    marginTop: 4,
+    marginTop: 6,
+    letterSpacing: -0.5,
+    fontFamily: mono,
     fontVariant: ['tabular-nums'],
   },
-  heroSub: { color: colors.textMuted, fontSize: 13, marginTop: 4 },
-  heroPnl: {
-    marginTop: spacing.md,
-    paddingTop: spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: colors.cardBorder,
-  },
-  heroPnlLabel: { fontSize: 12 },
-  heroPnlValue: { fontSize: 22, fontWeight: '600', marginTop: 4, fontVariant: ['tabular-nums'] },
   sync: { color: colors.textDim, fontSize: 11, marginTop: spacing.sm },
+  kpiGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+    marginTop: spacing.lg,
+  },
+  kpi: {
+    flexGrow: 1,
+    flexBasis: '47%',
+    backgroundColor: colors.card2,
+    borderRadius: radius.sm,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+  },
+  kpiLabel: {
+    color: colors.textDim,
+    fontSize: 10,
+    fontWeight: '600',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+  },
+  kpiValue: {
+    color: colors.text,
+    fontSize: 17,
+    fontWeight: '600',
+    marginTop: 5,
+    fontFamily: mono,
+    fontVariant: ['tabular-nums'],
+  },
   sectionTitle: {
     color: colors.text,
     fontSize: 16,

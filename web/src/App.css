@@ -1,4 +1,4 @@
-/* Terminal 277 — A&T CAPITAL */
+/* Terminal 277 — Anthan */
 
 .terminal {
   min-height: 100vh;
@@ -1039,6 +1039,49 @@
 }
 .tx-risk-main em { font-style: normal; font-size: 0.74rem; }
 .tx-rr { color: var(--accent-2); font-weight: 600; }
+
+/* Mobile : positions en cartes empilées, aucun scroll horizontal */
+@media (max-width: 640px) {
+  .tx-table { overflow: visible; border: none; border-radius: 0; }
+  .tx-pos {
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-md);
+    margin-bottom: 10px;
+    background: var(--card);
+  }
+  .tx-pos:last-child { border-bottom: 1px solid var(--card-border); }
+  .tx-row--head { display: none; }
+  .tx-row {
+    min-width: 0;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 14px;
+    padding: 16px;
+  }
+  .tx-row .tx-sym {
+    grid-column: 1 / -1;
+    font-size: 1.05rem;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+  }
+  .tx-row > span:not(.tx-sym) {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    text-align: left;
+    font-size: 0.9rem;
+  }
+  .tx-row > span[data-label]::before {
+    content: attr(data-label);
+    font-family: var(--font);
+    font-size: 0.52rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  .tx-risk { min-width: 0; margin: 0 14px 14px; }
+  .tx-kpis { grid-template-columns: repeat(2, 1fr); }
+}
 
 .tx-empty {
   padding: 2.5rem 1.5rem;

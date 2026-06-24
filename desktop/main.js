@@ -18,7 +18,7 @@ function createWindow() {
     minWidth: 900,
     minHeight: 640,
     backgroundColor: '#060608',
-    title: 'A&T CAPITAL · Terminal 277',
+    title: 'Anthan · Terminal 277',
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
