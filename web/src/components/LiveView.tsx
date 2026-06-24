@@ -85,10 +85,6 @@ export function LiveView({
       }, 0),
     [positions, mids, priceTick]
   );
-  const exposure = useMemo(
-    () => positions.reduce((s, p) => s + p.positionValue, 0),
-    [positions]
-  );
   const winRate = useMemo(() => {
     const closed = history.filter((e) => e.isClose);
     if (!closed.length) return null;
@@ -160,10 +156,6 @@ export function LiveView({
           <span>Réussite</span>
           <b>{winRate != null ? `${winRate}%` : 'n/a'}</b>
         </div>
-        <div className="tr-stat">
-          <span>Exposition</span>
-          <b>{formatUsd(exposure)}</b>
-        </div>
       </div>
 
       {error && <div className="tr-alert">{error}</div>}
@@ -210,9 +202,11 @@ export function LiveView({
                     </span>
                   </div>
                   <div className="tr-pos-fig">
-                    <span className="tr-pos-val">{formatUsd(p.positionValue)}</span>
+                    <span className={`tr-pos-val ${win ? 'pos' : 'neg'}`}>
+                      {formatUsd(live, true)}
+                    </span>
                     <span className={`tr-pos-pnl ${win ? 'pos' : 'neg'}`}>
-                      {formatUsd(live, true)} · {formatPct(pct)}
+                      {formatPct(pct)}
                     </span>
                   </div>
                 </div>

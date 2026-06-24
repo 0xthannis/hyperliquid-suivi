@@ -127,39 +127,19 @@ export default function App() {
         <StatusBar barStyle="light-content" backgroundColor={colors.bg} />
         <SafeAreaView style={styles.safe} edges={['top']}>
           <View style={styles.header}>
-            <View style={styles.headerTop}>
-              <View>
-                <Text style={styles.brandMark}>AT Trading</Text>
-                <Text style={styles.appName}>{BRAND_NAME}</Text>
-                <Text style={styles.tagline}>{TERMINAL_NAME} · Hyperliquid</Text>
-              </View>
-              <View style={styles.liveRow}>
-                <View
-                  style={[
-                    styles.dot,
-                    {
-                      backgroundColor: data.wsConnected ? colors.green : colors.textDim,
-                    },
-                  ]}
-                />
-                <Text style={styles.liveText}>
-                  {data.wsConnected ? 'Flux connecté' : 'Synchronisation'}
-                </Text>
-              </View>
-            </View>
-            <SyncBadge lastUpdate={data.lastUpdate} wsConnected={data.wsConnected} />
-          </View>
-
-          <View style={styles.scopeBar}>
-            <Text style={styles.scopeText}>{DATA_SCOPE}</Text>
-            <View style={styles.scopeMeta}>
-              <Text style={styles.scopeMetaText}>{syncLabel}</Text>
-              <Text style={styles.scopeMetaText}> · API HL</Text>
-              <Pressable
-                onPress={() => Linking.openURL(hyperliquidExplorerUrl(TRADER_WALLET))}
+            <Text style={styles.brand}>{BRAND_NAME}</Text>
+            <View style={styles.liveRow}>
+              <View
+                style={[
+                  styles.dot,
+                  { backgroundColor: data.wsConnected ? colors.green : colors.textDim },
+                ]}
+              />
+              <Text
+                style={[styles.liveText, data.wsConnected && { color: colors.green }]}
               >
-                <Text style={styles.scopeLink}>{truncateWallet(TRADER_WALLET)}</Text>
-              </Pressable>
+                {data.wsConnected ? 'En direct' : 'Synchro'}
+              </Text>
             </View>
           </View>
 
@@ -207,48 +187,27 @@ const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bg },
   safe: { flex: 1 },
   header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.sm,
     paddingBottom: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: colors.cardBorder,
+    borderBottomColor: colors.line,
   },
-  headerTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-  },
-  brandMark: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    backgroundColor: colors.gold,
-    color: colors.bg,
-    fontSize: 10,
+  brand: {
+    color: colors.text,
+    fontSize: 20,
     fontWeight: '800',
-    letterSpacing: 0.5,
-    marginBottom: 4,
+    letterSpacing: -0.2,
   },
-  appName: {
-    color: colors.goldLight,
-    fontSize: 18,
-    fontWeight: '700',
-    letterSpacing: 2,
-  },
-  tagline: {
-    color: colors.textMuted,
-    fontSize: typography.fontSize.sm,
-    marginTop: 4,
-    lineHeight: 20,
-  },
-  liveRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 },
-  dot: { width: 6, height: 6, borderRadius: 3 },
+  liveRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  dot: { width: 7, height: 7, borderRadius: 4 },
   liveText: {
-    color: colors.green,
-    fontSize: typography.fontSize.xs,
+    color: colors.textMuted,
+    fontSize: 12,
     fontWeight: '600',
-    letterSpacing: 0.6,
-    textTransform: 'uppercase',
   },
   scopeBar: {
     paddingHorizontal: spacing.lg,

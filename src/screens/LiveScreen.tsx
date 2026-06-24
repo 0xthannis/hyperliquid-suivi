@@ -70,7 +70,6 @@ export function LiveScreen({
     return s + (px != null ? pnlAtPrice(p, px) : p.unrealizedPnl);
   }, 0);
   const totalPositive = totalPnl >= 0;
-  const exposure = positions.reduce((s, p) => s + p.positionValue, 0);
   const closed = history.filter((e) => e.isClose);
   const winRate =
     closed.length > 0
@@ -124,8 +123,7 @@ export function LiveScreen({
             value={formatUsd(allTimePnl, true)}
             color={allTimePnl >= 0 ? colors.green : colors.red}
           />
-          <Kpi label="Win rate" value={winRate} />
-          <Kpi label="Exposition" value={formatUsd(exposure)} />
+          <Kpi label="Réussite" value={winRate} />
         </View>
       </View>
 
@@ -204,7 +202,8 @@ const styles = StyleSheet.create({
   },
   kpi: {
     flexGrow: 1,
-    flexBasis: '47%',
+    flexBasis: 0,
+    minWidth: 92,
     backgroundColor: colors.card2,
     borderRadius: radius.sm,
     paddingVertical: 12,

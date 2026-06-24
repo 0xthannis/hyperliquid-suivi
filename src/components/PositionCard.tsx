@@ -21,7 +21,7 @@ type Props = {
 };
 
 export function PositionCard({ position, orders, currentPrice }: Props) {
-  const { coin, isLong, unrealizedPnl, entryPx, leverage, positionValue } = position;
+  const { coin, isLong, unrealizedPnl, entryPx, leverage } = position;
   const price = currentPrice ?? entryPx;
   const livePnl = currentPrice != null ? pnlAtPrice(position, price) : unrealizedPnl;
   const pct = pnlPercent(position, price);
@@ -85,7 +85,6 @@ export function PositionCard({ position, orders, currentPrice }: Props) {
 
       <View style={styles.infoRow}>
         <InfoChip term="entree" value={`${entryPx.toFixed(4)} $`} />
-        <InfoChip term="notionnel" value={formatUsd(positionValue)} />
       </View>
 
       {(stopLoss || takeProfit) && (
