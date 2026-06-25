@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { BRAND_NAME, TERMINAL_NAME } from '../constants';
+import { BRAND_NAME } from '../constants';
 import {
   formatPct,
   formatTradePrice,
@@ -9,28 +8,23 @@ import {
   type PnlCardData,
 } from '../utils/pnlCard';
 import { displaySymbol } from '../api/hyperliquid';
-import { colors, radius } from '../theme';
 
 type Props = {
   data: PnlCardData;
   width?: number;
 };
 
-/** Ratio plus haut pour éviter de rogner le footer (durée / clôture HL). */
-const CARD_RATIO = 1.58;
-
-function fmtCapital(value: number): string {
-  return value > 1e-6 ? formatUsd(value) : '—';
-}
+const CARD_RATIO = 1.34;
 
 export function PnlShareCard({ data, width = 360 }: Props) {
-  const height = width * CARD_RATIO;
   const scale = width / 360;
   const s = (n: number) => n * scale;
+  const height = width * CARD_RATIO;
 
-  const pnlColor = data.isWin ? colors.green : colors.red;
-  const sideBg = data.side === 'LONG' ? colors.greenMuted : colors.redMuted;
-  const sideColor = data.side === 'LONG' ? colors.green : colors.red;
+  const win = data.isWin;
+  const accent = win ? '#00b37e' : '#ff3b30';
+  const sideBg = data.side === 'LONG' ? '#e6f9f1' : '#ffeceb';
+  const sideColor = data.side === 'LONG' ? '#00875a' : '#d92d20';
 
   const closedLabel = new Date(data.closedAt).toLocaleDateString('fr-FR', {
     day: '2-digit',
@@ -39,285 +33,111 @@ export function PnlShareCard({ data, width = 360 }: Props) {
   });
 
   return (
-    <View style={[styles.wrap, { width, height }]}>
-      <LinearGradient
-        colors={['#0a0a0e', '#060608', '#12110c']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={StyleSheet.absoluteFill}
-      />
-      <View
-        style={[
-          styles.glow,
-          {
-            width: s(220),
-            height: s(220),
-            top: -s(80),
-            right: -s(60),
-            backgroundColor: data.isWin
-              ? 'rgba(74, 222, 128, 0.12)'
-              : 'rgba(248, 113, 113, 0.1)',
-          },
-        ]}
-      />
-      <View
-        style={[
-          styles.glow,
-          {
-            width: s(160),
-            height: s(160),
-            bottom: s(40),
-            left: -s(40),
-            backgroundColor: 'rgba(201, 169, 98, 0.08)',
-          },
-        ]}
-      />
-
-      <View style={[styles.inner, { padding: s(22), paddingBottom: s(28) }]}>
-        <View style={styles.header}>
-          <View style={[styles.brandBlock, { gap: s(5), minHeight: s(34) }]}>
-            <Text style={[styles.brand, { fontSize: s(11), lineHeight: s(14) }]}>
-              {BRAND_NAME}
-            </Text>
-            <Text style={[styles.terminal, { fontSize: s(9), lineHeight: s(12) }]}>
-              {TERMINAL_NAME}
+    <View style={[styles.wrap, { width, height, padding: s(28) }]}>
+      <View style={styles.header}>
+        <Text style={[styles.brand, { fontSize: s(15) }]}>{BRAND_NAME}</Text>
+        <View style={[styles.badges, { gap: s(8) }]}>
+          <View
+            style={[
+              styles.sidePill,
+              { backgroundColor: sideBg, paddingHorizontal: s(10), paddingVertical: s(4) },
+            ]}
+          >
+            <Text style={[styles.sideText, { color: sideColor, fontSize: s(10) }]}>
+              {data.side}
             </Text>
           </View>
-          <View style={[styles.badges, { gap: s(5) }]}>
-            <View style={[styles.sidePill, { backgroundColor: sideBg, paddingHorizontal: s(10), paddingVertical: s(4) }]}>
-              <Text style={[styles.sideText, { color: sideColor, fontSize: s(10) }]}>
-                {data.side}
-              </Text>
-            </View>
-            {data.leverage != null && (
-              <Text style={[styles.leverage, { fontSize: s(10) }]}>×{data.leverage}</Text>
-            )}
-          </View>
-        </View>
-
-        <Text style={[styles.coin, { fontSize: s(42), marginTop: s(18) }]}>{displaySymbol(data.coin)}</Text>
-
-        <View style={[styles.hero, { marginTop: s(20) }]}>
-          <Text style={[styles.pnlHero, { color: pnlColor, fontSize: s(38) }]}>
-            {formatUsd(data.netPnl, true)}
-          </Text>
-          <Text style={[styles.pctHero, { color: pnlColor, fontSize: s(20), marginTop: s(4) }]}>
-            {formatPct(data.pnlPct)}
-          </Text>
-        </View>
-
-        <View style={[styles.priceRow, { marginTop: s(24), gap: s(12) }]}>
-          <View style={[styles.priceCell, { padding: s(12) }]}>
-            <Text style={[styles.cellLabel, { fontSize: s(9) }]}>Entrée</Text>
-            <Text style={[styles.cellValue, { fontSize: s(15), marginTop: s(4) }]}>
-              {formatTradePrice(data.entryPx)}
-            </Text>
-          </View>
-          <View style={[styles.priceCell, { padding: s(12) }]}>
-            <Text style={[styles.cellLabel, { fontSize: s(9) }]}>Sortie</Text>
-            <Text style={[styles.cellValue, { fontSize: s(15), marginTop: s(4) }]}>
-              {formatTradePrice(data.exitPx)}
-            </Text>
-          </View>
-        </View>
-
-        <View style={[styles.notionalRow, { marginTop: s(10), gap: s(6) }]}>
-          <View style={[styles.notionalCell, { padding: s(8), minHeight: s(58), gap: s(8) }]}>
-            <Text style={[styles.cellLabel, styles.cellLabelStacked, { fontSize: s(7) }]}>
-              Capital{'\n'}risqué
-            </Text>
-            <Text style={[styles.cellValueSm, { fontSize: s(11) }]}>
-              {fmtCapital(data.riskedUsd)}
-            </Text>
-          </View>
-          <View style={[styles.notionalCell, { padding: s(8), minHeight: s(58), gap: s(8) }]}>
-            <Text style={[styles.cellLabel, styles.cellLabelStacked, { fontSize: s(7) }]}>
-              Capital{'\n'}sortie
-            </Text>
-            <Text style={[styles.cellValueSm, { fontSize: s(11) }]}>
-              {fmtCapital(data.exitCapitalUsd)}
-            </Text>
-          </View>
-          <View style={[styles.notionalCell, styles.notionalProfit, { padding: s(8), minHeight: s(58), gap: s(8) }]}>
-            <Text style={[styles.cellLabel, { fontSize: s(7) }]}>Profit</Text>
-            <Text style={[styles.cellValueSm, { color: pnlColor, fontSize: s(11) }]}>
-              {formatUsd(data.netPnl, true)}
-            </Text>
-          </View>
-        </View>
-
-        <View style={[styles.footer, { marginTop: s(16), paddingTop: s(12) }]}>
-          <View style={styles.footerLeft}>
-            <Text style={[styles.footerMeta, { fontSize: s(10) }]}>
-              Durée · {data.durationLabel}
-            </Text>
-            <Text style={[styles.footerDate, { fontSize: s(10), marginTop: s(2) }]}>
-              {closedLabel}
-            </Text>
-          </View>
-          {data.closeProofLabel ? (
-            <View style={styles.footerRight}>
-              <Text style={[styles.proofLabel, { fontSize: s(8) }]}>Clôture HL</Text>
-              <Text style={[styles.proof, { fontSize: s(9), marginTop: s(2) }]}>
-                {data.closeProofLabel}
-              </Text>
-            </View>
-          ) : null}
+          {data.leverage != null && (
+            <Text style={[styles.lev, { fontSize: s(12) }]}>×{data.leverage}</Text>
+          )}
         </View>
       </View>
 
-      <View style={[styles.border, { borderRadius: s(8) }]} pointerEvents="none" />
+      <Text style={[styles.sym, { fontSize: s(26), marginTop: s(26) }]}>
+        {displaySymbol(data.coin)}
+      </Text>
+
+      <View style={[styles.hero, { marginTop: s(6), gap: s(6) }]}>
+        <Text style={[styles.arrow, { color: accent, fontSize: s(30) }]}>
+          {win ? '↑' : '↓'}
+        </Text>
+        <Text style={[styles.pct, { color: accent, fontSize: s(52) }]}>
+          {formatPct(data.pnlPct)}
+        </Text>
+      </View>
+      <Text style={[styles.pnl, { color: accent, fontSize: s(20), marginTop: s(6) }]}>
+        {formatUsd(data.netPnl, true)}
+      </Text>
+
+      <View style={[styles.grid, { marginTop: s(26), paddingTop: s(18) }]}>
+        <View style={styles.cell}>
+          <Text style={[styles.cellLabel, { fontSize: s(10) }]}>Entrée</Text>
+          <Text style={[styles.cellVal, { fontSize: s(15), marginTop: s(5) }]}>
+            {formatTradePrice(data.entryPx)}
+          </Text>
+        </View>
+        <View style={styles.cell}>
+          <Text style={[styles.cellLabel, { fontSize: s(10) }]}>Sortie</Text>
+          <Text style={[styles.cellVal, { fontSize: s(15), marginTop: s(5) }]}>
+            {formatTradePrice(data.exitPx)}
+          </Text>
+        </View>
+        <View style={styles.cell}>
+          <Text style={[styles.cellLabel, { fontSize: s(10) }]}>Durée</Text>
+          <Text style={[styles.cellVal, { fontSize: s(15), marginTop: s(5) }]}>
+            {data.durationLabel}
+          </Text>
+        </View>
+      </View>
+
+      <View style={[styles.footer, { marginTop: s(22) }]}>
+        <Text style={[styles.foot, { fontSize: s(10) }]}>{closedLabel}</Text>
+        <Text style={[styles.foot, { fontSize: s(10) }]}>
+          {data.closeProofLabel ? `Clôture HL · ${data.closeProofLabel}` : 'Vérifié on-chain'}
+        </Text>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   wrap: {
+    backgroundColor: '#ffffff',
+    borderRadius: 24,
     overflow: 'hidden',
-    borderRadius: 8,
-    backgroundColor: colors.bg,
-  },
-  glow: {
-    position: 'absolute',
-    borderRadius: 999,
-  },
-  inner: {
-    flex: 1,
-    zIndex: 1,
-    justifyContent: 'flex-start',
-  },
-  border: {
-    ...StyleSheet.absoluteFillObject,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
-    zIndex: 2,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'center',
   },
-  brandBlock: {
-    flexDirection: 'column',
-    flexShrink: 0,
-  },
-  brand: {
-    color: colors.goldLight,
-    fontWeight: '700',
-    letterSpacing: 1.2,
-  },
-  terminal: {
-    color: colors.textDim,
-    fontWeight: '600',
-    letterSpacing: 0.6,
-  },
-  badges: {
-    alignItems: 'flex-end',
-    flexShrink: 0,
-  },
-  sidePill: {
-    borderRadius: radius.pill,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
-  },
-  sideText: {
-    fontWeight: '800',
-    letterSpacing: 1,
-  },
-  leverage: {
-    color: colors.textMuted,
-    fontWeight: '700',
-  },
-  coin: {
-    color: colors.text,
-    fontWeight: '700',
-    letterSpacing: -0.5,
-  },
-  hero: {
-    alignItems: 'flex-start',
-  },
-  pnlHero: {
-    fontWeight: '700',
-    fontVariant: ['tabular-nums'],
-  },
-  pctHero: {
-    fontWeight: '600',
-    fontVariant: ['tabular-nums'],
-  },
-  priceRow: {
+  brand: { color: '#0a0a0a', fontWeight: '800', letterSpacing: -0.2 },
+  badges: { flexDirection: 'row', alignItems: 'center' },
+  sidePill: { borderRadius: 999 },
+  sideText: { fontWeight: '800', letterSpacing: 0.8 },
+  lev: { color: '#0a0a0a', fontWeight: '700' },
+  sym: { color: '#0a0a0a', fontWeight: '800', letterSpacing: -0.5 },
+  hero: { flexDirection: 'row', alignItems: 'baseline' },
+  arrow: { fontWeight: '800' },
+  pct: { fontWeight: '800', letterSpacing: -1, fontVariant: ['tabular-nums'] },
+  pnl: { fontWeight: '700', fontVariant: ['tabular-nums'] },
+  grid: {
     flexDirection: 'row',
+    borderTopWidth: 1,
+    borderTopColor: '#ededed',
   },
-  priceCell: {
-    flex: 1,
-    backgroundColor: 'rgba(20, 20, 24, 0.85)',
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
-  },
-  notionalRow: {
-    flexDirection: 'row',
-  },
-  notionalCell: {
-    flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'flex-start',
-    backgroundColor: 'rgba(20, 20, 24, 0.65)',
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
-  },
-  cellLabelStacked: {
-    lineHeight: 13,
-  },
-  notionalProfit: {
-    borderColor: 'rgba(201, 169, 98, 0.25)',
-  },
+  cell: { flex: 1 },
   cellLabel: {
-    color: colors.textMuted,
-    fontWeight: '700',
-    letterSpacing: 0.8,
+    color: '#9b9b9b',
+    fontWeight: '600',
+    letterSpacing: 0.4,
     textTransform: 'uppercase',
   },
-  cellValue: {
-    color: colors.text,
-    fontWeight: '600',
-    fontVariant: ['tabular-nums'],
-  },
-  cellValueSm: {
-    color: colors.text,
-    fontWeight: '600',
-    fontVariant: ['tabular-nums'],
-  },
+  cellVal: { color: '#0a0a0a', fontWeight: '700', fontVariant: ['tabular-nums'] },
   footer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-end',
-    borderTopWidth: 1,
-    borderTopColor: colors.cardBorder,
+    alignItems: 'center',
   },
-  footerLeft: {
-    flex: 1,
-  },
-  footerRight: {
-    alignItems: 'flex-end',
-    maxWidth: '48%',
-  },
-  footerMeta: {
-    color: colors.textMuted,
-    fontWeight: '600',
-  },
-  footerDate: {
-    color: colors.textDim,
-  },
-  proofLabel: {
-    color: colors.textDim,
-    fontWeight: '700',
-    letterSpacing: 0.6,
-    textTransform: 'uppercase',
-  },
-  proof: {
-    color: colors.textMuted,
-    fontWeight: '600',
-    fontVariant: ['tabular-nums'],
-  },
+  foot: { color: '#9b9b9b', fontWeight: '500' },
 });

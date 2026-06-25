@@ -1,437 +1,158 @@
-/* Carte PnL partageable — 1080×1350 export (ratio 4:5) */
-.pnl-card {
-  position: relative;
-  width: 360px;
-  aspect-ratio: 4 / 5;
-  overflow: hidden;
-  border-radius: 8px;
-  background: linear-gradient(145deg, #0a0a0e 0%, #060608 45%, #12110c 100%);
-  border: 1px solid var(--card-border);
-  padding: 22px;
+/* Carte PnL partageable — blanc, texte noir, esprit Trade Republic */
+.pc {
+  width: 400px;
   box-sizing: border-box;
-  font-family: var(--font);
-  color: var(--text);
-}
-
-.pnl-card__glow {
-  position: absolute;
-  border-radius: 50%;
-  pointer-events: none;
-}
-
-.pnl-card__glow--pnl {
-  width: 220px;
-  height: 220px;
-  top: -80px;
-  right: -60px;
-}
-
-.pnl-card--win .pnl-card__glow--pnl {
-  background: rgba(74, 222, 128, 0.12);
-}
-
-.pnl-card--loss .pnl-card__glow--pnl {
-  background: rgba(248, 113, 113, 0.1);
-}
-
-.pnl-card__glow--gold {
-  width: 160px;
-  height: 160px;
-  bottom: 40px;
-  left: -40px;
-  background: rgba(201, 169, 98, 0.08);
-}
-
-.pnl-card__header {
+  background: #ffffff;
+  color: #0a0a0a;
+  border-radius: 28px;
+  padding: 36px 34px 30px;
+  font-family: 'Manrope', system-ui, sans-serif;
   position: relative;
-  z-index: 1;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 12px;
+  overflow: hidden;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
 }
 
-.pnl-card__brand-block {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 5px;
-  min-height: 34px;
-  flex-shrink: 0;
-}
+.pc--win { --pc-accent: #00b37e; }
+.pc--loss { --pc-accent: #ff3b30; }
 
-.pnl-card__brand {
-  margin: 0;
-  padding: 0;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  line-height: 1.25;
-  color: var(--gold-light);
-  display: block;
-}
-
-.pnl-card__terminal {
-  margin: 0;
-  padding: 0;
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  line-height: 1.35;
-  color: var(--text-dim);
-  display: block;
-}
-
-.pnl-card__badges {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 5px;
-  flex-shrink: 0;
-}
-
-.pnl-card__side {
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  padding: 4px 10px;
-  border-radius: 999px;
-  border: 1px solid var(--card-border);
-  line-height: 1.2;
-}
-
-.pnl-card__leverage {
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--text-muted);
-  letter-spacing: 0.04em;
-  line-height: 1.2;
-}
-
-.pnl-card__side--long {
-  color: var(--green);
-  background: rgba(74, 222, 128, 0.1);
-}
-
-.pnl-card__side--short {
-  color: var(--red);
-  background: rgba(248, 113, 113, 0.1);
-}
-
-.pnl-card__coin {
-  position: relative;
-  z-index: 1;
-  margin: 18px 0 0;
-  font-size: 42px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1;
-}
-
-.pnl-card__hero {
-  position: relative;
-  z-index: 1;
-  margin-top: 20px;
-}
-
-.pnl-card--win .pnl-card__pnl,
-.pnl-card--win .pnl-card__pct,
-.pnl-card--win .pnl-card__profit-value {
-  color: var(--green);
-}
-
-.pnl-card--loss .pnl-card__pnl,
-.pnl-card--loss .pnl-card__pct,
-.pnl-card--loss .pnl-card__profit-value {
-  color: var(--red);
-}
-
-.pnl-card__pnl {
-  margin: 0;
-  font-size: 38px;
-  font-weight: 700;
-  line-height: 1.05;
-}
-
-.pnl-card__pct {
-  margin: 4px 0 0;
-  font-size: 20px;
-  font-weight: 600;
-}
-
-.pnl-card__prices {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-top: 24px;
-}
-
-.pnl-card__notionals {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin-top: 10px;
-}
-
-.pnl-card__cell {
-  background: rgba(20, 20, 24, 0.85);
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius-md);
-  padding: 12px;
-}
-
-.pnl-card__cell--sm {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  gap: 8px;
-  min-height: 64px;
-  padding: 10px 6px;
-  background: rgba(20, 20, 24, 0.65);
-}
-
-.pnl-card__notionals .pnl-card__label {
-  font-size: 7px;
-  line-height: 1.45;
-  min-height: 2.6em;
-  margin: 0;
-}
-
-.pnl-card__notionals .pnl-card__value-sm {
-  margin-top: 0;
-  font-size: 11px;
-  line-height: 1.25;
-  flex-shrink: 0;
-}
-
-.pnl-card__cell--profit {
-  border-color: rgba(201, 169, 98, 0.25);
-}
-
-.pnl-card__label {
-  display: block;
-  font-size: 8px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-
-.pnl-card__prices .pnl-card__label {
-  font-size: 9px;
-}
-
-.pnl-card__value {
-  display: block;
-  margin-top: 4px;
-  font-size: 15px;
-  font-weight: 600;
-}
-
-.pnl-card__value-sm {
-  display: block;
-  margin-top: 3px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.pnl-card__footer {
-  position: relative;
-  z-index: 1;
-  margin-top: 16px;
-  padding-top: 12px;
-  border-top: 1px solid var(--card-border);
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: 12px;
-}
-
-.pnl-card__footer-left {
-  flex: 1;
-  min-width: 0;
-}
-
-.pnl-card__footer-right {
-  text-align: right;
-  flex-shrink: 0;
-}
-
-.pnl-card__meta {
-  margin: 0;
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--text-muted);
-  line-height: 1.35;
-}
-
-.pnl-card__date {
-  margin: 2px 0 0;
-  font-size: 10px;
-  color: var(--text-dim);
-  line-height: 1.35;
-}
-
-.pnl-card__proof-label {
-  margin: 0;
-  font-size: 8px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-dim);
-  line-height: 1.3;
-}
-
-.pnl-card__proof {
-  margin: 2px 0 0;
-  font-size: 9px;
-  font-weight: 600;
-  color: var(--text-muted);
-  line-height: 1.3;
-  word-break: break-all;
-}
-
-.pnl-card--export {
-  flex-shrink: 0;
-  width: 360px;
-  height: auto;
-  min-height: 500px;
-  aspect-ratio: unset;
-  overflow: visible;
-}
-
-.pnl-card--export .pnl-card__notionals .pnl-card__cell--sm {
-  min-height: 72px;
-  gap: 10px;
-  padding: 10px 5px;
-}
-
-.pnl-card--export .pnl-card__notionals .pnl-card__label {
-  min-height: 3em;
-}
-
-.pnl-card--export .pnl-card__footer {
-  padding-bottom: 4px;
-}
-
-.pnl-card-export-host {
-  position: fixed;
-  left: -9999px;
-  top: 0;
-  width: 360px;
-  overflow: visible;
-  pointer-events: none;
-  opacity: 0;
-  z-index: -1;
-}
-
-.pnl-card-modal__loading {
-  margin: 0;
-  font-size: 13px;
-  color: var(--text-muted);
-  text-align: center;
-  padding: 40px 0;
-}
-
-/* Modal */
-.pnl-card-modal-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 200;
+.pc-top {
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 20px;
-  background: rgba(0, 0, 0, 0.88);
+  justify-content: space-between;
 }
-
-.pnl-card-modal {
-  max-width: 420px;
-  width: 100%;
-  max-height: 92vh;
-  overflow-y: auto;
-  background: var(--bg-elevated);
-  border: 1px solid var(--card-border);
-  border-radius: 6px;
-  padding: 20px;
+.pc-brand {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
 }
-
-.pnl-card-modal__title {
-  margin: 0;
-  font-size: 18px;
+.pc-badges {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.pc-side {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 5px 11px;
+  border-radius: 999px;
+}
+.pc-side.long {
+  background: #e6f9f1;
+  color: #00875a;
+}
+.pc-side.short {
+  background: #ffeceb;
+  color: #d92d20;
+}
+.pc-lev {
+  font-size: 13px;
   font-weight: 700;
-  color: var(--gold-light);
+  color: #0a0a0a;
 }
 
-.pnl-card-modal__sub {
-  margin: 4px 0 16px;
-  font-size: 12px;
-  color: var(--text-muted);
+.pc-sym {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-top: 30px;
 }
 
-.pnl-card-modal__preview {
+.pc-hero {
   display: flex;
-  justify-content: center;
-  margin-bottom: 16px;
-}
-
-.pnl-card-modal__actions {
-  display: flex;
-  flex-direction: column;
+  align-items: baseline;
   gap: 8px;
+  margin-top: 8px;
+  color: var(--pc-accent);
 }
-
-.pnl-card-modal__btn {
-  padding: 12px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--card-border);
-  background: var(--card);
-  color: var(--text-muted);
-  font-weight: 600;
-  font-size: 14px;
-  cursor: pointer;
+.pc-arrow {
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 1;
 }
-
-.pnl-card-modal__btn:hover {
-  border-color: var(--gold);
-  color: var(--text);
+.pc-pct {
+  font-size: 66px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
 }
-
-.pnl-card-modal__btn--primary {
-  background: var(--gold);
-  border-color: var(--gold);
-  color: var(--bg);
-}
-
-.pnl-card-modal__btn--primary:hover {
-  filter: brightness(1.05);
-  color: var(--bg);
-}
-
-.pnl-card-modal__btn:disabled {
-  opacity: 0.6;
-  cursor: wait;
-}
-
-.btn-pnl-card {
-  flex-shrink: 0;
-  padding: 4px 8px;
-  font-size: 10px;
+.pc-pnl {
+  font-size: 22px;
   font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--gold-light);
-  background: var(--accent-muted);
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
+  margin-top: 10px;
+  color: var(--pc-accent);
 }
 
-.btn-pnl-card:hover {
-  border-color: var(--gold);
+.pc-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-top: 30px;
+  padding-top: 22px;
+  border-top: 1px solid #ededed;
+}
+.pc-cell span {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #9b9b9b;
+}
+.pc-cell b {
+  display: block;
+  font-size: 16px;
+  font-weight: 700;
+  margin-top: 5px;
+  letter-spacing: -0.01em;
+}
+
+.pc-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 26px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #9b9b9b;
+}
+
+.pc .tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.pc--export {
+  box-shadow: none;
+}
+
+/* ===== Modal de la carte PnL ===== */
+.pnl-card-modal-backdrop {
+  position: fixed; inset: 0; z-index: 100;
+  background: rgba(0, 0, 0, 0.82); backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center; padding: 1.25rem;
+  font-family: 'Manrope', system-ui, sans-serif;
+}
+.pnl-card-modal {
+  width: 100%; max-width: 448px;
+  background: var(--bg-2, #0a0a0a);
+  border: 1px solid var(--line, rgba(255, 255, 255, 0.1));
+  border-radius: 22px; padding: 1.5rem; max-height: 94vh; overflow-y: auto;
+}
+.pnl-card-modal__title { font-size: 1.15rem; font-weight: 800; color: #fff; }
+.pnl-card-modal__sub { font-size: 0.78rem; color: var(--text-muted, #8a8d93); margin-top: 4px; }
+.pnl-card-modal__preview { display: flex; justify-content: center; margin: 1.4rem 0; overflow: hidden; }
+.pnl-card-modal__loading { color: var(--text-muted, #8a8d93); font-size: 0.85rem; padding: 2rem 0; }
+.pnl-card-export-host { position: absolute; left: -9999px; top: 0; opacity: 0; pointer-events: none; }
+.pnl-card-modal__actions { display: flex; gap: 10px; }
+.pnl-card-modal__btn {
+  flex: 1; padding: 13px; border-radius: 999px; font-weight: 700; font-size: 0.9rem;
+  font-family: inherit; cursor: pointer; transition: opacity .15s;
+  border: 1px solid var(--line-strong, rgba(255, 255, 255, 0.22)); background: transparent; color: #fff;
+}
+.pnl-card-modal__btn--primary { background: #fff; color: #000; border-color: #fff; }
+.pnl-card-modal__btn:hover:not(:disabled) { opacity: 0.85; }
+.pnl-card-modal__btn:disabled { opacity: 0.5; cursor: default; }
+@media (max-width: 440px) {
+  .pnl-card-modal__preview .pc { transform: scale(0.82); transform-origin: top center; }
 }
