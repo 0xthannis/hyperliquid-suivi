@@ -11,18 +11,30 @@ import {
 import './PnlShareCard.css';
 
 type Props = {
-  event: HistoryEvent | null;
-  fills: Fill[];
+  event?: HistoryEvent | null;
+  fills?: Fill[];
+  /** Carte déjà construite (ex. position en cours) — court-circuite le build. */
+  prebuilt?: PnlCardData | null;
   onClose: () => void;
 };
 
-export function PnlCardModal({ event, fills, onClose }: Props) {
+export function PnlCardModal({
+  event = null,
+  fills = [],
+  prebuilt = null,
+  onClose,
+}: Props) {
   const exportRef = useRef<HTMLDivElement>(null);
-  const [data, setData] = useState<PnlCardData | null>(null);
+  const [data, setData] = useState<PnlCardData | null>(prebuilt);
   const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
+    if (prebuilt) {
+      setData(prebuilt);
+      setLoading(false);
+      return;
+    }
     if (!event?.isClose) {
       setData(null);
       return;
@@ -39,9 +51,9 @@ export function PnlCardModal({ event, fills, onClose }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [event, fills]);
+  }, [event, fills, prebuilt]);
 
-  if (!event) return null;
+  if (!event && !prebuilt) return null;
 
   async function downloadCard() {
     const node = exportRef.current;

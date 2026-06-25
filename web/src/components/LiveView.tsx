@@ -16,6 +16,34 @@ import {
 } from '../lib/calculations';
 import { computeExitMetrics, formatRiskReward } from '../lib/riskMetrics';
 import { getPushSupport } from '../lib/push';
+import { PnlCardModal } from './PnlCardModal';
+import type { PnlCardData } from '../lib/pnlCard';
+
+/** Carte PnL pour une position encore ouverte (snapshot du PnL courant). */
+function openPositionCard(p: AssetPosition, price: number): PnlCardData {
+  const net = pnlAtPrice(p, price);
+  return {
+    coin: p.coin,
+    side: p.isLong ? 'LONG' : 'SHORT',
+    entryPx: p.entryPx,
+    exitPx: price,
+    size: p.size,
+    riskedUsd: 0,
+    exitCapitalUsd: 0,
+    grossPnl: net,
+    totalFees: 0,
+    netPnl: net,
+    pnlPct: pnlPercent(p, price),
+    leverage: p.leverage,
+    durationMs: null,
+    durationLabel: 'En cours',
+    closedAt: Date.now(),
+    isWin: net >= 0,
+    closeHash: null,
+    closeTid: null,
+    closeProofLabel: null,
+  };
+}
 
 type Props = {
   positions: AssetPosition[];
@@ -66,6 +94,7 @@ export function LiveView({
   const pushState = getPushSupport();
   const [period, setPeriod] = useState<Period>('month');
   const [equity, setEquity] = useState<number[]>([]);
+  const [card, setCard] = useState<PnlCardData | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -229,11 +258,20 @@ export function LiveView({
                     </span>
                   </div>
                 )}
+                <button
+                  type="button"
+                  className="tr-pos-card"
+                  onClick={() => setCard(openPositionCard(p, px))}
+                >
+                  Carte PnL ↗
+                </button>
               </div>
             );
           })}
         </div>
       )}
+
+      {card && <PnlCardModal prebuilt={card} onClose={() => setCard(null)} />}
     </div>
   );
 }
