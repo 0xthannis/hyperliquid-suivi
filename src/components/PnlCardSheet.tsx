@@ -21,18 +21,30 @@ import {
 import { colors, spacing, radius } from '../theme';
 
 type Props = {
-  event: HistoryEvent | null;
-  fills: Fill[];
+  event?: HistoryEvent | null;
+  fills?: Fill[];
+  /** Carte déjà construite (position en cours) — court-circuite le build. */
+  prebuilt?: PnlCardData | null;
   onClose: () => void;
 };
 
-export function PnlCardSheet({ event, fills, onClose }: Props) {
+export function PnlCardSheet({
+  event = null,
+  fills = [],
+  prebuilt = null,
+  onClose,
+}: Props) {
   const cardRef = useRef<View>(null);
-  const [data, setData] = useState<PnlCardData | null>(null);
+  const [data, setData] = useState<PnlCardData | null>(prebuilt);
   const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
+    if (prebuilt) {
+      setData(prebuilt);
+      setLoading(false);
+      return;
+    }
     if (!event?.isClose) {
       setData(null);
       return;
@@ -49,7 +61,7 @@ export function PnlCardSheet({ event, fills, onClose }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [event, fills]);
+  }, [event, fills, prebuilt]);
 
   async function shareCard() {
     if (!data || !cardRef.current) return;
@@ -80,7 +92,7 @@ export function PnlCardSheet({ event, fills, onClose }: Props) {
     }
   }
 
-  if (!event) return null;
+  if (!event && !prebuilt) return null;
 
   return (
     <Modal

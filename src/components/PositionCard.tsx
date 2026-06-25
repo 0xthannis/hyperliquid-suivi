@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { displaySymbol, type AssetPosition, type TpSlOrder } from '../api/hyperliquid';
 import {
   findTpSlForCoin,
@@ -18,9 +18,10 @@ type Props = {
   position: AssetPosition;
   orders: TpSlOrder[];
   currentPrice?: number;
+  onCard?: () => void;
 };
 
-export function PositionCard({ position, orders, currentPrice }: Props) {
+export function PositionCard({ position, orders, currentPrice, onCard }: Props) {
   const { coin, isLong, unrealizedPnl, entryPx, leverage } = position;
   const price = currentPrice ?? entryPx;
   const livePnl = currentPrice != null ? pnlAtPrice(position, price) : unrealizedPnl;
@@ -107,6 +108,12 @@ export function PositionCard({ position, orders, currentPrice }: Props) {
             />
           )}
         </View>
+      )}
+
+      {onCard && (
+        <Pressable style={styles.cardBtn} onPress={onCard}>
+          <Text style={styles.cardBtnText}>Carte PnL ↗</Text>
+        </Pressable>
       )}
     </View>
   );
@@ -251,4 +258,14 @@ const styles = StyleSheet.create({
   scenarioLabel: { color: colors.text, fontSize: 14, fontWeight: '500' },
   scenarioPrice: { color: colors.textMuted, fontSize: 12, marginTop: 2 },
   scenarioAmount: { fontSize: 15, fontWeight: '600', fontVariant: ['tabular-nums'] },
+  cardBtn: {
+    marginTop: spacing.md,
+    alignSelf: 'flex-start',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: radius.pill,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
+  },
+  cardBtnText: { color: colors.text, fontSize: 12, fontWeight: '700' },
 });

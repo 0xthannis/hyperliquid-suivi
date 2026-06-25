@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -11,7 +11,9 @@ import {
 import { PositionCard } from '../components/PositionCard';
 import { TermLabel } from '../components/TermLabel';
 import type { TraderSnapshot } from '../hooks/useTraderData';
-import { formatUsd, pnlAtPrice } from '../utils/calculations';
+import { formatUsd, pnlAtPrice, pnlPercent } from '../utils/calculations';
+import { PnlCardSheet } from '../components/PnlCardSheet';
+import type { PnlCardData } from '../utils/pnlCard';
 import { TERMINAL_NAME } from '../constants';
 import { colors, spacing, radius, mono } from '../theme';
 
@@ -75,6 +77,33 @@ export function LiveScreen({
     closed.length > 0
       ? `${Math.round((closed.filter((e) => e.isWin).length / closed.length) * 100)}%`
       : 'n/a';
+
+  const [cardData, setCardData] = useState<PnlCardData | null>(null);
+
+  function buildCard(p: (typeof positions)[number], price: number): PnlCardData {
+    const net = pnlAtPrice(p, price);
+    return {
+      coin: p.coin,
+      side: p.isLong ? 'LONG' : 'SHORT',
+      entryPx: p.entryPx,
+      exitPx: price,
+      size: p.size,
+      riskedUsd: 0,
+      exitCapitalUsd: 0,
+      grossPnl: net,
+      totalFees: 0,
+      netPnl: net,
+      pnlPct: pnlPercent(p, price),
+      leverage: p.leverage,
+      durationMs: null,
+      durationLabel: 'En cours',
+      closedAt: Date.now(),
+      isWin: net >= 0,
+      closeHash: null,
+      closeTid: null,
+      closeProofLabel: null,
+    };
+  }
 
   if (loading && positions.length === 0) {
     return (
@@ -162,8 +191,12 @@ export function LiveScreen({
             position={p}
             orders={orders}
             currentPrice={mids[p.coin]}
+            onCard={() => setCardData(buildCard(p, mids[p.coin] ?? p.entryPx))}
           />
         ))
+      )}
+      {cardData && (
+        <PnlCardSheet prebuilt={cardData} onClose={() => setCardData(null)} />
       )}
     </ScrollView>
   );
