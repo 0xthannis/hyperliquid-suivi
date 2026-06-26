@@ -1,11 +1,11 @@
-/* Carte PnL partageable — blanc, texte noir, esprit Trade Republic */
+/* Carte PnL partageable — sombre, texte blanc, logo, esprit Trade Republic */
 .pc {
   width: 400px;
   box-sizing: border-box;
   background: #ffffff;
   color: #0a0a0a;
   border-radius: 28px;
-  padding: 36px 34px 30px;
+  padding: 32px 30px 26px;
   font-family: 'Manrope', system-ui, sans-serif;
   position: relative;
   overflow: hidden;
@@ -21,9 +21,19 @@
   justify-content: space-between;
 }
 .pc-brand {
-  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 15px;
   font-weight: 800;
   letter-spacing: -0.01em;
+  color: #0a0a0a;
+}
+.pc-logo {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  display: block;
 }
 .pc-badges {
   display: flex;
@@ -52,43 +62,39 @@
 }
 
 .pc-sym {
-  font-size: 30px;
+  font-size: 26px;
   font-weight: 800;
   letter-spacing: -0.02em;
-  margin-top: 30px;
+  margin-top: 26px;
 }
 
 .pc-hero {
   display: flex;
   align-items: baseline;
   gap: 8px;
-  margin-top: 8px;
-  color: var(--pc-accent);
+  margin-top: 6px;
+  flex-wrap: wrap;
 }
-.pc-arrow {
-  font-size: 36px;
+.pc-amount {
+  font-size: 40px;
   font-weight: 800;
-  line-height: 1;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  color: var(--pc-accent);
 }
 .pc-pct {
-  font-size: 66px;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  line-height: 1;
-}
-.pc-pnl {
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 700;
-  margin-top: 10px;
   color: var(--pc-accent);
+  opacity: 0.85;
 }
 
 .pc-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 14px;
-  margin-top: 30px;
-  padding-top: 22px;
+  margin-top: 26px;
+  padding-top: 20px;
   border-top: 1px solid #ededed;
 }
 .pc-cell span {
@@ -101,10 +107,11 @@
 }
 .pc-cell b {
   display: block;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
   margin-top: 5px;
   letter-spacing: -0.01em;
+  color: #0a0a0a;
 }
 
 .pc-foot {
@@ -112,7 +119,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-top: 26px;
+  margin-top: 22px;
   font-size: 11px;
   font-weight: 500;
   color: #9b9b9b;

@@ -29,7 +29,10 @@ export function PnlShareCard({ data, className = '', forExport = false }: Props)
       aria-label={`Carte PnL ${displaySymbol(data.coin)} ${data.side}`}
     >
       <header className="pc-top">
-        <span className="pc-brand">{BRAND_NAME}</span>
+        <span className="pc-brand">
+          <img className="pc-logo" src="/icon.png" alt="" aria-hidden />
+          {BRAND_NAME}
+        </span>
         <span className="pc-badges">
           <span className={`pc-side ${data.side === 'LONG' ? 'long' : 'short'}`}>
             {data.side}
@@ -41,10 +44,9 @@ export function PnlShareCard({ data, className = '', forExport = false }: Props)
       <div className="pc-sym">{displaySymbol(data.coin)}</div>
 
       <div className="pc-hero">
-        <span className="pc-arrow">{win ? '↑' : '↓'}</span>
-        <span className="pc-pct tabular">{formatPct(data.pnlPct)}</span>
+        <span className="pc-amount tabular">{formatUsd(data.netPnl, true)}</span>
+        <span className="pc-pct tabular">({formatPct(data.pnlPct)})</span>
       </div>
-      <div className="pc-pnl tabular">{formatUsd(data.netPnl, true)}</div>
 
       <div className="pc-grid">
         <div className="pc-cell">

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import { BRAND_NAME } from '../constants';
 import {
   formatPct,
@@ -35,7 +35,13 @@ export function PnlShareCard({ data, width = 360 }: Props) {
   return (
     <View style={[styles.wrap, { width, height, padding: s(28) }]}>
       <View style={styles.header}>
-        <Text style={[styles.brand, { fontSize: s(15) }]}>{BRAND_NAME}</Text>
+        <View style={[styles.brandRow, { gap: s(8) }]}>
+          <Image
+            source={require('../../assets/icon.png')}
+            style={{ width: s(24), height: s(24), borderRadius: s(6) }}
+          />
+          <Text style={[styles.brand, { fontSize: s(15) }]}>{BRAND_NAME}</Text>
+        </View>
         <View style={[styles.badges, { gap: s(8) }]}>
           <View
             style={[
@@ -57,17 +63,14 @@ export function PnlShareCard({ data, width = 360 }: Props) {
         {displaySymbol(data.coin)}
       </Text>
 
-      <View style={[styles.hero, { marginTop: s(6), gap: s(6) }]}>
-        <Text style={[styles.arrow, { color: accent, fontSize: s(30) }]}>
-          {win ? '↑' : '↓'}
+      <View style={[styles.hero, { marginTop: s(8), gap: s(8) }]}>
+        <Text style={[styles.amount, { color: accent, fontSize: s(34) }]}>
+          {formatUsd(data.netPnl, true)}
         </Text>
-        <Text style={[styles.pct, { color: accent, fontSize: s(52) }]}>
-          {formatPct(data.pnlPct)}
+        <Text style={[styles.pct, { color: accent, fontSize: s(16) }]}>
+          ({formatPct(data.pnlPct)})
         </Text>
       </View>
-      <Text style={[styles.pnl, { color: accent, fontSize: s(20), marginTop: s(6) }]}>
-        {formatUsd(data.netPnl, true)}
-      </Text>
 
       <View style={[styles.grid, { marginTop: s(26), paddingTop: s(18) }]}>
         <View style={styles.cell}>
@@ -111,16 +114,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  brandRow: { flexDirection: 'row', alignItems: 'center' },
   brand: { color: '#0a0a0a', fontWeight: '800', letterSpacing: -0.2 },
   badges: { flexDirection: 'row', alignItems: 'center' },
   sidePill: { borderRadius: 999 },
   sideText: { fontWeight: '800', letterSpacing: 0.8 },
   lev: { color: '#0a0a0a', fontWeight: '700' },
   sym: { color: '#0a0a0a', fontWeight: '800', letterSpacing: -0.5 },
-  hero: { flexDirection: 'row', alignItems: 'baseline' },
-  arrow: { fontWeight: '800' },
-  pct: { fontWeight: '800', letterSpacing: -1, fontVariant: ['tabular-nums'] },
-  pnl: { fontWeight: '700', fontVariant: ['tabular-nums'] },
+  hero: { flexDirection: 'row', alignItems: 'baseline', flexWrap: 'wrap' },
+  amount: { fontWeight: '800', letterSpacing: -0.5, fontVariant: ['tabular-nums'] },
+  pct: { fontWeight: '700', fontVariant: ['tabular-nums'], opacity: 0.85 },
   grid: {
     flexDirection: 'row',
     borderTopWidth: 1,

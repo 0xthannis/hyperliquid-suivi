@@ -1200,3 +1200,20 @@
   transition: background .15s, color .15s, border-color .15s;
 }
 .tr-pos-card:hover { background: #fff; color: #000; border-color: #fff; }
+
+/* Bouton « Card » (générer la carte PnL) dans l'historique */
+.btn-pnl-card {
+  font-family: inherit;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--text);
+  background: transparent;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  padding: 4px 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.btn-pnl-card:hover { background: #fff; color: #000; border-color: #fff; }
