@@ -20,7 +20,7 @@ const SUBS_FILE = path.join(DATA_DIR, 'push-subscriptions.json');
 const MOBILE_FILE = path.join(DATA_DIR, 'expo-push-tokens.json');
 const STATE_FILE = path.join(DATA_DIR, 'push-state.json');
 const TRADER_WALLET =
-  process.env.VITE_TRADER_WALLET ?? '0x994Ff80b7dA1174a164e0F93121bDfbb68cf7A3F';
+  process.env.VITE_TRADER_WALLET ?? '0x5372140d358Dda770690a734798aaa37958Fb927';
 const API_URL = 'https://api.hyperliquid.xyz/info';
 const POLL_MS = Number(process.env.PUSH_POLL_MS) || 25_000;
 const BRAND = 'Thannis';
