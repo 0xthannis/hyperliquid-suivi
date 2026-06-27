@@ -14,6 +14,28 @@ function monthLabel(ms: number): string {
   return new Date(ms).toLocaleDateString('fr-FR', { month: 'short', year: '2-digit' });
 }
 
+const CW = 600;
+const CH = 150;
+
+/** Trace ligne + aire pour la courbe cumulée (démarre à 0). */
+function cumPaths(values: number[]): { line: string; area: string } | null {
+  if (values.length < 2) return null;
+  const series = [0, ...values];
+  const min = Math.min(...series);
+  const max = Math.max(...series);
+  const span = max - min || 1;
+  const pad = CH * 0.12;
+  const pts = series.map((v, i) => ({
+    x: (i / (series.length - 1)) * CW,
+    y: CH - pad - ((v - min) / span) * (CH - pad * 2),
+  }));
+  const line = pts
+    .map((p, i) => `${i ? 'L' : 'M'}${p.x.toFixed(1)},${p.y.toFixed(1)}`)
+    .join(' ');
+  const area = `${line} L${CW},${CH} L0,${CH} Z`;
+  return { line, area };
+}
+
 export function TrackRecordView({ history, allTimePnl, loading }: Props) {
   const stats = useMemo(() => {
     const closed = history
@@ -104,6 +126,8 @@ export function TrackRecordView({ history, allTimePnl, loading }: Props) {
   }
 
   const cumUp = allTimePnl >= 0;
+  const curve = cumPaths(stats.cumPoints);
+  const curveColor = cumUp ? 'var(--green)' : 'var(--red)';
 
   return (
     <div className="trk">
@@ -116,6 +140,26 @@ export function TrackRecordView({ history, allTimePnl, loading }: Props) {
           {stats.count} trades clôturés · {stats.winRate}% de réussite
         </span>
       </div>
+
+      {curve && (
+        <svg className="trk-curve" viewBox={`0 0 ${CW} ${CH}`} preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="trk-grad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={curveColor} stopOpacity="0.2" />
+              <stop offset="100%" stopColor={curveColor} stopOpacity="0" />
+            </linearGradient>
+          </defs>
+          <path d={curve.area} fill="url(#trk-grad)" stroke="none" />
+          <path
+            d={curve.line}
+            fill="none"
+            stroke={curveColor}
+            strokeWidth="2"
+            strokeLinejoin="round"
+            vectorEffect="non-scaling-stroke"
+          />
+        </svg>
+      )}
 
       <div className="trk-kpis">
         <div className="trk-kpi">

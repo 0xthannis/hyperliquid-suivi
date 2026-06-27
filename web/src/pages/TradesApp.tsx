@@ -6,6 +6,7 @@ import { useTraderData } from '../hooks/useTraderData';
 import { LiveView } from '../components/LiveView';
 import { HistoryView } from '../components/HistoryView';
 import { TrackRecordView } from '../components/TrackRecordView';
+import { TerminalOnboarding } from '../components/TerminalOnboarding';
 import {
   BRAND_NAME,
   TRADER_WALLET,
@@ -31,6 +32,8 @@ export function TradesApp() {
           {data.wsConnected ? 'En direct' : 'Synchro'}
         </div>
       </header>
+
+      <TerminalOnboarding />
 
       <div className="trx-seg" role="tablist">
         <button
