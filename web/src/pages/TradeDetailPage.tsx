@@ -10,6 +10,8 @@ import {
 import { buildPnlCardData, type PnlCardData } from '../lib/pnlCard';
 import { PnlShareCard } from '../components/PnlShareCard';
 import { PnlCardModal } from '../components/PnlCardModal';
+import { useLang } from '../i18n';
+import { getPagesCopy } from '../i18n/pages';
 import {
   BRAND_NAME,
   TERMINAL_NAME,
@@ -21,6 +23,8 @@ import './TradeDetailPage.css';
 
 export function TradeDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const [lang] = useLang();
+  const c = getPagesCopy(lang).trade;
   const [event, setEvent] = useState<HistoryEvent | null>(null);
   const [fills, setFills] = useState<Fill[]>([]);
   const [card, setCard] = useState<PnlCardData | null>(null);
@@ -60,7 +64,7 @@ export function TradeDetailPage() {
       <header className="td-nav">
         <Link to="/app" className="td-back">← {TERMINAL_NAME}</Link>
         <span className="td-logo">{BRAND_NAME}</span>
-        <Link to="/verifie" className="td-cta">Vérifié</Link>
+        <Link to="/verifie" className="td-cta">{getPagesCopy(lang).common.verified}</Link>
       </header>
 
       <main className="td-main">
@@ -68,13 +72,13 @@ export function TradeDetailPage() {
           <div className="tr-skel" style={{ height: 380, width: 400, maxWidth: '100%', borderRadius: 20, margin: '0 auto' }} />
         ) : !event || !event.isClose || !card ? (
           <div className="td-empty">
-            <h1>Trade introuvable</h1>
-            <p>Ce trade n'existe pas ou n'est plus disponible dans l'historique on-chain.</p>
-            <Link to="/app" className="td-empty-cta">Voir tous nos trades</Link>
+            <h1>{c.notFoundTitle}</h1>
+            <p>{c.notFoundText}</p>
+            <Link to="/app" className="td-empty-cta">{c.seeAll}</Link>
           </div>
         ) : (
           <>
-            <p className="td-eyebrow">Trade vérifié on-chain</p>
+            <p className="td-eyebrow">{c.eyebrow}</p>
             <h1 className="td-title">{displaySymbol(event.coin)}</h1>
 
             <div className="td-card-wrap">
@@ -83,17 +87,17 @@ export function TradeDetailPage() {
 
             <div className="td-facts">
               <div className="td-fact">
-                <span>Résultat net</span>
+                <span>{c.netResult}</span>
                 <b className={event.netPnl >= 0 ? 'pos' : 'neg'}>
                   {formatUsd(event.netPnl, true)}
                 </b>
               </div>
               <div className="td-fact">
-                <span>Clôturé le</span>
+                <span>{c.closedOn}</span>
                 <b>{formatDateTime(event.time)}</b>
               </div>
               <div className="td-fact">
-                <span>Frais</span>
+                <span>{c.fees}</span>
                 <b>{formatUsd(event.totalFees)}</b>
               </div>
             </div>
@@ -104,7 +108,7 @@ export function TradeDetailPage() {
                 className="td-btn td-btn--primary"
                 onClick={() => setModalOpen(true)}
               >
-                Partager la carte
+                {c.share}
               </button>
               <a
                 className="td-btn"
@@ -112,14 +116,11 @@ export function TradeDetailPage() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Vérifier on-chain
+                {c.verify}
               </a>
             </div>
 
-            <p className="td-note">
-              Chaque trade {BRAND_NAME} est public et vérifiable. Les performances passées
-              ne préjugent pas des performances futures. Ce n'est pas un conseil financier.
-            </p>
+            <p className="td-note">{c.note(BRAND_NAME)}</p>
           </>
         )}
       </main>

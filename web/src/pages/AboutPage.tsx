@@ -9,14 +9,20 @@ import {
   hyperliquidExplorerUrl,
 } from '../constants';
 import { truncateWallet } from '../lib/wallet';
+import { useLang } from '../i18n';
+import { getPagesCopy } from '../i18n/pages';
 import './AboutPage.css';
 
 export function AboutPage() {
+  const [lang] = useLang();
+  const p = getPagesCopy(lang);
+  const c = p.about;
+
   return (
     <div className="about">
       <header className="about-nav">
         <Link to="/" className="about-back">
-          Accueil
+          {p.common.home}
         </Link>
         <BrandLogo compact />
         <Link to="/app" className="about-cta">
@@ -25,72 +31,57 @@ export function AboutPage() {
       </header>
 
       <main className="about-main">
-        <p className="about-eyebrow">À propos</p>
+        <p className="about-eyebrow">{c.eyebrow}</p>
         <h1>{BRAND_NAME}</h1>
         <p className="about-lead">
-          Société de trading spécialisée dans les <strong>actions</strong> et les{' '}
-          <strong>matières premières</strong>, fondée par un couple,{' '}
-          <strong>Annissa</strong> et <strong>Thanh</strong>. Nous publions chaque
-          position en temps réel sur{' '}
-          <a href={SITE_URL}>{SITE_URL.replace('https://', '')}</a>, pour que vous
-          puissiez la suivre comme un signal.
+          {c.leadPre}
+          <a href={SITE_URL}>{SITE_URL.replace('https://', '')}</a>
+          {c.leadPost}
         </p>
 
         <section className="about-block">
-          <h2>Les fondateurs</h2>
+          <h2>{c.foundersTitle}</h2>
           <div className="about-people">
             <article>
               <h3>Thanh</h3>
-              <p className="about-role">Exécution</p>
-              <p>
-                Il prend et gère les positions affichées. Les données viennent
-                directement de son wallet Hyperliquid, on-chain, sans aucune retouche.
-              </p>
+              <p className="about-role">{c.thanhRole}</p>
+              <p>{c.thanhText}</p>
             </article>
             <article>
               <h3>Annissa</h3>
-              <p className="about-role">Direction</p>
-              <p>
-                Elle pilote {BRAND_NAME} avec Thanh et porte notre engagement de
-                transparence totale. La structure est dirigée à deux.
-              </p>
+              <p className="about-role">{c.annissaRole}</p>
+              <p>{c.annissaText}</p>
             </article>
           </div>
         </section>
 
         <section className="about-block">
-          <h2>Notre conviction</h2>
-          <p>
-            La plupart des traders ne montrent que leurs gains. Nous montrons{' '}
-            <strong>tout</strong> : entrées, stops, objectifs, pertes comme profits, en
-            direct et vérifiable on-chain. La transparence n&apos;est pas une option, c&apos;est
-            notre standard.
-          </p>
+          <h2>{c.convictionTitle}</h2>
+          <p>{c.convictionText}</p>
         </section>
 
         <section className="about-block">
-          <h2>Ce que nous proposons</h2>
+          <h2>{c.offerTitle}</h2>
           <ul className="about-list">
-            <li>Chaque position en temps réel (long / short, levier, SL, TP, P&amp;L)</li>
-            <li>Un track record public et vérifiable on-chain</li>
-            <li>Des notifications à chaque ouverture, ajustement et clôture</li>
-            <li>Des signaux à suivre librement, pour profiter avec nous</li>
+            {c.offer.map((li) => (
+              <li key={li}>{li}</li>
+            ))}
           </ul>
         </section>
 
         <section className="about-block">
-          <h2>Ce que nous ne faisons pas</h2>
+          <h2>{c.notTitle}</h2>
           <ul className="about-list about-list--muted">
-            <li>Pas de gestion de capital pour le compte de tiers</li>
-            <li>Pas de promesse de performance</li>
-            <li>Pas de conseil en investissement</li>
+            {c.not.map((li) => (
+              <li key={li}>{li}</li>
+            ))}
           </ul>
         </section>
 
         <section className="about-block about-contact">
-          <h2>Contact et vérification</h2>
+          <h2>{c.contactTitle}</h2>
           <p>
-            Wallet suivi :{' '}
+            {c.walletLine}{' '}
             <a
               href={hyperliquidExplorerUrl(TRADER_WALLET)}
               target="_blank"
@@ -99,10 +90,10 @@ export function AboutPage() {
             >
               {truncateWallet(TRADER_WALLET)}
             </a>{' '}
-            (vérifier sur Hyperliquid)
+            {c.walletVerify}
           </p>
           <p>
-            E-mail :{' '}
+            {c.emailLine}{' '}
             <a href={`mailto:${CONTACT_EMAIL}`} className="about-link">
               {CONTACT_EMAIL}
             </a>
@@ -110,7 +101,7 @@ export function AboutPage() {
         </section>
 
         <div className="about-footer-links">
-          <Link to="/methodology">Notre approche</Link>
+          <Link to="/methodology">{p.common.approach}</Link>
           <span> · </span>
           <Link to="/app">{TERMINAL_NAME}</Link>
         </div>
