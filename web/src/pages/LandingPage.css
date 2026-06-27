@@ -335,3 +335,12 @@
 .hx-track-value { font-family: var(--font-display); font-size: 2rem; font-weight: 800; letter-spacing: -0.02em; }
 .hx-track-value.pos { color: var(--green); }
 .hx-track-value.neg { color: var(--red); }
+
+/* ===== Bande téléchargement app ===== */
+.hx-appband {
+  max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1.5rem;
+  border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+}
+.hx-appband-copy h3 { font-family: var(--font-display); font-size: 1.3rem; font-weight: 800; letter-spacing: -0.01em; }
+.hx-appband-copy p { margin-top: 0.5rem; font-size: var(--text-sm); color: var(--text-muted); }

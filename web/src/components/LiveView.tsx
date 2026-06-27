@@ -144,6 +144,25 @@ export function LiveView({
     return Math.round((closed.filter((e) => e.isWin).length / closed.length) * 100);
   }, [history]);
 
+  const exposure = useMemo(
+    () =>
+      positions.reduce((s, p) => s + Math.abs(p.size) * (mids[p.coin] ?? p.entryPx), 0),
+    [positions, mids, priceTick]
+  );
+  const maxDd = useMemo(() => {
+    if (equity.length < 2) return null;
+    let peak = equity[0];
+    let dd = 0;
+    for (const v of equity) {
+      if (v > peak) peak = v;
+      if (peak > 0) {
+        const d = (peak - v) / peak;
+        if (d > dd) dd = d;
+      }
+    }
+    return dd * 100;
+  }, [equity]);
+
   const first = equity[0];
   const last = equity[equity.length - 1];
   const changeAbs = first != null && last != null ? last - first : null;
@@ -296,6 +315,16 @@ export function LiveView({
           <span>Réussite</span>
           <b>{winRate != null ? `${winRate}%` : 'n/a'}</b>
         </div>
+      </div>
+
+      <div className="tr-risk-line">
+        <span>
+          Exposition <b>{formatUsd(exposure)}</b>
+        </span>
+        <span>
+          Drawdown max{' '}
+          <b className="neg">{maxDd != null ? formatPct(-maxDd) : 'n/a'}</b>
+        </span>
       </div>
 
       {error && <div className="tr-alert">{error}</div>}

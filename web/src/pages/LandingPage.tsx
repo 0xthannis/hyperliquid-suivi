@@ -7,6 +7,7 @@ import {
   type LandingSnapshot,
 } from '../hooks/useLandingSnapshot';
 import { formatUsd, formatPct } from '../lib/calculations';
+import { CountUp } from '../components/CountUp';
 import { getPushSupport, requestPushPermission } from '../lib/push';
 import {
   BRAND_NAME,
@@ -14,6 +15,7 @@ import {
   SITE_URL,
   TERMINAL_NAME,
   TRADER_WALLET,
+  APK_DOWNLOAD_PATH,
   hyperliquidExplorerUrl,
 } from '../constants';
 import { truncateWallet } from '../lib/wallet';
@@ -146,7 +148,11 @@ function HeroTerminal({ snap }: { snap: LandingSnapshot }) {
         <div className="hx-app-acct">
           <span className="hx-app-acct-label">Valeur du compte</span>
           <span className="hx-app-acct-value">
-            {snap.accountValue > 0 ? formatUsd(snap.accountValue) : 'n/a'}
+            {snap.accountValue > 0 ? (
+              <CountUp value={snap.accountValue} format={(n) => formatUsd(n)} />
+            ) : (
+              'n/a'
+            )}
           </span>
           {snap.changePct != null && (
             <span className={`hx-app-acct-delta ${up ? 'pos' : 'neg'}`}>
@@ -172,12 +178,22 @@ function HeroTerminal({ snap }: { snap: LandingSnapshot }) {
           <div>
             <span>PnL all-time</span>
             <b className={snap.allTimePnl >= 0 ? 'pos' : 'neg'}>
-              {snap.accountValue > 0 ? formatUsd(snap.allTimePnl, true) : 'n/a'}
+              {snap.accountValue > 0 ? (
+                <CountUp value={snap.allTimePnl} format={(n) => formatUsd(n, true)} />
+              ) : (
+                'n/a'
+              )}
             </b>
           </div>
           <div>
             <span>Réussite</span>
-            <b>{snap.winRate != null ? `${snap.winRate}%` : 'n/a'}</b>
+            <b>
+              {snap.winRate != null ? (
+                <CountUp value={snap.winRate} format={(n) => `${Math.round(n)}%`} />
+              ) : (
+                'n/a'
+              )}
+            </b>
           </div>
           <div>
             <span>Positions</span>
@@ -282,12 +298,22 @@ export function LandingPage() {
         </div>
         <div className="hx-stat">
           <span className="hx-stat-value">
-            {snap.winRate != null ? `${snap.winRate}%` : 'n/a'}
+            {snap.winRate != null ? (
+              <CountUp value={snap.winRate} format={(n) => `${Math.round(n)}%`} />
+            ) : (
+              'n/a'
+            )}
           </span>
           <span className="hx-stat-label">Taux de réussite</span>
         </div>
         <div className="hx-stat">
-          <span className="hx-stat-value">{snap.closedCount || 'n/a'}</span>
+          <span className="hx-stat-value">
+            {snap.closedCount ? (
+              <CountUp value={snap.closedCount} format={(n) => `${Math.round(n)}`} />
+            ) : (
+              'n/a'
+            )}
+          </span>
           <span className="hx-stat-label">Trades clôturés</span>
         </div>
         <div className="hx-stat">
@@ -436,6 +462,16 @@ export function LandingPage() {
         </div>
       </section>
 
+      <section className="hx-appband">
+        <div className="hx-appband-copy">
+          <h3>L'app THANNIS sur Android</h3>
+          <p>Les positions et les alertes dans votre poche. Téléchargement direct, un clic.</p>
+        </div>
+        <a className="hx-btn hx-btn--primary hx-btn--lg" href={APK_DOWNLOAD_PATH} download>
+          Télécharger l'app
+        </a>
+      </section>
+
       <section className="hx-section">
         <span className="hx-kicker">Questions fréquentes</span>
         <h2 className="hx-h2">Avant d’entrer.</h2>
@@ -462,6 +498,8 @@ export function LandingPage() {
           <Link to="/about">La maison</Link>
           <span aria-hidden> · </span>
           <Link to="/methodology">Notre approche</Link>
+          <span aria-hidden> · </span>
+          <Link to="/verifie">Vérifié</Link>
           <span aria-hidden> · </span>
           <Link to="/app">{TERMINAL_NAME}</Link>
           <span aria-hidden> · </span>

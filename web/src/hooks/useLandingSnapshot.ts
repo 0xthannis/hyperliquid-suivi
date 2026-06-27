@@ -19,6 +19,9 @@ export type LandingSnapshot = {
   closedCount: number;
   equity: number[];
   changePct: number | null;
+  exposure: number;
+  maxDrawdownPct: number | null;
+  sinceTs: number | null;
   loading: boolean;
   error: string | null;
 };
@@ -34,9 +37,27 @@ const INITIAL: LandingSnapshot = {
   closedCount: 0,
   equity: [],
   changePct: null,
+  exposure: 0,
+  maxDrawdownPct: null,
+  sinceTs: null,
   loading: true,
   error: null,
 };
+
+/** Drawdown max en % depuis la courbe d'équité (pic à creux). */
+function computeMaxDrawdownPct(equity: number[]): number | null {
+  if (equity.length < 2) return null;
+  let peak = equity[0];
+  let maxDd = 0;
+  for (const v of equity) {
+    if (v > peak) peak = v;
+    if (peak > 0) {
+      const dd = (peak - v) / peak;
+      if (dd > maxDd) maxDd = dd;
+    }
+  }
+  return maxDd * 100;
+}
 
 export function useLandingSnapshot(): LandingSnapshot {
   const [state, setState] = useState<LandingSnapshot>(INITIAL);
@@ -70,6 +91,14 @@ export function useLandingSnapshot(): LandingSnapshot {
             ? ((last - first) / Math.abs(first)) * 100
             : null;
 
+        const exposure = positions.reduce(
+          (s, p) => s + Math.abs(p.size) * p.entryPx,
+          0
+        );
+        const sinceTs = fills.length
+          ? Math.min(...fills.map((f) => f.time))
+          : null;
+
         setState({
           openCount: positions.length,
           openCoins: positions.map((p) => displaySymbol(p.coin)),
@@ -81,6 +110,9 @@ export function useLandingSnapshot(): LandingSnapshot {
           closedCount: closed.length,
           equity,
           changePct,
+          exposure,
+          maxDrawdownPct: computeMaxDrawdownPct(equity),
+          sinceTs,
           loading: false,
           error: null,
         });

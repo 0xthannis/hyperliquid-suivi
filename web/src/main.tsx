@@ -4,6 +4,7 @@ import { BrowserRouter, HashRouter, Routes, Route } from 'react-router-dom';
 import { LandingPage } from './pages/LandingPage';
 import { AboutPage } from './pages/AboutPage';
 import { MethodologyPage } from './pages/MethodologyPage';
+import { VerifiedPage } from './pages/VerifiedPage';
 import { TradesApp } from './pages/TradesApp';
 import './index.css';
 
@@ -18,6 +19,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/app" element={<TradesApp />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/methodology" element={<MethodologyPage />} />
+        <Route path="/verifie" element={<VerifiedPage />} />
       </Routes>
     </Router>
   </StrictMode>

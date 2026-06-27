@@ -23,3 +23,14 @@ export const API_SOURCE_LABEL = 'Source : API Hyperliquid (info)';
 export function hyperliquidExplorerUrl(wallet: string): string {
   return `https://app.hyperliquid.xyz/explorer/address/${wallet}`;
 }
+
+/** Téléchargement APK (relatif = marche sur n'importe quel hôte servant le web). */
+export const APK_DOWNLOAD_PATH = '/Thannis.apk';
+
+/**
+ * Preuve de propriété : message à signer avec le wallet, et la signature.
+ * Pour générer la signature : signer OWNERSHIP_MESSAGE avec le wallet THANNIS
+ * (ex. via un wallet supportant personal_sign), puis coller la signature ici.
+ */
+export const OWNERSHIP_MESSAGE = `THANNIS est le propriétaire du wallet ${TRADER_WALLET}. Toutes nos positions sont publiques et vérifiables on-chain.`;
+export const OWNERSHIP_SIGNATURE = '';

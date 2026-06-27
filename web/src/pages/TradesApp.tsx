@@ -6,6 +6,7 @@ import { useTraderData } from '../hooks/useTraderData';
 import { LiveView } from '../components/LiveView';
 import { HistoryView } from '../components/HistoryView';
 import { TrackRecordView } from '../components/TrackRecordView';
+import { WatchlistView } from '../components/WatchlistView';
 import { TerminalOnboarding } from '../components/TerminalOnboarding';
 import {
   BRAND_NAME,
@@ -15,7 +16,7 @@ import {
 import { truncateWallet } from '../lib/wallet';
 import '../App.css';
 
-type Tab = 'live' | 'history' | 'track';
+type Tab = 'live' | 'watch' | 'history' | 'track';
 
 export function TradesApp() {
   const [tab, setTab] = useState<Tab>('live');
@@ -42,6 +43,13 @@ export function TradesApp() {
           onClick={() => setTab('live')}
         >
           Positions
+        </button>
+        <button
+          type="button"
+          className={tab === 'watch' ? 'is-active' : ''}
+          onClick={() => setTab('watch')}
+        >
+          Watchlist
         </button>
         <button
           type="button"
@@ -72,6 +80,8 @@ export function TradesApp() {
             error={data.error}
             priceTick={data.priceTick}
           />
+        ) : tab === 'watch' ? (
+          <WatchlistView />
         ) : tab === 'history' ? (
           <HistoryView
             history={data.history}
@@ -100,6 +110,8 @@ export function TradesApp() {
           </a>
           <span aria-hidden> · </span>
           <Link to="/methodology">Notre approche</Link>
+          <span aria-hidden> · </span>
+          <Link to="/verifie">Vérifié</Link>
           <span aria-hidden> · </span>
           <Link to="/about">À propos</Link>
         </span>

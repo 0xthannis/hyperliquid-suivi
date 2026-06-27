@@ -1,0 +1,20 @@
+{
+  "updated": "2026-06-27",
+  "items": [
+    {
+      "symbol": "OR",
+      "bias": "long",
+      "note": "Cassure des plus hauts, momentum haussier intact. On guette un repli pour entrer."
+    },
+    {
+      "symbol": "BRENT",
+      "bias": "short",
+      "note": "Zone de surachat, divergence baissière. On surveille un retournement."
+    },
+    {
+      "symbol": "NVDA",
+      "bias": "watch",
+      "note": "Avant résultats. On observe la réaction du marché avant de se positionner."
+    }
+  ]
+}

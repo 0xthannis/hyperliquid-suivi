@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import {
   APK_DOWNLOAD_URL,
+  APK_DOWNLOAD_PATH,
   ANDROID_PACKAGE,
   SITE_URL,
 } from '../constants';
@@ -35,13 +36,13 @@ export function MobileAppBanner() {
     window.location.href = APP_SCHEME_URL;
     setTimeout(() => {
       if (document.visibilityState === 'visible') {
-        window.location.href = APK_DOWNLOAD_URL;
+        window.location.href = APK_DOWNLOAD_PATH;
       }
     }, 1500);
   }
 
   function installApk() {
-    window.location.href = APK_DOWNLOAD_URL;
+    window.location.href = APK_DOWNLOAD_PATH;
   }
 
   return (
