@@ -96,7 +96,7 @@ function buildMenu() {
           label: 'Vérifier sur Hyperliquid',
           click: () =>
             shell.openExternal(
-              'https://app.hyperliquid.xyz/explorer/address/0x994Ff80b7dA1174a164e0F93121bDfbb68cf7A3F'
+              'https://app.hyperliquid.xyz/explorer/address/0x5372140d358Dda770690a734798aaa37958Fb927'
             ),
         },
       ],
