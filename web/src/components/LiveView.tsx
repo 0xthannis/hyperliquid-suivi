@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type MouseEvent } from 'react';
 import { Link } from 'react-router-dom';
 import {
   displaySymbol,
@@ -15,9 +15,10 @@ import {
   type HistoryEvent,
 } from '../lib/calculations';
 import { computeExitMetrics, formatRiskReward } from '../lib/riskMetrics';
-import { getPushSupport } from '../lib/push';
+import { getPushSupport, requestPushPermission, type PushState } from '../lib/push';
 import { PnlCardModal } from './PnlCardModal';
 import type { PnlCardData } from '../lib/pnlCard';
+import { TRADER_WALLET, hyperliquidExplorerUrl } from '../constants';
 
 /** Carte PnL pour une position encore ouverte (snapshot du PnL courant). */
 function openPositionCard(p: AssetPosition, price: number): PnlCardData {
@@ -65,19 +66,28 @@ const PERIODS: [Period, string][] = [
   ['allTime', 'MAX'],
 ];
 
-function linePath(values: number[], w: number, h: number) {
-  if (values.length < 2) return '';
+const CHART_W = 400;
+const CHART_H = 120;
+
+/** Points (x,y) en coordonnées viewBox pour la courbe d'équité. */
+function chartPoints(values: number[], w = CHART_W, h = CHART_H) {
   const min = Math.min(...values);
   const max = Math.max(...values);
   const span = max - min || 1;
   const pad = h * 0.14;
-  return values
-    .map((v, i) => {
-      const x = (i / (values.length - 1)) * w;
-      const y = h - pad - ((v - min) / span) * (h - pad * 2);
-      return `${i ? 'L' : 'M'}${x.toFixed(1)},${y.toFixed(1)}`;
-    })
-    .join(' ');
+  return values.map((v, i) => ({
+    x: values.length > 1 ? (i / (values.length - 1)) * w : w / 2,
+    y: h - pad - ((v - min) / span) * (h - pad * 2),
+  }));
+}
+
+function lineD(pts: { x: number; y: number }[]) {
+  return pts.map((p, i) => `${i ? 'L' : 'M'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+}
+
+function areaD(pts: { x: number; y: number }[], h = CHART_H) {
+  if (pts.length < 2) return '';
+  return `${lineD(pts)} L${pts[pts.length - 1].x.toFixed(1)},${h} L${pts[0].x.toFixed(1)},${h} Z`;
 }
 
 export function LiveView({
@@ -91,10 +101,24 @@ export function LiveView({
   error,
   priceTick,
 }: Props) {
-  const pushState = getPushSupport();
+  const [pushState, setPushState] = useState<PushState>(() => getPushSupport());
+  const [pushBusy, setPushBusy] = useState(false);
+  const [pushMsg, setPushMsg] = useState<string | null>(null);
   const [period, setPeriod] = useState<Period>('month');
   const [equity, setEquity] = useState<number[]>([]);
+  const [hover, setHover] = useState<number | null>(null);
   const [card, setCard] = useState<PnlCardData | null>(null);
+
+  async function enableAlerts() {
+    setPushBusy(true);
+    try {
+      const r = await requestPushPermission();
+      setPushState(r.state);
+      setPushMsg(r.message);
+    } finally {
+      setPushBusy(false);
+    }
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -129,11 +153,37 @@ export function LiveView({
       : null;
   const up = (changeAbs ?? 0) >= 0;
   const lineColor = up ? 'var(--green)' : 'var(--red)';
+  const pts = useMemo(() => (equity.length >= 2 ? chartPoints(equity) : []), [equity]);
+  const hoverPt = hover != null ? pts[hover] : null;
+  const hoverVal = hover != null ? equity[hover] : null;
+
+  function onChartMove(e: MouseEvent<HTMLDivElement>) {
+    if (pts.length < 2) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const ratio = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+    setHover(Math.round(ratio * (pts.length - 1)));
+  }
 
   if (loading && positions.length === 0 && equity.length === 0) {
     return (
-      <div className="tr-loading">
-        <div className="tr-spinner" />
+      <div className="tr">
+        <div className="tr-left">
+          <span className="tr-label">Valeur du compte</span>
+          <div className="tr-skel tr-skel-value" />
+          <div className="tr-skel tr-skel-sub" />
+          <div className="tr-skel tr-skel-chart" />
+          <div className="tr-skel-periods">
+            {PERIODS.map(([p]) => (
+              <div key={p} className="tr-skel tr-skel-pill" />
+            ))}
+          </div>
+        </div>
+        <div className="tr-right">
+          <div className="tr-section-label">Positions</div>
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="tr-skel tr-skel-row" />
+          ))}
+        </div>
       </div>
     );
   }
@@ -152,10 +202,70 @@ export function LiveView({
         )}
       </div>
 
-      {equity.length >= 2 && (
-        <svg className="tr-chart" viewBox="0 0 400 120" preserveAspectRatio="none">
-          <path d={linePath(equity, 400, 120)} fill="none" stroke={lineColor} strokeWidth="2" />
-        </svg>
+      {pts.length >= 2 && (
+        <div
+          className="tr-chart-wrap"
+          onMouseMove={onChartMove}
+          onMouseLeave={() => setHover(null)}
+        >
+          <svg
+            className="tr-chart"
+            viewBox={`0 0 ${CHART_W} ${CHART_H}`}
+            preserveAspectRatio="none"
+          >
+            <defs>
+              <linearGradient id="tr-grad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor={lineColor} stopOpacity="0.22" />
+                <stop offset="100%" stopColor={lineColor} stopOpacity="0" />
+              </linearGradient>
+            </defs>
+            <path className="tr-area" d={areaD(pts)} fill="url(#tr-grad)" stroke="none" />
+            <path
+              className="tr-line"
+              d={lineD(pts)}
+              fill="none"
+              stroke={lineColor}
+              strokeWidth="2"
+              strokeLinejoin="round"
+              vectorEffect="non-scaling-stroke"
+            />
+            {hoverPt && (
+              <>
+                <line
+                  className="tr-chart-cursor"
+                  x1={hoverPt.x}
+                  y1="0"
+                  x2={hoverPt.x}
+                  y2={CHART_H}
+                />
+                <circle
+                  className="tr-chart-dot"
+                  cx={hoverPt.x}
+                  cy={hoverPt.y}
+                  r="3.5"
+                  fill={lineColor}
+                />
+              </>
+            )}
+          </svg>
+          {hoverPt && hoverVal != null && (
+            <div
+              className="tr-tip"
+              style={{
+                left: `${(hoverPt.x / CHART_W) * 100}%`,
+                top: `${(hoverPt.y / CHART_H) * 100}%`,
+              }}
+            >
+              <b>{formatUsd(hoverVal)}</b>
+              {first != null && (
+                <span>
+                  {hoverVal - first >= 0 ? '+' : ''}
+                  {formatUsd(hoverVal - first, true)} sur la période
+                </span>
+              )}
+            </div>
+          )}
+        </div>
       )}
 
       <div className="tr-periods">
@@ -261,16 +371,45 @@ export function LiveView({
                     </span>
                   </div>
                 )}
-                <button
-                  type="button"
-                  className="tr-pos-card"
-                  onClick={() => setCard(openPositionCard(p, px))}
-                >
-                  Carte PnL ↗
-                </button>
+                <div className="tr-pos-actions">
+                  <button
+                    type="button"
+                    className="tr-pos-card"
+                    onClick={() => setCard(openPositionCard(p, px))}
+                  >
+                    Carte PnL ↗
+                  </button>
+                  <a
+                    className="tr-verif"
+                    href={hyperliquidExplorerUrl(TRADER_WALLET)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Vérifié on-chain ↗
+                  </a>
+                </div>
               </div>
             );
           })}
+        </div>
+      )}
+
+      {pushState !== 'unsupported' && pushState !== 'granted' && (
+        <div className="tr-cta">
+          <div className="tr-cta-title">Activez les alertes</div>
+          <p className="tr-cta-text">
+            Recevez chaque signal — ouverture, SL/TP, clôture — en temps réel, dès qu'une
+            position bouge.
+          </p>
+          <button
+            type="button"
+            className="tr-cta-btn"
+            onClick={enableAlerts}
+            disabled={pushBusy || pushState === 'denied'}
+          >
+            {pushBusy ? 'Activation…' : pushState === 'denied' ? 'Bloquées' : 'Activer les alertes'}
+          </button>
+          {pushMsg && <p className="tr-cta-note">{pushMsg}</p>}
         </div>
       )}
       </div>

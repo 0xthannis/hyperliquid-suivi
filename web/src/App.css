@@ -1120,7 +1120,6 @@
 .tr-change { font-size: 0.95rem; font-weight: 600; margin-top: 10px; }
 .tr .pos { color: var(--green); }
 .tr .neg { color: var(--red); }
-.tr-chart { width: 100%; height: 130px; display: block; margin: 1.25rem 0 0.5rem; }
 .tr-periods { display: flex; gap: 6px; margin: 0.5rem 0 1.5rem; }
 .tr-period { padding: 7px 16px; border-radius: 999px; font-size: 0.78rem; font-weight: 600; color: var(--text-muted); background: transparent; border: none; cursor: pointer; transition: color .15s, background .15s; }
 .tr-period:hover { color: var(--text); }
@@ -1152,6 +1151,58 @@
 .tr-empty-text a { color: var(--text); text-decoration: underline; }
 .tr-loading { min-height: 40vh; display: flex; align-items: center; justify-content: center; }
 .tr-spinner { width: 26px; height: 26px; border: 2px solid var(--line-strong); border-top-color: #0a0a0b; border-radius: 50%; animation: spin .8s linear infinite; }
+
+/* ===== Micro-animations ===== */
+@keyframes tr-fade-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.tr-left, .tr-right { animation: tr-fade-up .45s cubic-bezier(.22,.61,.36,1) both; }
+.tr-right { animation-delay: .06s; }
+.tr-period:active { transform: scale(.95); }
+.tr-pos-card:active, .btn-pnl-card:active { transform: scale(.96); }
+.tr-pos-card, .btn-pnl-card, .tr-period { transition: background .15s, color .15s, border-color .15s, transform .1s; }
+.tr-chart path.tr-line, .tr-chart path.tr-area { transition: opacity .3s ease; }
+
+/* ===== Chart (dégradé + survol) ===== */
+.tr-chart-wrap { position: relative; margin: 1.25rem 0 0.5rem; }
+.tr-chart { width: 100%; height: 130px; display: block; }
+.tr-chart-dot { pointer-events: none; }
+.tr-chart-cursor { stroke: var(--line-strong); stroke-width: 1; stroke-dasharray: 3 3; pointer-events: none; }
+.tr-tip {
+  position: absolute; top: -4px; transform: translate(-50%, -100%); pointer-events: none;
+  background: #0a0a0b; color: #fff; border-radius: 8px; padding: 6px 9px; white-space: nowrap;
+  font-size: 0.7rem; font-weight: 600; line-height: 1.35; box-shadow: 0 6px 20px rgba(0,0,0,.25); z-index: 4;
+}
+.tr-tip b { font-size: 0.78rem; font-weight: 800; }
+.tr-tip span { display: block; color: rgba(255,255,255,.65); font-weight: 500; font-size: 0.64rem; }
+
+/* ===== Skeletons ===== */
+@keyframes tr-shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+.tr-skel { border-radius: 8px; background: linear-gradient(90deg, var(--bg-2) 25%, var(--bg-3) 37%, var(--bg-2) 63%); background-size: 200% 100%; animation: tr-shimmer 1.4s ease-in-out infinite; }
+.tr-skel-value { width: 56%; height: 46px; margin: 8px 0 14px; }
+.tr-skel-sub { width: 34%; height: 16px; }
+.tr-skel-chart { width: 100%; height: 130px; margin: 1.25rem 0; }
+.tr-skel-periods { display: flex; gap: 8px; margin-bottom: 1.5rem; }
+.tr-skel-pill { width: 52px; height: 28px; border-radius: 999px; }
+.tr-skel-row { height: 56px; margin-bottom: 14px; }
+
+/* ===== CTA alertes (colonne droite) ===== */
+.tr-cta { margin-top: 1.5rem; padding: 1.25rem; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--bg-2); }
+.tr-cta-title { font-size: 0.98rem; font-weight: 800; letter-spacing: -0.01em; }
+.tr-cta-text { font-size: 0.8rem; color: var(--text-muted); margin-top: 6px; line-height: 1.5; }
+.tr-cta-btn {
+  margin-top: 14px; font-family: inherit; font-size: 0.82rem; font-weight: 700; color: #fff; background: #0a0a0b;
+  border: none; border-radius: 999px; padding: 9px 18px; cursor: pointer; transition: opacity .15s, transform .1s;
+}
+.tr-cta-btn:hover { opacity: .88; }
+.tr-cta-btn:active { transform: scale(.97); }
+.tr-cta-btn:disabled { opacity: .5; cursor: default; }
+.tr-cta-note { margin-top: 10px; font-size: 0.72rem; color: var(--text-dim); }
+
+/* ===== Badge vérifié on-chain ===== */
+.tr-verif { display: inline-flex; align-items: center; gap: 4px; font-size: 0.7rem; font-weight: 600; color: var(--text-dim); text-decoration: none; }
+.tr-verif::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+.tr-verif:hover { color: var(--text); }
+.tr-pos-actions { display: flex; align-items: center; gap: 14px; margin-top: 14px; flex-wrap: wrap; }
+.tr-pos-actions .tr-pos-card { margin-top: 0; }
 
 /* ===== Terminal shell — Trade Republic minimal ===== */
 .trx { min-height: 100vh; background: var(--bg); color: var(--text); font-family: var(--font-display); }
