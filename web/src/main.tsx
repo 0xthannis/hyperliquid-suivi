@@ -5,6 +5,7 @@ import { LandingPage } from './pages/LandingPage';
 import { AboutPage } from './pages/AboutPage';
 import { MethodologyPage } from './pages/MethodologyPage';
 import { VerifiedPage } from './pages/VerifiedPage';
+import { TradeDetailPage } from './pages/TradeDetailPage';
 import { TradesApp } from './pages/TradesApp';
 import './index.css';
 
@@ -20,6 +21,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/about" element={<AboutPage />} />
         <Route path="/methodology" element={<MethodologyPage />} />
         <Route path="/verifie" element={<VerifiedPage />} />
+        <Route path="/t/:id" element={<TradeDetailPage />} />
       </Routes>
     </Router>
   </StrictMode>

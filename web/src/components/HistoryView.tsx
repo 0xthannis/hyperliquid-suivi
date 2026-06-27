@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { displaySymbol, type Fill } from '../api/hyperliquid';
 import {
   computeHistorySummary,
@@ -204,13 +205,21 @@ export function HistoryView({ history, fills, allTimePnl, loading }: Props) {
                     </td>
                     <td className="journal-th-actions">
                       {e.isClose && (
-                        <button
-                          type="button"
-                          className="btn-pnl-card"
-                          onClick={() => setPnlCardEvent(e)}
-                        >
-                          Card
-                        </button>
+                        <>
+                          <button
+                            type="button"
+                            className="btn-pnl-card"
+                            onClick={() => setPnlCardEvent(e)}
+                          >
+                            Card
+                          </button>
+                          <Link
+                            className="btn-trade-link"
+                            to={`/t/${encodeURIComponent(e.id)}`}
+                          >
+                            ↗
+                          </Link>
+                        </>
                       )}
                     </td>
                   </tr>
@@ -244,6 +253,12 @@ export function HistoryView({ history, fills, allTimePnl, loading }: Props) {
                       >
                         Card
                       </button>
+                      <Link
+                        className="btn-trade-link"
+                        to={`/t/${encodeURIComponent(e.id)}`}
+                      >
+                        ↗
+                      </Link>
                     </>
                   )}
                 </div>

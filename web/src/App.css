@@ -1344,6 +1344,13 @@
   transition: background .15s, color .15s, border-color .15s;
 }
 .btn-pnl-card:hover { background: #0a0a0b; color: #fff; border-color: #0a0a0b; }
+.btn-trade-link {
+  display: inline-flex; align-items: center; justify-content: center; margin-left: 8px;
+  width: 26px; height: 26px; border-radius: 999px; border: 1px solid var(--line-strong);
+  color: var(--text); text-decoration: none; font-size: 0.8rem; font-weight: 700;
+  transition: background .15s, color .15s, border-color .15s; vertical-align: middle;
+}
+.btn-trade-link:hover { background: #0a0a0b; color: #fff; border-color: #0a0a0b; }
 
 /* Terminal : pleine largeur sur desktop (2 colonnes), empilé sur mobile */
 @media (min-width: 900px) {
