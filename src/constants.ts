@@ -28,6 +28,8 @@ export const PUSH_API_BASE = 'https://atcapital.up.railway.app';
 export const CONTACT_EMAIL = 'contact@thannis.com';
 export const APK_DOWNLOAD_URL = `${SITE_URL}/Thannis.apk`;
 export const ANDROID_PACKAGE = 'com.thanh.suivitrades';
+/** Watchlist publique servie par le même hôte que le web (Railway). */
+export const WATCHLIST_URL = `${PUSH_API_BASE}/watchlist.json`;
 
 export const DATA_SCOPE =
   'Wallet Hyperliquid uniquement · historique limité à l\'activité HL';

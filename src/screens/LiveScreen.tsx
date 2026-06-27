@@ -25,7 +25,9 @@ import {
 } from '../utils/calculations';
 import { computeExitMetrics, formatRiskReward } from '../utils/riskMetrics';
 import { PnlCardSheet } from '../components/PnlCardSheet';
+import { WatchlistSection } from '../components/WatchlistSection';
 import { registerRemotePush } from '../services/remotePush';
+import { useCountUp } from '../hooks/useCountUp';
 import type { PnlCardData } from '../utils/pnlCard';
 import { colors, spacing, font } from '../theme';
 
@@ -141,6 +143,26 @@ export function LiveScreen({
       : null;
   const up = (changeAbs ?? 0) >= 0;
 
+  const animAccount = useCountUp(accountValue);
+  const animAllTime = useCountUp(allTimePnl);
+  const exposure = positions.reduce(
+    (s, p) => s + Math.abs(p.size) * (mids[p.coin] ?? p.entryPx),
+    0
+  );
+  const maxDd = (() => {
+    if (equity.length < 2) return null;
+    let peak = equity[0];
+    let dd = 0;
+    for (const v of equity) {
+      if (v > peak) peak = v;
+      if (peak > 0) {
+        const d = (peak - v) / peak;
+        if (d > dd) dd = d;
+      }
+    }
+    return dd * 100;
+  })();
+
   function buildCard(p: (typeof positions)[number], price: number): PnlCardData {
     const net = pnlAtPrice(p, price);
     return {
@@ -183,7 +205,7 @@ export function LiveScreen({
       }
     >
       <Text style={styles.heroLabel}>Valeur du compte</Text>
-      <Text style={styles.heroValue}>{formatUsd(accountValue)}</Text>
+      <Text style={styles.heroValue}>{formatUsd(animAccount)}</Text>
       {changeAbs != null && (
         <Text style={[styles.heroChange, { color: up ? colors.green : colors.red }]}>
           {up ? '↑' : '↓'} {formatUsd(Math.abs(changeAbs))}
@@ -254,7 +276,7 @@ export function LiveScreen({
         <View style={styles.stat}>
           <Text style={styles.statLabel}>PnL total</Text>
           <Text style={[styles.statValue, { color: allTimePnl >= 0 ? colors.green : colors.red }]}>
-            {formatUsd(allTimePnl, true)}
+            {formatUsd(animAllTime, true)}
           </Text>
         </View>
         <View style={styles.statDivider} />
@@ -262,6 +284,18 @@ export function LiveScreen({
           <Text style={styles.statLabel}>Réussite</Text>
           <Text style={styles.statValue}>{winRate}</Text>
         </View>
+      </View>
+
+      <View style={styles.riskLine}>
+        <Text style={styles.riskText}>
+          Exposition <Text style={styles.riskLineStrong}>{formatUsd(exposure)}</Text>
+        </Text>
+        <Text style={styles.riskText}>
+          Drawdown max{' '}
+          <Text style={[styles.riskLineStrong, { color: colors.red }]}>
+            {maxDd != null ? formatPct(-maxDd) : 'n/a'}
+          </Text>
+        </Text>
       </View>
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
@@ -342,6 +376,8 @@ export function LiveScreen({
         })
       )}
 
+      <WatchlistSection />
+
       <View style={styles.alertCard}>
         <Text style={styles.alertTitle}>Activez les alertes</Text>
         <Text style={styles.alertText}>
@@ -408,6 +444,10 @@ const styles = StyleSheet.create({
   statValue: { color: colors.text, fontSize: 17, fontFamily: font.bold, marginTop: 6 },
 
   error: { color: colors.red, fontSize: 13, fontFamily: font.medium, marginTop: 16 },
+
+  riskLine: { flexDirection: 'row', flexWrap: 'wrap', gap: 20, marginTop: 14 },
+  riskText: { color: colors.textDim, fontSize: 12, fontFamily: font.medium },
+  riskLineStrong: { color: colors.textMuted, fontFamily: font.bold },
 
   section: { color: colors.text, fontSize: 17, fontFamily: font.extrabold, marginTop: 28, marginBottom: 4 },
   sectionCount: { color: colors.textMuted, fontSize: 14, fontFamily: font.bold },
