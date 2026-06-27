@@ -25,6 +25,7 @@ import {
 } from '../utils/calculations';
 import { computeExitMetrics, formatRiskReward } from '../utils/riskMetrics';
 import { PnlCardSheet } from '../components/PnlCardSheet';
+import { registerRemotePush } from '../services/remotePush';
 import type { PnlCardData } from '../utils/pnlCard';
 import { colors, spacing, font } from '../theme';
 
@@ -94,6 +95,22 @@ export function LiveScreen({
   const [period, setPeriod] = useState<Period>('month');
   const [equity, setEquity] = useState<number[]>([]);
   const [cardData, setCardData] = useState<PnlCardData | null>(null);
+  const [alertBusy, setAlertBusy] = useState(false);
+  const [alertMsg, setAlertMsg] = useState<string | null>(null);
+
+  async function enableAlerts() {
+    setAlertBusy(true);
+    try {
+      const r = await registerRemotePush();
+      setAlertMsg(
+        r.ok
+          ? 'Alertes activées. Vous serez prévenu à chaque mouvement.'
+          : 'Autorisez les notifications dans les réglages du téléphone.'
+      );
+    } finally {
+      setAlertBusy(false);
+    }
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -325,6 +342,27 @@ export function LiveScreen({
         })
       )}
 
+      <View style={styles.alertCard}>
+        <Text style={styles.alertTitle}>Activez les alertes</Text>
+        <Text style={styles.alertText}>
+          Recevez chaque signal, ouverture, SL/TP et clôture, en temps réel, dès qu'une
+          position bouge.
+        </Text>
+        <Pressable
+          style={[styles.alertBtn, alertBusy && styles.alertBtnDisabled]}
+          onPress={() => {
+            Haptics.selectionAsync().catch(() => {});
+            void enableAlerts();
+          }}
+          disabled={alertBusy}
+        >
+          <Text style={styles.alertBtnText}>
+            {alertBusy ? 'Activation' : 'Activer les alertes'}
+          </Text>
+        </Pressable>
+        {alertMsg ? <Text style={styles.alertNote}>{alertMsg}</Text> : null}
+      </View>
+
       {cardData && (
         <PnlCardSheet prebuilt={cardData} onClose={() => setCardData(null)} />
       )}
@@ -416,4 +454,32 @@ const styles = StyleSheet.create({
     backgroundColor: '#0a0a0b',
   },
   emptyBtnText: { color: '#fff', fontSize: 13, fontFamily: font.bold },
+
+  alertCard: {
+    marginTop: 28,
+    padding: spacing.lg,
+    borderWidth: 1,
+    borderColor: colors.line,
+    borderRadius: 20,
+    backgroundColor: colors.bgElevated,
+  },
+  alertTitle: { color: colors.text, fontSize: 16, fontFamily: font.extrabold },
+  alertText: {
+    color: colors.textMuted,
+    fontSize: 13,
+    fontFamily: font.regular,
+    lineHeight: 20,
+    marginTop: 6,
+  },
+  alertBtn: {
+    alignSelf: 'flex-start',
+    marginTop: 14,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 999,
+    backgroundColor: '#0a0a0b',
+  },
+  alertBtnDisabled: { opacity: 0.5 },
+  alertBtnText: { color: '#fff', fontSize: 13, fontFamily: font.bold },
+  alertNote: { color: colors.textDim, fontSize: 12, fontFamily: font.regular, marginTop: 10, lineHeight: 18 },
 });

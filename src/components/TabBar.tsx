@@ -3,11 +3,12 @@ import { View, Text, Pressable, StyleSheet } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { colors, spacing, font } from '../theme';
 
-export type TabId = 'live' | 'history' | 'about';
+export type TabId = 'live' | 'history' | 'track' | 'about';
 
 const TABS: { id: TabId; label: string }[] = [
   { id: 'live', label: 'Positions' },
   { id: 'history', label: 'Historique' },
+  { id: 'track', label: 'Track' },
   { id: 'about', label: 'À propos' },
 ];
 

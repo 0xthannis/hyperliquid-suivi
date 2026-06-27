@@ -26,6 +26,7 @@ import { SyncBadge } from './src/components/SyncBadge';
 import { TerminalTour } from './src/components/TerminalTour';
 import { LiveScreen } from './src/screens/LiveScreen';
 import { HistoryScreen } from './src/screens/HistoryScreen';
+import { TrackRecordScreen } from './src/screens/TrackRecordScreen';
 import { AboutScreen } from './src/screens/AboutScreen';
 import { useTraderData } from './src/hooks/useTraderData';
 import { registerBackgroundFetch } from './src/background/positionTask';
@@ -189,6 +190,14 @@ export default function App() {
               <HistoryScreen
                 history={data.history}
                 fills={data.fills}
+                allTimePnl={data.allTimePnl}
+                loading={data.loading}
+                refreshing={data.refreshing}
+                onRefresh={data.refresh}
+              />
+            ) : tab === 'track' ? (
+              <TrackRecordScreen
+                history={data.history}
                 allTimePnl={data.allTimePnl}
                 loading={data.loading}
                 refreshing={data.refreshing}
