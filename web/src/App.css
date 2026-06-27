@@ -1290,6 +1290,14 @@
   border-bottom: 1px solid var(--line);
 }
 .trx-brand { font-size: 1.05rem; font-weight: 800; letter-spacing: -0.01em; text-decoration: none; color: var(--text); }
+.trx-nav-right { display: flex; align-items: center; gap: 14px; }
+.hx-lang {
+  font-family: inherit; font-size: 0.76rem; font-weight: 700; letter-spacing: 0.04em;
+  color: var(--text-muted); background: transparent; border: 1px solid var(--line-strong);
+  border-radius: 999px; padding: 6px 12px; cursor: pointer;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.hx-lang:hover { background: #0a0a0b; color: #fff; border-color: #0a0a0b; }
 .trx-live { display: inline-flex; align-items: center; gap: 7px; font-size: 0.76rem; font-weight: 600; color: var(--text-muted); }
 .trx-live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-dim); }
 .trx-live.on { color: var(--green); }

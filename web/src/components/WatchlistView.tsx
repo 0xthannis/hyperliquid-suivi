@@ -1,7 +1,11 @@
-import { biasLabel, useWatchlist } from '../hooks/useWatchlist';
+import { useWatchlist } from '../hooks/useWatchlist';
+import { useLang } from '../i18n';
+import { getTerminalCopy } from '../i18n/terminal';
 
 export function WatchlistView() {
   const { items, updated, loading } = useWatchlist();
+  const [lang] = useLang();
+  const t = getTerminalCopy(lang);
 
   if (loading) {
     return (
@@ -15,19 +19,16 @@ export function WatchlistView() {
     <div className="wl">
       <div className="wl-head">
         <div>
-          <div className="wl-title">Ce qu'on surveille</div>
-          <p className="wl-sub">
-            Les marchés que nous guettons avant d'ouvrir une position. Ce ne sont pas
-            encore des positions, juste notre radar.
-          </p>
+          <div className="wl-title">{t.wlTitle}</div>
+          <p className="wl-sub">{t.wlSub}</p>
         </div>
-        {updated && <span className="wl-updated">Mis à jour le {updated}</span>}
+        {updated && <span className="wl-updated">{t.wlUpdated(updated)}</span>}
       </div>
 
       {items.length === 0 ? (
         <div className="tr-empty">
-          <p className="tr-empty-title">Rien sur le radar pour l'instant</p>
-          <p className="tr-empty-text">Les marchés surveillés apparaîtront ici.</p>
+          <p className="tr-empty-title">{t.wlEmptyTitle}</p>
+          <p className="tr-empty-text">{t.wlEmptyText}</p>
         </div>
       ) : (
         <div className="wl-list">
@@ -35,7 +36,7 @@ export function WatchlistView() {
             <div className="wl-item" key={`${it.symbol}-${i}`}>
               <div className="wl-item-top">
                 <span className="wl-sym">{it.symbol}</span>
-                <span className={`wl-bias wl-bias--${it.bias}`}>{biasLabel(it.bias)}</span>
+                <span className={`wl-bias wl-bias--${it.bias}`}>{t.bias(it.bias)}</span>
               </div>
               <p className="wl-note">{it.note}</p>
             </div>

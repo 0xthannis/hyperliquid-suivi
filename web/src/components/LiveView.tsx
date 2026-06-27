@@ -19,6 +19,8 @@ import { getPushSupport, requestPushPermission, type PushState } from '../lib/pu
 import { PnlCardModal } from './PnlCardModal';
 import type { PnlCardData } from '../lib/pnlCard';
 import { TRADER_WALLET, hyperliquidExplorerUrl } from '../constants';
+import { useLang } from '../i18n';
+import { getTerminalCopy } from '../i18n/terminal';
 
 /** Carte PnL pour une position encore ouverte (snapshot du PnL courant). */
 function openPositionCard(p: AssetPosition, price: number): PnlCardData {
@@ -101,6 +103,8 @@ export function LiveView({
   error,
   priceTick,
 }: Props) {
+  const [lang] = useLang();
+  const t = getTerminalCopy(lang);
   const [pushState, setPushState] = useState<PushState>(() => getPushSupport());
   const [pushBusy, setPushBusy] = useState(false);
   const [pushMsg, setPushMsg] = useState<string | null>(null);
@@ -187,7 +191,7 @@ export function LiveView({
     return (
       <div className="tr">
         <div className="tr-left">
-          <span className="tr-label">Valeur du compte</span>
+          <span className="tr-label">{t.accountValue}</span>
           <div className="tr-skel tr-skel-value" />
           <div className="tr-skel tr-skel-sub" />
           <div className="tr-skel tr-skel-chart" />
@@ -198,7 +202,7 @@ export function LiveView({
           </div>
         </div>
         <div className="tr-right">
-          <div className="tr-section-label">Positions</div>
+          <div className="tr-section-label">{t.positions}</div>
           {[0, 1, 2].map((i) => (
             <div key={i} className="tr-skel tr-skel-row" />
           ))}
@@ -211,7 +215,7 @@ export function LiveView({
     <div className="tr">
       <div className="tr-left">
       <div className="tr-hero">
-        <span className="tr-label">Valeur du compte</span>
+        <span className="tr-label">{t.accountValue}</span>
         <div className="tr-value">{formatUsd(accountValue)}</div>
         {changeAbs != null && (
           <div className={`tr-change ${up ? 'pos' : 'neg'}`}>
@@ -279,7 +283,7 @@ export function LiveView({
               {first != null && (
                 <span>
                   {hoverVal - first >= 0 ? '+' : ''}
-                  {formatUsd(hoverVal - first, true)} sur la période
+                  {formatUsd(hoverVal - first, true)} {t.onThePeriod}
                 </span>
               )}
             </div>
@@ -288,41 +292,41 @@ export function LiveView({
       )}
 
       <div className="tr-periods">
-        {PERIODS.map(([p, label]) => (
+        {PERIODS.map(([p]) => (
           <button
             key={p}
             type="button"
             className={`tr-period ${period === p ? 'is-active' : ''}`}
             onClick={() => setPeriod(p)}
           >
-            {label}
+            {t.periods[p]}
           </button>
         ))}
       </div>
 
       <div className="tr-stats">
         <div className="tr-stat">
-          <span>PnL ouvert</span>
+          <span>{t.pnlOpen}</span>
           <b className={positions.length ? (totalPnl >= 0 ? 'pos' : 'neg') : ''}>
             {positions.length ? formatUsd(totalPnl, true) : formatUsd(0)}
           </b>
         </div>
         <div className="tr-stat">
-          <span>PnL total</span>
+          <span>{t.pnlTotal}</span>
           <b className={allTimePnl >= 0 ? 'pos' : 'neg'}>{formatUsd(allTimePnl, true)}</b>
         </div>
         <div className="tr-stat">
-          <span>Réussite</span>
+          <span>{t.winRate}</span>
           <b>{winRate != null ? `${winRate}%` : 'n/a'}</b>
         </div>
       </div>
 
       <div className="tr-risk-line">
         <span>
-          Exposition <b>{formatUsd(exposure)}</b>
+          {t.exposure} <b>{formatUsd(exposure)}</b>
         </span>
         <span>
-          Drawdown max{' '}
+          {t.maxDrawdown}{' '}
           <b className="neg">{maxDd != null ? formatPct(-maxDd) : 'n/a'}</b>
         </span>
       </div>
@@ -332,18 +336,18 @@ export function LiveView({
 
       <div className="tr-right">
       <div className="tr-section-label">
-        Positions <span className="tr-count">{positions.length}</span>
+        {t.positions} <span className="tr-count">{positions.length}</span>
       </div>
 
       {positions.length === 0 ? (
         <div className="tr-empty">
-          <p className="tr-empty-title">Aucune position ouverte</p>
-          <p className="tr-empty-text">
-            Dès qu'une position s'ouvre, elle apparaît ici en temps réel.
-          </p>
+          <p className="tr-empty-title">{t.emptyTitle}</p>
+          <p className="tr-empty-text">{t.emptyText}</p>
           {pushState !== 'unsupported' && pushState !== 'denied' && (
             <p className="tr-empty-text">
-              Activez les alertes depuis la <Link to="/">page d'accueil</Link>.
+              {t.emptyAlertsPre}
+              <Link to="/">{t.homePage}</Link>
+              {t.emptyAlertsPost}
             </p>
           )}
         </div>
@@ -369,7 +373,7 @@ export function LiveView({
                   <div className="tr-pos-id">
                     <span className="tr-pos-sym">{displaySymbol(p.coin)}</span>
                     <span className="tr-pos-sub">
-                      {p.isLong ? 'Long' : 'Short'} · {p.leverage}× · entrée {p.entryPx}
+                      {p.isLong ? t.long : t.short} · {p.leverage}× · {t.entry} {p.entryPx}
                     </span>
                   </div>
                   <div className="tr-pos-fig">
@@ -406,7 +410,7 @@ export function LiveView({
                     className="tr-pos-card"
                     onClick={() => setCard(openPositionCard(p, px))}
                   >
-                    Carte PnL ↗
+                    {t.pnlCard}
                   </button>
                   <a
                     className="tr-verif"
@@ -414,7 +418,7 @@ export function LiveView({
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    Vérifié on-chain ↗
+                    {t.verifiedOnchain}
                   </a>
                 </div>
               </div>
@@ -425,18 +429,19 @@ export function LiveView({
 
       {pushState !== 'unsupported' && pushState !== 'granted' && (
         <div className="tr-cta">
-          <div className="tr-cta-title">Activez les alertes</div>
-          <p className="tr-cta-text">
-            Recevez chaque signal, ouverture, SL/TP, clôture, en temps réel, dès qu'une
-            position bouge.
-          </p>
+          <div className="tr-cta-title">{t.alertsTitle}</div>
+          <p className="tr-cta-text">{t.alertsText}</p>
           <button
             type="button"
             className="tr-cta-btn"
             onClick={enableAlerts}
             disabled={pushBusy || pushState === 'denied'}
           >
-            {pushBusy ? 'Activation…' : pushState === 'denied' ? 'Bloquées' : 'Activer les alertes'}
+            {pushBusy
+              ? `${t.alertsEnabling}…`
+              : pushState === 'denied'
+                ? t.alertsBlocked
+                : t.alertsBtn}
           </button>
           {pushMsg && <p className="tr-cta-note">{pushMsg}</p>}
         </div>

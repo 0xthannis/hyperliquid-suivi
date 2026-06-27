@@ -1,14 +1,12 @@
 import { useState } from 'react';
+import { useLang } from '../i18n';
+import { getTerminalCopy } from '../i18n/terminal';
 
 const KEY = 'thannis_terminal_onboarding_v1';
 
-const STEPS = [
-  'Chaque position affichée est réelle et publique, lue directement on-chain.',
-  'Sens, levier, entrée, stop et objectif sont visibles. Suivez-les comme des signaux.',
-  'Activez les alertes pour être prévenu à chaque ouverture, ajustement et clôture.',
-];
-
 export function TerminalOnboarding() {
+  const [lang] = useLang();
+  const t = getTerminalCopy(lang);
   const [dismissed, setDismissed] = useState(() => {
     try {
       return localStorage.getItem(KEY) === '1';
@@ -33,9 +31,9 @@ export function TerminalOnboarding() {
       <button type="button" className="tro-close" onClick={close} aria-label="Fermer">
         ×
       </button>
-      <div className="tro-title">Comment lire ce terminal</div>
+      <div className="tro-title">{t.onbTitle}</div>
       <div className="tro-steps">
-        {STEPS.map((s, i) => (
+        {t.onbSteps.map((s, i) => (
           <div className="tro-step" key={i}>
             <span className="tro-num">{i + 1}</span>
             <p>{s}</p>

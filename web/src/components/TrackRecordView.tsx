@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
 import { formatUsd, type HistoryEvent } from '../lib/calculations';
 import { displaySymbol } from '../api/hyperliquid';
+import { useLang } from '../i18n';
+import { getTerminalCopy } from '../i18n/terminal';
 
 type Props = {
   history: HistoryEvent[];
@@ -37,6 +39,8 @@ function cumPaths(values: number[]): { line: string; area: string } | null {
 }
 
 export function TrackRecordView({ history, allTimePnl, loading }: Props) {
+  const [lang] = useLang();
+  const t = getTerminalCopy(lang);
   const stats = useMemo(() => {
     const closed = history
       .filter((e) => e.isClose)
@@ -116,10 +120,8 @@ export function TrackRecordView({ history, allTimePnl, loading }: Props) {
     return (
       <div className="trk">
         <div className="tr-empty">
-          <p className="tr-empty-title">Aucun trade clôturé pour l'instant</p>
-          <p className="tr-empty-text">
-            Le track record se construit à chaque position fermée, public et vérifiable.
-          </p>
+          <p className="tr-empty-title">{t.trkEmptyTitle}</p>
+          <p className="tr-empty-text">{t.trkEmptyText}</p>
         </div>
       </div>
     );
@@ -132,13 +134,11 @@ export function TrackRecordView({ history, allTimePnl, loading }: Props) {
   return (
     <div className="trk">
       <div className="trk-hero">
-        <span className="tr-label">Performance cumulée · net</span>
+        <span className="tr-label">{t.trkLabel}</span>
         <div className={`trk-total ${cumUp ? 'pos' : 'neg'}`}>
           {formatUsd(allTimePnl, true)}
         </div>
-        <span className="trk-hero-sub">
-          {stats.count} trades clôturés · {stats.winRate}% de réussite
-        </span>
+        <span className="trk-hero-sub">{t.trkSub(stats.count, stats.winRate ?? 0)}</span>
       </div>
 
       {curve && (
@@ -163,24 +163,24 @@ export function TrackRecordView({ history, allTimePnl, loading }: Props) {
 
       <div className="trk-kpis">
         <div className="trk-kpi">
-          <span>Profit factor</span>
+          <span>{t.trkProfitFactor}</span>
           <b>{stats.profitFactor != null ? stats.profitFactor.toFixed(2) : 'n/a'}</b>
         </div>
         <div className="trk-kpi">
-          <span>Gain moyen</span>
+          <span>{t.trkAvgWin}</span>
           <b className="pos">{formatUsd(stats.avgWin, true)}</b>
         </div>
         <div className="trk-kpi">
-          <span>Perte moyenne</span>
+          <span>{t.trkAvgLoss}</span>
           <b className="neg">{formatUsd(-stats.avgLoss, true)}</b>
         </div>
         <div className="trk-kpi">
-          <span>Drawdown max</span>
+          <span>{t.trkDrawdown}</span>
           <b className="neg">{formatUsd(-stats.maxDd, true)}</b>
         </div>
       </div>
 
-      <div className="trk-section">Résultat mensuel</div>
+      <div className="trk-section">{t.trkMonthly}</div>
       <div className="trk-months">
         {stats.monthly.map((m) => {
           const w = (Math.abs(m.pnl) / stats.monthlyMax) * 100;
@@ -205,7 +205,7 @@ export function TrackRecordView({ history, allTimePnl, loading }: Props) {
       <div className="trk-extremes">
         {stats.best && (
           <div className="trk-extreme">
-            <span className="trk-extreme-label">Meilleur trade</span>
+            <span className="trk-extreme-label">{t.trkBest}</span>
             <div className="trk-extreme-row">
               <b>{displaySymbol(stats.best.coin)}</b>
               <span className="pos">{formatUsd(stats.best.netPnl, true)}</span>
@@ -214,7 +214,7 @@ export function TrackRecordView({ history, allTimePnl, loading }: Props) {
         )}
         {stats.worst && (
           <div className="trk-extreme">
-            <span className="trk-extreme-label">Pire trade</span>
+            <span className="trk-extreme-label">{t.trkWorst}</span>
             <div className="trk-extreme-row">
               <b>{displaySymbol(stats.worst.coin)}</b>
               <span className="neg">{formatUsd(stats.worst.netPnl, true)}</span>
@@ -223,10 +223,7 @@ export function TrackRecordView({ history, allTimePnl, loading }: Props) {
         )}
       </div>
 
-      <p className="trk-disclaimer">
-        Les performances passées ne préjugent pas des performances futures. Ceci n'est pas
-        un conseil en investissement.
-      </p>
+      <p className="trk-disclaimer">{t.trkDisclaimer}</p>
     </div>
   );
 }
