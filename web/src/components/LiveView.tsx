@@ -355,13 +355,13 @@ export function LiveView({
                 {(stopLoss || takeProfit) && (
                   <div className="tr-pos-risk">
                     <span>
-                      SL {stopLoss ? stopLoss.triggerPx : '—'}
+                      SL {stopLoss ? stopLoss.triggerPx : 'n/a'}
                       {lossAtSl != null && (
                         <em className="neg"> {formatUsd(lossAtSl, true)}</em>
                       )}
                     </span>
                     <span>
-                      TP {takeProfit ? takeProfit.triggerPx : '—'}
+                      TP {takeProfit ? takeProfit.triggerPx : 'n/a'}
                       {gainAtTp != null && (
                         <em className="pos"> {formatUsd(gainAtTp, true)}</em>
                       )}
@@ -398,7 +398,7 @@ export function LiveView({
         <div className="tr-cta">
           <div className="tr-cta-title">Activez les alertes</div>
           <p className="tr-cta-text">
-            Recevez chaque signal — ouverture, SL/TP, clôture — en temps réel, dès qu'une
+            Recevez chaque signal, ouverture, SL/TP, clôture, en temps réel, dès qu'une
             position bouge.
           </p>
           <button

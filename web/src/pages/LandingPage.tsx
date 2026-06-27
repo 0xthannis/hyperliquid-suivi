@@ -4,7 +4,9 @@ import { MobileAppBanner } from '../components/MobileAppBanner';
 import {
   formatLandingActivity,
   useLandingSnapshot,
+  type LandingSnapshot,
 } from '../hooks/useLandingSnapshot';
+import { formatUsd, formatPct } from '../lib/calculations';
 import { getPushSupport, requestPushPermission } from '../lib/push';
 import {
   BRAND_NAME,
@@ -22,28 +24,40 @@ const MARKETS_TICKER = [
   'BLÉ', 'AAPL', 'NVDA', 'MSFT', 'TSLA', 'AMZN', 'MRVL', 'MU', 'AMD',
 ];
 
-const STATS = [
-  { value: '100%', label: 'Vérifiable on-chain' },
-  { value: '2', label: 'Classes d’actifs réels' },
-  { value: '0 €', label: 'Terminal en accès libre' },
-  { value: '24/7', label: 'Exécution & suivi' },
-];
-
-const DOCTRINE = [
+const STEPS = [
   {
     k: '01',
-    title: 'Conviction',
-    text: 'Peu de lignes, prises avec intention. On entre quand la thèse est nette et le risque borné. Jamais pour suivre le bruit.',
+    title: 'Nous tradons',
+    text: 'Actions et matières premières, prises en conviction, avec un risque borné sur chaque position.',
   },
   {
     k: '02',
-    title: 'Discipline',
-    text: 'Stop et objectif définis avant chaque exécution. Le process commande, le résultat suit. Aucune position laissée au hasard.',
+    title: 'Tout s’affiche en direct',
+    text: 'Sens, levier, entrée, stop, objectif et P&L. Lu directement on-chain, sans la moindre retouche.',
   },
   {
     k: '03',
-    title: 'Transparence',
-    text: 'Tout est inscrit on-chain, en temps réel. Les mêmes chiffres que nous, pour tous, sans filtre ni récit arrangé.',
+    title: 'Vous suivez',
+    text: 'Une notification à chaque mouvement. Vous décidez de copier ou non. Vous gardez le contrôle.',
+  },
+];
+
+const BENEFITS = [
+  {
+    title: 'Transparence totale',
+    text: 'Chaque position visible, les gains comme les pertes. Aucun trade caché, aucun récit arrangé.',
+  },
+  {
+    title: 'Des signaux gratuits',
+    text: 'Suivez nos trades en temps réel, sans inscription et sans abonnement.',
+  },
+  {
+    title: 'Vérifiable on-chain',
+    text: 'Recoupez chaque chiffre vous-même sur la blockchain Hyperliquid. La preuve, pas la promesse.',
+  },
+  {
+    title: 'Alertes en temps réel',
+    text: 'Soyez prévenu à l’ouverture, à l’ajustement du stop ou de l’objectif, et à la clôture.',
   },
 ];
 
@@ -52,55 +66,134 @@ const MARKETS = [
     tag: '01',
     title: 'Matières premières',
     sub: 'Métaux · énergie · agricoles',
-    text: 'Or, argent, cuivre, aluminium, Brent, WTI, gaz naturel, céréales. Les actifs qui font tourner l’économie réelle, opérés sous mandat de risque strict.',
+    text: 'Or, argent, cuivre, aluminium, Brent, WTI, gaz naturel, céréales. Les actifs qui font tourner l’économie réelle.',
   },
   {
     tag: '02',
     title: 'Actions d’entreprises',
     sub: 'Large caps mondiales',
-    text: 'Les leaders cotés en technologie, industrie et consommation. On suit la qualité et le momentum des entreprises qui pèsent, pas les modes.',
+    text: 'Les leaders cotés en technologie, industrie et consommation. La qualité et le momentum des entreprises qui pèsent.',
   },
 ];
 
-const TERMINAL_FEATURES = [
+const PROFIT_STEPS = [
   {
-    title: 'Positions en direct',
-    text: 'Sens, levier, entrée, stop, take-profit et PnL non réalisé, actualisés en continu depuis la plateforme d’exécution.',
+    k: '01',
+    title: 'Ouvrez le terminal',
+    text: 'Aucun compte, aucun frais. Vous voyez immédiatement nos positions en cours.',
   },
   {
-    title: 'Journal vérifiable',
-    text: 'Chaque opération clôturée avec son résultat enregistré on-chain. Recoupable, exportable, sans retouche.',
+    k: '02',
+    title: 'Activez les alertes',
+    text: 'Vous êtes prévenu à chaque ouverture, ajustement et clôture, au moment où cela se passe.',
   },
   {
-    title: 'Alertes silencieuses',
-    text: 'Une notification à l’ouverture d’une position, si vous le souhaitez. Discret par défaut.',
+    k: '03',
+    title: 'Suivez nos signaux',
+    text: 'À votre rythme, selon votre propre jugement. Vous restez seul maître de votre capital.',
   },
 ];
 
 const FAQ = [
   {
     q: 'Que tradez-vous exactement ?',
-    a: 'Uniquement des matières premières (métaux, énergie, agricoles) et des actions d’entreprises cotées. Des actifs réels, opérés en conviction. Pas de bruit.',
+    a: 'Uniquement des matières premières (métaux, énergie, agricoles) et des actions d’entreprises cotées. Des actifs réels, opérés en conviction.',
   },
   {
     q: 'Comment vérifier que c’est réel ?',
-    a: 'Tout est exécuté sur un wallet public, lisible on-chain. Le Terminal affiche exactement ce que la plateforme enregistre : vous recoupez chaque chiffre.',
+    a: 'Tout est exécuté sur un wallet public, lisible on-chain. Le terminal affiche exactement ce que la plateforme enregistre. Vous recoupez chaque chiffre.',
   },
   {
-    q: 'C’est payant ?',
-    a: 'Non. Le site et le Terminal sont en accès libre, sans inscription. Aucun signal vendu, aucun capital géré pour des tiers.',
+    q: 'C’est vraiment gratuit ?',
+    a: 'Oui. Le site et le terminal sont en accès libre, sans inscription. Aucun signal vendu, aucun capital géré pour des tiers.',
   },
   {
     q: 'Puis-je suivre vos trades comme des signaux ?',
-    a: 'Oui. Chaque position s’affiche en temps réel avec entrée, stop, take-profit et levier, et vous pouvez activer les notifications. Vous décidez de copier ou non — THANNIS ne gère pas votre argent et ne donne aucun conseil financier.',
+    a: 'Oui. Chaque position s’affiche en temps réel avec entrée, stop, objectif et levier, et vous pouvez activer les notifications. Vous décidez de copier ou non. THANNIS ne gère pas votre argent et ne donne aucun conseil financier.',
   },
 ];
+
+function curveLine(values: number[], w: number, h: number): string {
+  if (values.length < 2) return '';
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const span = max - min || 1;
+  const pad = h * 0.12;
+  return values
+    .map((v, i) => {
+      const x = (i / (values.length - 1)) * w;
+      const y = h - pad - ((v - min) / span) * (h - pad * 2);
+      return `${i ? 'L' : 'M'}${x.toFixed(1)},${y.toFixed(1)}`;
+    })
+    .join(' ');
+}
+
+function HeroTerminal({ snap }: { snap: LandingSnapshot }) {
+  const up = (snap.changePct ?? 0) >= 0;
+  const color = up ? '#00935f' : '#e5342a';
+  const line = curveLine(snap.equity, 320, 86);
+  const area =
+    line && `${line} L320,86 L0,86 Z`;
+
+  return (
+    <div className="hx-app">
+      <div className="hx-app-bar">
+        <span className="hx-app-dots"><i /><i /><i /></span>
+        <span className="hx-app-title">{BRAND_NAME} · {TERMINAL_NAME}</span>
+        <span className="hx-app-live"><span className="hx-app-live-dot" /> LIVE</span>
+      </div>
+      <div className="hx-app-body">
+        <div className="hx-app-acct">
+          <span className="hx-app-acct-label">Valeur du compte</span>
+          <span className="hx-app-acct-value">
+            {snap.accountValue > 0 ? formatUsd(snap.accountValue) : 'n/a'}
+          </span>
+          {snap.changePct != null && (
+            <span className={`hx-app-acct-delta ${up ? 'pos' : 'neg'}`}>
+              {up ? '▲' : '▼'} {formatPct(snap.changePct)} · perf cumulée
+            </span>
+          )}
+        </div>
+        {line ? (
+          <svg className="hx-curve" viewBox="0 0 320 86" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="hxfill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor={color} stopOpacity="0.28" />
+                <stop offset="100%" stopColor={color} stopOpacity="0" />
+              </linearGradient>
+            </defs>
+            <path d={area} fill="url(#hxfill)" />
+            <path d={line} fill="none" stroke={color} strokeWidth="1.6" />
+          </svg>
+        ) : (
+          <div className="hx-curve hx-curve--empty" />
+        )}
+        <div className="hx-app-kpis">
+          <div>
+            <span>PnL all-time</span>
+            <b className={snap.allTimePnl >= 0 ? 'pos' : 'neg'}>
+              {snap.accountValue > 0 ? formatUsd(snap.allTimePnl, true) : 'n/a'}
+            </b>
+          </div>
+          <div>
+            <span>Réussite</span>
+            <b>{snap.winRate != null ? `${snap.winRate}%` : 'n/a'}</b>
+          </div>
+          <div>
+            <span>Positions</span>
+            <b>{snap.openCount}</b>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function LandingPage() {
   const [pushMsg, setPushMsg] = useState<string | null>(null);
   const [pushLoading, setPushLoading] = useState(false);
   const pushState = getPushSupport();
-  const snapshot = useLandingSnapshot();
+  const snap = useLandingSnapshot();
 
   async function handlePush() {
     setPushLoading(true);
@@ -109,6 +202,8 @@ export function LandingPage() {
     setPushMsg(result.message);
     setPushLoading(false);
   }
+
+  const trackUp = snap.allTimePnl >= 0;
 
   return (
     <div className="hx">
@@ -121,12 +216,12 @@ export function LandingPage() {
             <span className="hx-wordmark-desc">Commodities &amp; Equities</span>
           </Link>
           <nav className="hx-nav-links" aria-label="Navigation">
-            <a href="#maison">La maison</a>
-            <a href="#marches">Marchés</a>
-            <a href="#terminal">Terminal</a>
+            <a href="#fonctionnement">Comment ça marche</a>
+            <a href="#fondateurs">Les fondateurs</a>
+            <a href="#preuve">Track record</a>
           </nav>
           <Link to="/app" className="hx-btn hx-btn--primary hx-btn--sm">
-            Ouvrir le Terminal
+            Ouvrir le terminal
           </Link>
         </div>
       </header>
@@ -135,23 +230,21 @@ export function LandingPage() {
         <div className="hx-hero-copy">
           <span className="hx-pill">
             <span className="hx-pill-dot" />
-            Société de trading · Actions &amp; matières premières
+            Société de trading. Actions et matières premières.
           </span>
           <h1 className="hx-hero-title">
-            Nos positions, publiques
+            Voyez ce que nous tradons.
             <br />
-            et en <span className="hx-accent">temps réel</span>.
+            En <span className="hx-accent">temps réel</span>.
           </h1>
           <p className="hx-hero-lead">
-            {BRAND_NAME} est une société de trading spécialisée dans les actions et
-            les matières premières, fondée par un couple, Thanh &amp; Annissa. Chaque
-            position est publique, transparente et accessible en temps réel, avec les
-            notifications, pour les suivre comme des signaux et profiter avec nous.
-            Ce n’est pas un conseil financier.
+            {BRAND_NAME} publie chaque position au moment où elle est prise, avec son
+            entrée, son stop et son objectif. Suivez nos signaux librement, activez les
+            alertes, profitez avec nous. Ce n’est pas un conseil financier.
           </p>
           <div className="hx-hero-actions">
             <Link to="/app" className="hx-btn hx-btn--primary">
-              Ouvrir le Terminal
+              Ouvrir le terminal
             </Link>
             <a
               href={hyperliquidExplorerUrl(TRADER_WALLET)}
@@ -159,78 +252,18 @@ export function LandingPage() {
               rel="noopener noreferrer"
               className="hx-btn hx-btn--ghost"
             >
-              Vérifier on-chain →
+              Vérifier on-chain
             </a>
           </div>
           <div className="hx-hero-live">
             <span className="hx-hero-live-dot" />
-            {formatLandingActivity(snapshot)}
+            {formatLandingActivity(snap)}
           </div>
           {pushMsg && <p className="hx-push-msg">{pushMsg}</p>}
         </div>
 
-        <div className="hx-hero-visual" aria-hidden>
-          <div className="hx-app">
-            <div className="hx-app-bar">
-              <span className="hx-app-dots">
-                <i /><i /><i />
-              </span>
-              <span className="hx-app-title">{BRAND_NAME} · {TERMINAL_NAME}</span>
-              <span className="hx-app-live">
-                <span className="hx-app-live-dot" /> LIVE
-              </span>
-            </div>
-            <div className="hx-app-body">
-              <div className="hx-app-acct">
-                <span className="hx-app-acct-label">Valeur du compte</span>
-                <span className="hx-app-acct-value">$478.48</span>
-                <span className="hx-app-acct-delta">▲ 1.93% · 30J</span>
-              </div>
-              <svg className="hx-curve" viewBox="0 0 320 80" preserveAspectRatio="none">
-                <defs>
-                  <linearGradient id="hxfill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#16d195" stopOpacity="0.35" />
-                    <stop offset="100%" stopColor="#16d195" stopOpacity="0" />
-                  </linearGradient>
-                </defs>
-                <path
-                  d="M0,62 L26,58 L52,63 L78,49 L104,53 L130,40 L156,44 L182,31 L208,35 L234,24 L260,28 L286,16 L320,12 L320,80 L0,80 Z"
-                  fill="url(#hxfill)"
-                />
-                <path
-                  d="M0,62 L26,58 L52,63 L78,49 L104,53 L130,40 L156,44 L182,31 L208,35 L234,24 L260,28 L286,16 L320,12"
-                  fill="none"
-                  stroke="#16d195"
-                  strokeWidth="1.5"
-                />
-              </svg>
-              <div className="hx-app-kpis">
-                <div><span>PnL all-time</span><b className="pos">+$1,284</b></div>
-                <div><span>Win rate</span><b>61%</b></div>
-                <div><span>Exposition</span><b>$2,370</b></div>
-              </div>
-              <div className="hx-app-table">
-                <div className="hx-app-row hx-app-row--head">
-                  <span>Marché</span><span>Sens</span><span>Lev</span><span className="r">PnL</span>
-                </div>
-                <div className="hx-app-row">
-                  <span className="hx-app-sym">MRVL</span>
-                  <span className="neg">SHORT</span><span>3×</span>
-                  <span className="r pos">+$9.06</span>
-                </div>
-                <div className="hx-app-row">
-                  <span className="hx-app-sym">GOLD</span>
-                  <span className="pos">LONG</span><span>5×</span>
-                  <span className="r pos">+$41.20</span>
-                </div>
-                <div className="hx-app-row">
-                  <span className="hx-app-sym">BRENT</span>
-                  <span className="neg">SHORT</span><span>4×</span>
-                  <span className="r neg">−$12.40</span>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div className="hx-hero-visual">
+          <HeroTerminal snap={snap} />
         </div>
       </section>
 
@@ -243,25 +276,35 @@ export function LandingPage() {
       </div>
 
       <section className="hx-stats">
-        {STATS.map((s) => (
-          <div className="hx-stat" key={s.label}>
-            <span className="hx-stat-value">{s.value}</span>
-            <span className="hx-stat-label">{s.label}</span>
-          </div>
-        ))}
+        <div className="hx-stat">
+          <span className="hx-stat-value">100%</span>
+          <span className="hx-stat-label">Vérifiable on-chain</span>
+        </div>
+        <div className="hx-stat">
+          <span className="hx-stat-value">
+            {snap.winRate != null ? `${snap.winRate}%` : 'n/a'}
+          </span>
+          <span className="hx-stat-label">Taux de réussite</span>
+        </div>
+        <div className="hx-stat">
+          <span className="hx-stat-value">{snap.closedCount || 'n/a'}</span>
+          <span className="hx-stat-label">Trades clôturés</span>
+        </div>
+        <div className="hx-stat">
+          <span className="hx-stat-value">0 €</span>
+          <span className="hx-stat-label">Accès libre</span>
+        </div>
       </section>
 
-      <section className="hx-section" id="maison">
-        <span className="hx-kicker">La maison</span>
-        <h2 className="hx-h2">Un capital opéré par deux.<br />La rigueur d’une institution.</h2>
+      <section className="hx-section" id="fonctionnement">
+        <span className="hx-kicker">Comment ça marche</span>
+        <h2 className="hx-h2">Trois étapes. Aucune zone d’ombre.</h2>
         <p className="hx-lead">
-          {BRAND_NAME} est une structure privée fondée par <strong>Annissa</strong>{' '}
-          et <strong>Thanh</strong>. Aucune levée auprès de tiers, aucun client à
-          servir : un capital propre, engagé sur les marchés réels, avec la
-          discipline d’une salle des marchés et l’exigence de tout rendre vérifiable.
+          Vous n’avez pas besoin de nous connaître pour commencer. Vous regardez, vous
+          comprenez, vous suivez. Tout est lisible dès la première minute.
         </p>
         <div className="hx-cards hx-cards--3">
-          {DOCTRINE.map((d) => (
+          {STEPS.map((d) => (
             <article className="hx-card" key={d.k}>
               <span className="hx-card-num">{d.k}</span>
               <h3>{d.title}</h3>
@@ -271,7 +314,21 @@ export function LandingPage() {
         </div>
       </section>
 
-      <section className="hx-section hx-section--band" id="marches">
+      <section className="hx-section hx-section--band">
+        <span className="hx-kicker">Ce que vous y gagnez</span>
+        <h2 className="hx-h2">Un avantage simple. La vérité.</h2>
+        <div className="hx-cards hx-cards--2">
+          {BENEFITS.map((b) => (
+            <article className="hx-benefit" key={b.title}>
+              <div className="hx-benefit-rule" />
+              <h3>{b.title}</h3>
+              <p>{b.text}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="hx-section" id="marches">
         <span className="hx-kicker">Univers d’investissement</span>
         <h2 className="hx-h2">Deux classes d’actifs réels.</h2>
         <div className="hx-cards hx-cards--2">
@@ -287,26 +344,80 @@ export function LandingPage() {
         <p className="hx-note">Pas de crypto à l’avant. Pas de tokens à la mode. Des actifs que l’on comprend.</p>
       </section>
 
-      <section className="hx-section" id="terminal">
-        <span className="hx-kicker">{TERMINAL_NAME}</span>
-        <h2 className="hx-h2">La salle des marchés, ouverte à tous.</h2>
+      <section className="hx-section hx-section--band" id="preuve">
+        <span className="hx-kicker">Track record</span>
+        <h2 className="hx-h2">La performance, à découvert.</h2>
         <p className="hx-lead">
-          Le {TERMINAL_NAME} est notre table de lecture publique : les mêmes
-          positions que nous, en temps réel, branchées sur la plateforme
-          d’exécution. Aucun compte, aucun frais.
+          Voici nos chiffres en direct, calculés sur l’activité réelle du wallet. Rien
+          n’est sélectionné, rien n’est lissé.
         </p>
-        <div className="hx-features">
-          {TERMINAL_FEATURES.map((f) => (
-            <article className="hx-feature" key={f.title}>
-              <div className="hx-feature-rule" />
-              <h3>{f.title}</h3>
-              <p>{f.text}</p>
+        <div className="hx-track">
+          <div className="hx-track-fig">
+            <span className="hx-track-label">PnL cumulé net</span>
+            <span className={`hx-track-value ${trackUp ? 'pos' : 'neg'}`}>
+              {snap.accountValue > 0 ? formatUsd(snap.allTimePnl, true) : 'n/a'}
+            </span>
+          </div>
+          <div className="hx-track-fig">
+            <span className="hx-track-label">Taux de réussite</span>
+            <span className="hx-track-value">
+              {snap.winRate != null ? `${snap.winRate}%` : 'n/a'}
+            </span>
+          </div>
+          <div className="hx-track-fig">
+            <span className="hx-track-label">Trades clôturés</span>
+            <span className="hx-track-value">{snap.closedCount || 'n/a'}</span>
+          </div>
+        </div>
+        <div className="hx-cta-row">
+          <Link to="/app" className="hx-btn hx-btn--primary hx-btn--lg">
+            Voir le track record complet
+          </Link>
+        </div>
+      </section>
+
+      <section className="hx-section" id="fondateurs">
+        <span className="hx-kicker">Les fondateurs</span>
+        <h2 className="hx-h2">Thanh et Annissa.</h2>
+        <p className="hx-lead">
+          Deux fondateurs, une conviction. Rendre le trading vérifiable. Un capital
+          propre, engagé sur les marchés réels, avec l’exigence de tout rendre public.
+        </p>
+        <div className="hx-cards hx-cards--2">
+          <article className="hx-founder">
+            <span className="hx-founder-name">Thanh</span>
+            <span className="hx-founder-role">Trading et exécution</span>
+            <p>
+              Il prend et gère chaque position affichée. Tout vient de son wallet
+              Hyperliquid, lisible on-chain, sans aucune retouche.
+            </p>
+          </article>
+          <article className="hx-founder">
+            <span className="hx-founder-name">Annissa</span>
+            <span className="hx-founder-role">Co-fondatrice</span>
+            <p>
+              Elle bâtit {BRAND_NAME} avec Thanh. La même exigence, rendre chaque trade
+              public et vérifiable, sans compromis.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section className="hx-section hx-section--band">
+        <span className="hx-kicker">Comment en profiter</span>
+        <h2 className="hx-h2">Suivez. Décidez. Gardez le contrôle.</h2>
+        <div className="hx-cards hx-cards--3">
+          {PROFIT_STEPS.map((d) => (
+            <article className="hx-card" key={d.k}>
+              <span className="hx-card-num">{d.k}</span>
+              <h3>{d.title}</h3>
+              <p>{d.text}</p>
             </article>
           ))}
         </div>
         <div className="hx-cta-row">
           <Link to="/app" className="hx-btn hx-btn--primary hx-btn--lg">
-            Entrer dans le Terminal
+            Entrer dans le terminal
           </Link>
           {pushState !== 'unsupported' && pushState !== 'denied' && (
             <button
@@ -318,14 +429,14 @@ export function LandingPage() {
               {pushState === 'granted'
                 ? 'Alertes activées'
                 : pushLoading
-                  ? 'Activation…'
+                  ? 'Activation'
                   : 'Recevoir les alertes'}
             </button>
           )}
         </div>
       </section>
 
-      <section className="hx-section hx-section--band">
+      <section className="hx-section">
         <span className="hx-kicker">Questions fréquentes</span>
         <h2 className="hx-h2">Avant d’entrer.</h2>
         <div className="hx-faq">
@@ -341,10 +452,10 @@ export function LandingPage() {
       <footer className="hx-footer">
         <div className="hx-footer-brand">
           <span className="hx-footer-mark">{BRAND_NAME}</span>
-          <span className="hx-footer-desc">Commodities &amp; Equities · Annissa &amp; Thanh</span>
+          <span className="hx-footer-desc">Commodities &amp; Equities · Thanh &amp; Annissa</span>
         </div>
         <p className="hx-footer-legal">
-          Données on-chain uniquement · Accès libre · Aucune sollicitation, aucune
+          Données on-chain uniquement. Accès libre. Aucune sollicitation, aucune
           promesse de performance, pas un conseil en investissement.
         </p>
         <p className="hx-footer-links">

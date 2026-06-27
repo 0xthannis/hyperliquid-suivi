@@ -32,7 +32,7 @@ export function AboutPage() {
           <strong>matières premières</strong>, fondée par un couple,{' '}
           <strong>Annissa</strong> et <strong>Thanh</strong>. Nous publions chaque
           position en temps réel sur{' '}
-          <a href={SITE_URL}>{SITE_URL.replace('https://', '')}</a> — pour que vous
+          <a href={SITE_URL}>{SITE_URL.replace('https://', '')}</a>, pour que vous
           puissiez la suivre comme un signal.
         </p>
 
@@ -74,7 +74,7 @@ export function AboutPage() {
             <li>Chaque position en temps réel (long / short, levier, SL, TP, P&amp;L)</li>
             <li>Un track record public et vérifiable on-chain</li>
             <li>Des notifications à chaque ouverture, ajustement et clôture</li>
-            <li>Des signaux à suivre librement — pour profiter avec nous</li>
+            <li>Des signaux à suivre librement, pour profiter avec nous</li>
           </ul>
         </section>
 

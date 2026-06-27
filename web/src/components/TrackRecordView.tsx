@@ -96,7 +96,7 @@ export function TrackRecordView({ history, allTimePnl, loading }: Props) {
         <div className="tr-empty">
           <p className="tr-empty-title">Aucun trade clôturé pour l'instant</p>
           <p className="tr-empty-text">
-            Le track record se construit à chaque position fermée — public et vérifiable.
+            Le track record se construit à chaque position fermée, public et vérifiable.
           </p>
         </div>
       </div>

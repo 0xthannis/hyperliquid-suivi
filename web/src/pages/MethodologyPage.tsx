@@ -12,15 +12,15 @@ import './MethodologyPage.css';
 const SECTIONS = [
   {
     title: 'Qui nous sommes',
-    body: `${BRAND_NAME} est une société de trading spécialisée dans les actions et les matières premières, fondée par un couple, Thanh et Annissa. Nous opérons notre propre capital — les positions affichées sont les nôtres.`,
+    body: `${BRAND_NAME} est une société de trading spécialisée dans les actions et les matières premières, fondée par un couple, Thanh et Annissa. Nous opérons notre propre capital, les positions affichées sont les nôtres.`,
   },
   {
     title: 'Transparence totale',
-    body: 'Chaque position que nous prenons est publique et visible en temps réel : sens, levier, point d\'entrée, stop, objectif et P&L. Rien n\'est retouché ni sélectionné après coup — tout est lu directement on-chain.',
+    body: 'Chaque position que nous prenons est publique et visible en temps réel : sens, levier, point d\'entrée, stop, objectif et P&L. Rien n\'est retouché ni sélectionné après coup, tout est lu directement on-chain.',
   },
   {
     title: 'Suivre nos signaux',
-    body: 'Vous pouvez suivre nos positions comme des signaux et en profiter avec nous. Activez les notifications pour être prévenu à chaque ouverture, ajustement de stop ou d\'objectif, et clôture — au moment où cela se passe.',
+    body: 'Vous pouvez suivre nos positions comme des signaux et en profiter avec nous. Activez les notifications pour être prévenu à chaque ouverture, ajustement de stop ou d\'objectif, et clôture, au moment où cela se passe.',
   },
   {
     title: 'Des données vérifiables',

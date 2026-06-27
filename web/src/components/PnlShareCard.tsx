@@ -16,7 +16,7 @@ type Props = {
 };
 
 function fmtCapital(value: number): string {
-  return value > 1e-6 ? formatUsd(value) : '—';
+  return value > 1e-6 ? formatUsd(value) : 'n/a';
 }
 
 export function PnlShareCard({ data, className = '', forExport = false }: Props) {

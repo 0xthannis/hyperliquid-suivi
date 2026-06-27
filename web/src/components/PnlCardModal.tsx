@@ -13,7 +13,7 @@ import './PnlShareCard.css';
 type Props = {
   event?: HistoryEvent | null;
   fills?: Fill[];
-  /** Carte déjà construite (ex. position en cours) — court-circuite le build. */
+  /** Carte déjà construite (ex. position en cours), court-circuite le build. */
   prebuilt?: PnlCardData | null;
   onClose: () => void;
 };
@@ -96,7 +96,7 @@ export function PnlCardModal({
   function shareText(): string {
     if (!data) return 'Suivez nos signaux de trading en temps réel sur THANNIS.';
     const sign = data.pnlPct >= 0 ? '+' : '';
-    return `${data.coin} ${data.side} ${sign}${data.pnlPct.toFixed(1)}% — chaque position publique et en temps réel sur THANNIS. Pas un conseil financier.`;
+    return `${data.coin} ${data.side} ${sign}${data.pnlPct.toFixed(1)}%, chaque position publique et en temps réel sur THANNIS. Pas un conseil financier.`;
   }
 
   async function shareCard() {

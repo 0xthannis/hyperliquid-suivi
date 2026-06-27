@@ -1,45 +1,86 @@
 import { useEffect, useState } from 'react';
-import { fetchFills, fetchPositions } from '../api/hyperliquid';
-import { timeAgo } from '../lib/calculations';
+import {
+  fetchFills,
+  fetchPositions,
+  fetchPortfolioPnl,
+  fetchAccountValueHistory,
+  displaySymbol,
+} from '../api/hyperliquid';
+import { groupFillsToHistory, timeAgo } from '../lib/calculations';
 
 export type LandingSnapshot = {
   openCount: number;
   openCoins: string[];
   lastActivityTs: number | null;
   lastActivityLabel: string | null;
+  accountValue: number;
+  allTimePnl: number;
+  winRate: number | null;
+  closedCount: number;
+  equity: number[];
+  changePct: number | null;
   loading: boolean;
   error: string | null;
 };
 
+const INITIAL: LandingSnapshot = {
+  openCount: 0,
+  openCoins: [],
+  lastActivityTs: null,
+  lastActivityLabel: null,
+  accountValue: 0,
+  allTimePnl: 0,
+  winRate: null,
+  closedCount: 0,
+  equity: [],
+  changePct: null,
+  loading: true,
+  error: null,
+};
+
 export function useLandingSnapshot(): LandingSnapshot {
-  const [state, setState] = useState<LandingSnapshot>({
-    openCount: 0,
-    openCoins: [],
-    lastActivityTs: null,
-    lastActivityLabel: null,
-    loading: true,
-    error: null,
-  });
+  const [state, setState] = useState<LandingSnapshot>(INITIAL);
 
   useEffect(() => {
     let cancelled = false;
 
     async function load() {
       try {
-        const [{ positions }, fills] = await Promise.all([
+        const [{ positions, accountValue }, fills, pnl, equity] = await Promise.all([
           fetchPositions(),
           fetchFills(),
+          fetchPortfolioPnl().catch(() => ({ perpAllTimePnl: 0 })),
+          fetchAccountValueHistory('allTime').catch(() => [] as number[]),
         ]);
         if (cancelled) return;
 
         const sorted = [...fills].sort((a, b) => b.time - a.time);
         const latest = sorted[0] ?? null;
 
+        const closed = groupFillsToHistory(fills).filter((e) => e.isClose);
+        const wins = closed.filter((e) => e.isWin).length;
+        const winRate = closed.length
+          ? Math.round((wins / closed.length) * 100)
+          : null;
+
+        const first = equity[0];
+        const last = equity[equity.length - 1];
+        const changePct =
+          first != null && last != null && first !== 0
+            ? ((last - first) / Math.abs(first)) * 100
+            : null;
+
         setState({
           openCount: positions.length,
-          openCoins: positions.map((p) => p.coin),
+          openCoins: positions.map((p) => displaySymbol(p.coin)),
           lastActivityTs: latest?.time ?? null,
           lastActivityLabel: latest?.dir ?? null,
+          accountValue,
+          allTimePnl: pnl.perpAllTimePnl,
+          winRate,
+          closedCount: closed.length,
+          equity,
+          changePct,
           loading: false,
           error: null,
         });
@@ -65,7 +106,7 @@ export function useLandingSnapshot(): LandingSnapshot {
 }
 
 export function formatLandingActivity(snapshot: LandingSnapshot): string {
-  if (snapshot.loading) return 'Chargement de l\'activité…';
+  if (snapshot.loading) return 'Chargement de l\'activité';
   if (snapshot.error) return 'Activité indisponible pour le moment';
 
   const parts: string[] = [];
@@ -84,7 +125,7 @@ export function formatLandingActivity(snapshot: LandingSnapshot): string {
   if (snapshot.lastActivityTs != null) {
     const when = timeAgo(snapshot.lastActivityTs);
     const what = snapshot.lastActivityLabel ?? 'activité';
-    parts.push(`Dernière opération : ${what} · ${when}`);
+    parts.push(`Dernière opération ${what} · ${when}`);
   }
 
   return parts.join(' · ');

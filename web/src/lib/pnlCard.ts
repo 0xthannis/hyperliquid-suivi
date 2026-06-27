@@ -44,7 +44,7 @@ function normalizeEventTimeMs(time: number): number {
 }
 
 export function formatTradePrice(px: number): string {
-  if (!Number.isFinite(px) || px <= 0) return '—';
+  if (!Number.isFinite(px) || px <= 0) return 'n/a';
   const abs = Math.abs(px);
   if (abs >= 10_000) return px.toLocaleString('fr-FR', { maximumFractionDigits: 0 });
   if (abs >= 100) return px.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -234,7 +234,7 @@ export function historyEventToPnlCard(
     pnlPct,
     leverage: ctx.leverage ?? null,
     durationMs,
-    durationLabel: durationMs != null ? formatDuration(durationMs) : '—',
+    durationLabel: durationMs != null ? formatDuration(durationMs) : 'n/a',
     closedAt,
     isWin: event.netPnl > 0,
     closeHash: hash,

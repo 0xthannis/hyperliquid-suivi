@@ -64,7 +64,7 @@ export function AboutScreen({ onReplayTour }: Props) {
       <Text style={styles.title}>{BRAND_NAME}</Text>
       <Text style={styles.lead}>
         Société de trading spécialisée dans les actions et les matières premières, fondée
-        par un couple, Annissa et Thanh. Chaque position est publique et en temps réel —
+        par un couple, Annissa et Thanh. Chaque position est publique et en temps réel,
         à suivre comme un signal.
       </Text>
 

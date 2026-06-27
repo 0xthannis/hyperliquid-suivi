@@ -300,13 +300,13 @@ export function LiveScreen({
               {(stopLoss || takeProfit) && (
                 <View style={styles.posRisk}>
                   <Text style={styles.riskTxt}>
-                    SL {stopLoss ? stopLoss.triggerPx : '—'}
+                    SL {stopLoss ? stopLoss.triggerPx : 'n/a'}
                     {lossAtSl != null ? (
                       <Text style={{ color: colors.red }}> {formatUsd(lossAtSl, true)}</Text>
                     ) : null}
                   </Text>
                   <Text style={styles.riskTxt}>
-                    TP {takeProfit ? takeProfit.triggerPx : '—'}
+                    TP {takeProfit ? takeProfit.triggerPx : 'n/a'}
                     {gainAtTp != null ? (
                       <Text style={{ color: colors.green }}> {formatUsd(gainAtTp, true)}</Text>
                     ) : null}
