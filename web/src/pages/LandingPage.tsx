@@ -1,14 +1,12 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MobileAppBanner } from '../components/MobileAppBanner';
-import {
-  formatLandingActivity,
-  useLandingSnapshot,
-  type LandingSnapshot,
-} from '../hooks/useLandingSnapshot';
-import { formatUsd, formatPct } from '../lib/calculations';
+import { useLandingSnapshot, type LandingSnapshot } from '../hooks/useLandingSnapshot';
+import { formatUsd, formatPct, timeAgo } from '../lib/calculations';
 import { CountUp } from '../components/CountUp';
 import { getPushSupport, requestPushPermission } from '../lib/push';
+import { useLang } from '../i18n';
+import { getLandingCopy, type LandingCopy } from '../i18n/landing';
 import {
   BRAND_NAME,
   CONTACT_EMAIL,
@@ -26,95 +24,6 @@ const MARKETS_TICKER = [
   'BLÉ', 'AAPL', 'NVDA', 'MSFT', 'TSLA', 'AMZN', 'MRVL', 'MU', 'AMD',
 ];
 
-const STEPS = [
-  {
-    k: '01',
-    title: 'Nous tradons',
-    text: 'Actions et matières premières, prises en conviction, avec un risque borné sur chaque position.',
-  },
-  {
-    k: '02',
-    title: 'Tout s’affiche en direct',
-    text: 'Sens, levier, entrée, stop, objectif et P&L. Lu directement on-chain, sans la moindre retouche.',
-  },
-  {
-    k: '03',
-    title: 'Vous suivez',
-    text: 'Une notification à chaque mouvement. Vous décidez de copier ou non. Vous gardez le contrôle.',
-  },
-];
-
-const BENEFITS = [
-  {
-    title: 'Transparence totale',
-    text: 'Chaque position visible, les gains comme les pertes. Aucun trade caché, aucun récit arrangé.',
-  },
-  {
-    title: 'Des signaux gratuits',
-    text: 'Suivez nos trades en temps réel, sans inscription et sans abonnement.',
-  },
-  {
-    title: 'Vérifiable on-chain',
-    text: 'Recoupez chaque chiffre vous-même sur la blockchain Hyperliquid. La preuve, pas la promesse.',
-  },
-  {
-    title: 'Alertes en temps réel',
-    text: 'Soyez prévenu à l’ouverture, à l’ajustement du stop ou de l’objectif, et à la clôture.',
-  },
-];
-
-const MARKETS = [
-  {
-    tag: '01',
-    title: 'Matières premières',
-    sub: 'Métaux · énergie · agricoles',
-    text: 'Or, argent, cuivre, aluminium, Brent, WTI, gaz naturel, céréales. Les actifs qui font tourner l’économie réelle.',
-  },
-  {
-    tag: '02',
-    title: 'Actions d’entreprises',
-    sub: 'Large caps mondiales',
-    text: 'Les leaders cotés en technologie, industrie et consommation. La qualité et le momentum des entreprises qui pèsent.',
-  },
-];
-
-const PROFIT_STEPS = [
-  {
-    k: '01',
-    title: 'Ouvrez le terminal',
-    text: 'Aucun compte, aucun frais. Vous voyez immédiatement nos positions en cours.',
-  },
-  {
-    k: '02',
-    title: 'Activez les alertes',
-    text: 'Vous êtes prévenu à chaque ouverture, ajustement et clôture, au moment où cela se passe.',
-  },
-  {
-    k: '03',
-    title: 'Suivez nos signaux',
-    text: 'À votre rythme, selon votre propre jugement. Vous restez seul maître de votre capital.',
-  },
-];
-
-const FAQ = [
-  {
-    q: 'Que tradez-vous exactement ?',
-    a: 'Uniquement des matières premières (métaux, énergie, agricoles) et des actions d’entreprises cotées. Des actifs réels, opérés en conviction.',
-  },
-  {
-    q: 'Comment vérifier que c’est réel ?',
-    a: 'Tout est exécuté sur un wallet public, lisible on-chain. Le terminal affiche exactement ce que la plateforme enregistre. Vous recoupez chaque chiffre.',
-  },
-  {
-    q: 'C’est vraiment gratuit ?',
-    a: 'Oui. Le site et le terminal sont en accès libre, sans inscription. Aucun signal vendu, aucun capital géré pour des tiers.',
-  },
-  {
-    q: 'Puis-je suivre vos trades comme des signaux ?',
-    a: 'Oui. Chaque position s’affiche en temps réel avec entrée, stop, objectif et levier, et vous pouvez activer les notifications. Vous décidez de copier ou non. THANNIS ne gère pas votre argent et ne donne aucun conseil financier.',
-  },
-];
-
 function curveLine(values: number[], w: number, h: number): string {
   if (values.length < 2) return '';
   const min = Math.min(...values);
@@ -130,12 +39,30 @@ function curveLine(values: number[], w: number, h: number): string {
     .join(' ');
 }
 
-function HeroTerminal({ snap }: { snap: LandingSnapshot }) {
+function activityLine(snap: LandingSnapshot, c: LandingCopy): string {
+  if (snap.loading) return c.activity.loading;
+  if (snap.error) return c.activity.error;
+  const parts: string[] = [];
+  if (snap.openCount > 0) {
+    const coins =
+      snap.openCoins.length <= 3
+        ? snap.openCoins.join(', ')
+        : `${snap.openCoins.slice(0, 3).join(', ')} +${snap.openCoins.length - 3}`;
+    parts.push(c.activity.open(snap.openCount, coins));
+  } else {
+    parts.push(c.activity.none);
+  }
+  if (snap.lastActivityTs != null) {
+    parts.push(c.activity.last(snap.lastActivityLabel ?? '', timeAgo(snap.lastActivityTs)));
+  }
+  return parts.join(' · ');
+}
+
+function HeroTerminal({ snap, c }: { snap: LandingSnapshot; c: LandingCopy }) {
   const up = (snap.changePct ?? 0) >= 0;
   const color = up ? '#00935f' : '#e5342a';
   const line = curveLine(snap.equity, 320, 86);
-  const area =
-    line && `${line} L320,86 L0,86 Z`;
+  const area = line && `${line} L320,86 L0,86 Z`;
 
   return (
     <div className="hx-app">
@@ -146,7 +73,7 @@ function HeroTerminal({ snap }: { snap: LandingSnapshot }) {
       </div>
       <div className="hx-app-body">
         <div className="hx-app-acct">
-          <span className="hx-app-acct-label">Valeur du compte</span>
+          <span className="hx-app-acct-label">{c.term.accountLabel}</span>
           <span className="hx-app-acct-value">
             {snap.accountValue > 0 ? (
               <CountUp value={snap.accountValue} format={(n) => formatUsd(n)} />
@@ -156,7 +83,7 @@ function HeroTerminal({ snap }: { snap: LandingSnapshot }) {
           </span>
           {snap.changePct != null && (
             <span className={`hx-app-acct-delta ${up ? 'pos' : 'neg'}`}>
-              {up ? '▲' : '▼'} {formatPct(snap.changePct)} · perf cumulée
+              {up ? '▲' : '▼'} {formatPct(snap.changePct)} · {c.term.deltaSuffix}
             </span>
           )}
         </div>
@@ -176,7 +103,7 @@ function HeroTerminal({ snap }: { snap: LandingSnapshot }) {
         )}
         <div className="hx-app-kpis">
           <div>
-            <span>PnL all-time</span>
+            <span>{c.term.pnlAllTime}</span>
             <b className={snap.allTimePnl >= 0 ? 'pos' : 'neg'}>
               {snap.accountValue > 0 ? (
                 <CountUp value={snap.allTimePnl} format={(n) => formatUsd(n, true)} />
@@ -186,7 +113,7 @@ function HeroTerminal({ snap }: { snap: LandingSnapshot }) {
             </b>
           </div>
           <div>
-            <span>Réussite</span>
+            <span>{c.term.win}</span>
             <b>
               {snap.winRate != null ? (
                 <CountUp value={snap.winRate} format={(n) => `${Math.round(n)}%`} />
@@ -196,7 +123,7 @@ function HeroTerminal({ snap }: { snap: LandingSnapshot }) {
             </b>
           </div>
           <div>
-            <span>Positions</span>
+            <span>{c.term.positions}</span>
             <b>{snap.openCount}</b>
           </div>
         </div>
@@ -210,6 +137,8 @@ export function LandingPage() {
   const [pushLoading, setPushLoading] = useState(false);
   const pushState = getPushSupport();
   const snap = useLandingSnapshot();
+  const [lang, setLang] = useLang();
+  const c = getLandingCopy(lang);
 
   async function handlePush() {
     setPushLoading(true);
@@ -232,13 +161,23 @@ export function LandingPage() {
             <span className="hx-wordmark-desc">Commodities &amp; Equities</span>
           </Link>
           <nav className="hx-nav-links" aria-label="Navigation">
-            <a href="#fonctionnement">Comment ça marche</a>
-            <a href="#fondateurs">Les fondateurs</a>
-            <a href="#preuve">Track record</a>
+            <a href="#fonctionnement">{c.nav.how}</a>
+            <a href="#fondateurs">{c.nav.founders}</a>
+            <a href="#preuve">{c.nav.track}</a>
           </nav>
-          <Link to="/app" className="hx-btn hx-btn--primary hx-btn--sm">
-            Ouvrir le terminal
-          </Link>
+          <div className="hx-nav-right">
+            <button
+              type="button"
+              className="hx-lang"
+              onClick={() => setLang(lang === 'fr' ? 'en' : 'fr')}
+              aria-label="Language"
+            >
+              {lang === 'fr' ? 'EN' : 'FR'}
+            </button>
+            <Link to="/app" className="hx-btn hx-btn--primary hx-btn--sm">
+              {c.nav.open}
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -246,21 +185,19 @@ export function LandingPage() {
         <div className="hx-hero-copy">
           <span className="hx-pill">
             <span className="hx-pill-dot" />
-            Société de trading. Actions et matières premières.
+            {c.hero.pill}
           </span>
           <h1 className="hx-hero-title">
-            Voyez ce que nous tradons.
+            {c.hero.titleLine1}
             <br />
-            En <span className="hx-accent">temps réel</span>.
+            {c.hero.titlePre}
+            <span className="hx-accent">{c.hero.titleAccent}</span>
+            {c.hero.titlePost}
           </h1>
-          <p className="hx-hero-lead">
-            {BRAND_NAME} publie chaque position au moment où elle est prise, avec son
-            entrée, son stop et son objectif. Suivez nos signaux librement, activez les
-            alertes, profitez avec nous. Ce n’est pas un conseil financier.
-          </p>
+          <p className="hx-hero-lead">{c.hero.lead}</p>
           <div className="hx-hero-actions">
             <Link to="/app" className="hx-btn hx-btn--primary">
-              Ouvrir le terminal
+              {c.hero.open}
             </Link>
             <a
               href={hyperliquidExplorerUrl(TRADER_WALLET)}
@@ -268,18 +205,18 @@ export function LandingPage() {
               rel="noopener noreferrer"
               className="hx-btn hx-btn--ghost"
             >
-              Vérifier on-chain
+              {c.hero.verify}
             </a>
           </div>
           <div className="hx-hero-live">
             <span className="hx-hero-live-dot" />
-            {formatLandingActivity(snap)}
+            {activityLine(snap, c)}
           </div>
           {pushMsg && <p className="hx-push-msg">{pushMsg}</p>}
         </div>
 
         <div className="hx-hero-visual">
-          <HeroTerminal snap={snap} />
+          <HeroTerminal snap={snap} c={c} />
         </div>
       </section>
 
@@ -294,7 +231,7 @@ export function LandingPage() {
       <section className="hx-stats">
         <div className="hx-stat">
           <span className="hx-stat-value">100%</span>
-          <span className="hx-stat-label">Vérifiable on-chain</span>
+          <span className="hx-stat-label">{c.stats.verifiable}</span>
         </div>
         <div className="hx-stat">
           <span className="hx-stat-value">
@@ -304,7 +241,7 @@ export function LandingPage() {
               'n/a'
             )}
           </span>
-          <span className="hx-stat-label">Taux de réussite</span>
+          <span className="hx-stat-label">{c.stats.win}</span>
         </div>
         <div className="hx-stat">
           <span className="hx-stat-value">
@@ -314,23 +251,20 @@ export function LandingPage() {
               'n/a'
             )}
           </span>
-          <span className="hx-stat-label">Trades clôturés</span>
+          <span className="hx-stat-label">{c.stats.closed}</span>
         </div>
         <div className="hx-stat">
           <span className="hx-stat-value">0 €</span>
-          <span className="hx-stat-label">Accès libre</span>
+          <span className="hx-stat-label">{c.stats.free}</span>
         </div>
       </section>
 
       <section className="hx-section" id="fonctionnement">
-        <span className="hx-kicker">Comment ça marche</span>
-        <h2 className="hx-h2">Trois étapes. Aucune zone d’ombre.</h2>
-        <p className="hx-lead">
-          Vous n’avez pas besoin de nous connaître pour commencer. Vous regardez, vous
-          comprenez, vous suivez. Tout est lisible dès la première minute.
-        </p>
+        <span className="hx-kicker">{c.how.kicker}</span>
+        <h2 className="hx-h2">{c.how.h2}</h2>
+        <p className="hx-lead">{c.how.lead}</p>
         <div className="hx-cards hx-cards--3">
-          {STEPS.map((d) => (
+          {c.how.steps.map((d) => (
             <article className="hx-card" key={d.k}>
               <span className="hx-card-num">{d.k}</span>
               <h3>{d.title}</h3>
@@ -341,10 +275,10 @@ export function LandingPage() {
       </section>
 
       <section className="hx-section hx-section--band">
-        <span className="hx-kicker">Ce que vous y gagnez</span>
-        <h2 className="hx-h2">Un avantage simple. La vérité.</h2>
+        <span className="hx-kicker">{c.benefits.kicker}</span>
+        <h2 className="hx-h2">{c.benefits.h2}</h2>
         <div className="hx-cards hx-cards--2">
-          {BENEFITS.map((b) => (
+          {c.benefits.items.map((b) => (
             <article className="hx-benefit" key={b.title}>
               <div className="hx-benefit-rule" />
               <h3>{b.title}</h3>
@@ -355,10 +289,10 @@ export function LandingPage() {
       </section>
 
       <section className="hx-section" id="marches">
-        <span className="hx-kicker">Univers d’investissement</span>
-        <h2 className="hx-h2">Deux classes d’actifs réels.</h2>
+        <span className="hx-kicker">{c.markets.kicker}</span>
+        <h2 className="hx-h2">{c.markets.h2}</h2>
         <div className="hx-cards hx-cards--2">
-          {MARKETS.map((m) => (
+          {c.markets.items.map((m) => (
             <article className="hx-market" key={m.tag}>
               <span className="hx-market-tag">{m.tag}</span>
               <h3>{m.title}</h3>
@@ -367,73 +301,61 @@ export function LandingPage() {
             </article>
           ))}
         </div>
-        <p className="hx-note">Pas de crypto à l’avant. Pas de tokens à la mode. Des actifs que l’on comprend.</p>
+        <p className="hx-note">{c.markets.note}</p>
       </section>
 
       <section className="hx-section hx-section--band" id="preuve">
-        <span className="hx-kicker">Track record</span>
-        <h2 className="hx-h2">La performance, à découvert.</h2>
-        <p className="hx-lead">
-          Voici nos chiffres en direct, calculés sur l’activité réelle du wallet. Rien
-          n’est sélectionné, rien n’est lissé.
-        </p>
+        <span className="hx-kicker">{c.track.kicker}</span>
+        <h2 className="hx-h2">{c.track.h2}</h2>
+        <p className="hx-lead">{c.track.lead}</p>
         <div className="hx-track">
           <div className="hx-track-fig">
-            <span className="hx-track-label">PnL cumulé net</span>
+            <span className="hx-track-label">{c.track.pnl}</span>
             <span className={`hx-track-value ${trackUp ? 'pos' : 'neg'}`}>
               {snap.accountValue > 0 ? formatUsd(snap.allTimePnl, true) : 'n/a'}
             </span>
           </div>
           <div className="hx-track-fig">
-            <span className="hx-track-label">Taux de réussite</span>
+            <span className="hx-track-label">{c.track.win}</span>
             <span className="hx-track-value">
               {snap.winRate != null ? `${snap.winRate}%` : 'n/a'}
             </span>
           </div>
           <div className="hx-track-fig">
-            <span className="hx-track-label">Trades clôturés</span>
+            <span className="hx-track-label">{c.track.closed}</span>
             <span className="hx-track-value">{snap.closedCount || 'n/a'}</span>
           </div>
         </div>
         <div className="hx-cta-row">
           <Link to="/app" className="hx-btn hx-btn--primary hx-btn--lg">
-            Voir le track record complet
+            {c.track.cta}
           </Link>
         </div>
       </section>
 
       <section className="hx-section" id="fondateurs">
-        <span className="hx-kicker">Les fondateurs</span>
-        <h2 className="hx-h2">Thanh et Annissa.</h2>
-        <p className="hx-lead">
-          Deux fondateurs, une conviction. Rendre le trading vérifiable. Un capital
-          propre, engagé sur les marchés réels, avec l’exigence de tout rendre public.
-        </p>
+        <span className="hx-kicker">{c.founders.kicker}</span>
+        <h2 className="hx-h2">{c.founders.h2}</h2>
+        <p className="hx-lead">{c.founders.lead}</p>
         <div className="hx-cards hx-cards--2">
           <article className="hx-founder">
             <span className="hx-founder-name">Thanh</span>
-            <span className="hx-founder-role">Trading et exécution</span>
-            <p>
-              Il prend et gère chaque position affichée. Tout vient de son wallet
-              Hyperliquid, lisible on-chain, sans aucune retouche.
-            </p>
+            <span className="hx-founder-role">{c.founders.thanhRole}</span>
+            <p>{c.founders.thanhText}</p>
           </article>
           <article className="hx-founder">
             <span className="hx-founder-name">Annissa</span>
-            <span className="hx-founder-role">Co-fondatrice</span>
-            <p>
-              Elle bâtit {BRAND_NAME} avec Thanh. La même exigence, rendre chaque trade
-              public et vérifiable, sans compromis.
-            </p>
+            <span className="hx-founder-role">{c.founders.annissaRole}</span>
+            <p>{c.founders.annissaText}</p>
           </article>
         </div>
       </section>
 
       <section className="hx-section hx-section--band">
-        <span className="hx-kicker">Comment en profiter</span>
-        <h2 className="hx-h2">Suivez. Décidez. Gardez le contrôle.</h2>
+        <span className="hx-kicker">{c.profit.kicker}</span>
+        <h2 className="hx-h2">{c.profit.h2}</h2>
         <div className="hx-cards hx-cards--3">
-          {PROFIT_STEPS.map((d) => (
+          {c.profit.steps.map((d) => (
             <article className="hx-card" key={d.k}>
               <span className="hx-card-num">{d.k}</span>
               <h3>{d.title}</h3>
@@ -443,7 +365,7 @@ export function LandingPage() {
         </div>
         <div className="hx-cta-row">
           <Link to="/app" className="hx-btn hx-btn--primary hx-btn--lg">
-            Entrer dans le terminal
+            {c.profit.ctaTerminal}
           </Link>
           {pushState !== 'unsupported' && pushState !== 'denied' && (
             <button
@@ -453,10 +375,10 @@ export function LandingPage() {
               disabled={pushLoading || pushState === 'granted'}
             >
               {pushState === 'granted'
-                ? 'Alertes activées'
+                ? c.profit.alertsOn
                 : pushLoading
-                  ? 'Activation'
-                  : 'Recevoir les alertes'}
+                  ? c.profit.alertsEnabling
+                  : c.profit.alertsGet}
             </button>
           )}
         </div>
@@ -464,19 +386,19 @@ export function LandingPage() {
 
       <section className="hx-appband">
         <div className="hx-appband-copy">
-          <h3>L'app THANNIS sur Android</h3>
-          <p>Les positions et les alertes dans votre poche. Téléchargement direct, un clic.</p>
+          <h3>{c.appband.title}</h3>
+          <p>{c.appband.text}</p>
         </div>
         <a className="hx-btn hx-btn--primary hx-btn--lg" href={APK_DOWNLOAD_PATH} download>
-          Télécharger l'app
+          {c.appband.btn}
         </a>
       </section>
 
       <section className="hx-section">
-        <span className="hx-kicker">Questions fréquentes</span>
-        <h2 className="hx-h2">Avant d’entrer.</h2>
+        <span className="hx-kicker">{c.faq.kicker}</span>
+        <h2 className="hx-h2">{c.faq.h2}</h2>
         <div className="hx-faq">
-          {FAQ.map((item) => (
+          {c.faq.items.map((item) => (
             <details className="hx-faq-item" key={item.q}>
               <summary>{item.q}</summary>
               <p>{item.a}</p>
@@ -488,18 +410,15 @@ export function LandingPage() {
       <footer className="hx-footer">
         <div className="hx-footer-brand">
           <span className="hx-footer-mark">{BRAND_NAME}</span>
-          <span className="hx-footer-desc">Commodities &amp; Equities · Thanh &amp; Annissa</span>
+          <span className="hx-footer-desc">{c.footer.desc}</span>
         </div>
-        <p className="hx-footer-legal">
-          Données on-chain uniquement. Accès libre. Aucune sollicitation, aucune
-          promesse de performance, pas un conseil en investissement.
-        </p>
+        <p className="hx-footer-legal">{c.footer.legal}</p>
         <p className="hx-footer-links">
-          <Link to="/about">La maison</Link>
+          <Link to="/about">{c.footer.home}</Link>
           <span aria-hidden> · </span>
-          <Link to="/methodology">Notre approche</Link>
+          <Link to="/methodology">{c.footer.approach}</Link>
           <span aria-hidden> · </span>
-          <Link to="/verifie">Vérifié</Link>
+          <Link to="/verifie">{c.footer.verified}</Link>
           <span aria-hidden> · </span>
           <Link to="/app">{TERMINAL_NAME}</Link>
           <span aria-hidden> · </span>
@@ -508,7 +427,7 @@ export function LandingPage() {
         <p className="hx-footer-wallet">
           <a href={SITE_URL}>{SITE_URL.replace('https://', '')}</a>
           <span aria-hidden> · </span>
-          Wallet {truncateWallet(TRADER_WALLET)}
+          {c.footer.wallet} {truncateWallet(TRADER_WALLET)}
         </p>
       </footer>
 
