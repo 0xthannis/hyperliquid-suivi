@@ -1158,7 +1158,7 @@
 .trx-nav {
   position: sticky; top: 0; z-index: 20;
   display: flex; align-items: center; justify-content: space-between;
-  max-width: 760px; margin: 0 auto; padding: 1.05rem 1.5rem;
+  max-width: 1200px; margin: 0 auto; padding: 1.05rem 1.5rem;
   background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--line);
 }
@@ -1167,7 +1167,7 @@
 .trx-live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-dim); }
 .trx-live.on { color: var(--green); }
 .trx-live.on .trx-live-dot { background: var(--green); }
-.trx-seg { display: flex; gap: 22px; max-width: 760px; margin: 1.4rem auto 0; padding: 0 1.5rem; }
+.trx-seg { display: flex; gap: 22px; max-width: 1200px; margin: 1.4rem auto 0; padding: 0 1.5rem; }
 .trx-seg button {
   font-family: inherit; font-size: 0.98rem; font-weight: 700; color: var(--text-dim);
   background: none; border: none; padding: 6px 0; cursor: pointer; position: relative; transition: color .15s;
@@ -1177,9 +1177,9 @@
 .trx-seg button.is-active::after {
   content: ''; position: absolute; left: 0; right: 0; bottom: -7px; height: 2px; background: #0a0a0b; border-radius: 2px;
 }
-.trx-main { max-width: 760px; margin: 0 auto; }
+.trx-main { max-width: 1200px; margin: 0 auto; }
 .trx-foot {
-  max-width: 760px; margin: 1.5rem auto 0; padding: 1.5rem; border-top: 1px solid var(--line);
+  max-width: 1200px; margin: 1.5rem auto 0; padding: 1.5rem; border-top: 1px solid var(--line);
   display: flex; flex-direction: column; gap: 7px; font-size: 0.7rem; color: var(--text-dim); line-height: 1.5;
 }
 .trx-foot-links a { color: var(--text-muted); text-decoration: none; }
@@ -1217,3 +1217,17 @@
   transition: background .15s, color .15s, border-color .15s;
 }
 .btn-pnl-card:hover { background: #0a0a0b; color: #fff; border-color: #0a0a0b; }
+
+/* Terminal : pleine largeur sur desktop (2 colonnes), empilé sur mobile */
+@media (min-width: 900px) {
+  .tr {
+    display: grid;
+    grid-template-columns: minmax(360px, 440px) 1fr;
+    gap: 60px;
+    align-items: start;
+    padding: 2rem 1.5rem 2.5rem;
+  }
+  .tr-left { min-width: 0; }
+  .tr-right { min-width: 0; }
+  .tr-right .tr-section-label { margin-top: 0; }
+}

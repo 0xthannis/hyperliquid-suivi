@@ -140,6 +140,7 @@ export function LiveView({
 
   return (
     <div className="tr">
+      <div className="tr-left">
       <div className="tr-hero">
         <span className="tr-label">Valeur du compte</span>
         <div className="tr-value">{formatUsd(accountValue)}</div>
@@ -188,7 +189,9 @@ export function LiveView({
       </div>
 
       {error && <div className="tr-alert">{error}</div>}
+      </div>
 
+      <div className="tr-right">
       <div className="tr-section-label">
         Positions <span className="tr-count">{positions.length}</span>
       </div>
@@ -270,6 +273,7 @@ export function LiveView({
           })}
         </div>
       )}
+      </div>
 
       {card && <PnlCardModal prebuilt={card} onClose={() => setCard(null)} />}
     </div>
