@@ -12,6 +12,15 @@ import {
 import * as ExpoLinking from 'expo-linking';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import * as Notifications from 'expo-notifications';
+import {
+  useFonts,
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
+  Inter_700Bold,
+  Inter_800ExtraBold,
+  Inter_900Black,
+} from '@expo-google-fonts/inter';
 import { TabBar, type TabId } from './src/components/TabBar';
 import { SyncBadge } from './src/components/SyncBadge';
 import { TerminalTour } from './src/components/TerminalTour';
@@ -35,7 +44,7 @@ import {
   hyperliquidExplorerUrl,
 } from './src/constants';
 import { truncateWallet } from './src/utils/wallet';
-import { colors, spacing, typography } from './src/theme';
+import { colors, spacing, typography, font } from './src/theme';
 
 const LEGACY_WATCH_NOTIFICATION_ID = 'at-capital-watch-service';
 
@@ -74,6 +83,14 @@ export default function App() {
   const [tab, setTab] = useState<TabId>('live');
   const [replayTour, setReplayTour] = useState(false);
   const data = useTraderData();
+  const [fontsLoaded] = useFonts({
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+    Inter_800ExtraBold,
+    Inter_900Black,
+  });
 
   const handleDeepLink = useCallback((url: string | null) => {
     const next = tabFromDeepLink(url);
@@ -121,11 +138,19 @@ export default function App() {
     ? `Sync ${data.lastUpdate.toLocaleTimeString('fr-FR')}`
     : 'Sync en attente';
 
+  if (!fontsLoaded) {
+    return (
+      <View style={[styles.root, styles.boot]}>
+        <StatusBar barStyle="dark-content" backgroundColor={colors.bg} />
+      </View>
+    );
+  }
+
   return (
     <SafeAreaProvider>
       <View style={styles.root}>
         <StatusBar barStyle="dark-content" backgroundColor={colors.bg} />
-        <SafeAreaView style={styles.safe} edges={['top']}>
+        <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
           <View style={styles.header}>
             <Text style={styles.brand}>{BRAND_NAME}</Text>
             <View style={styles.liveRow}>
@@ -143,36 +168,38 @@ export default function App() {
             </View>
           </View>
 
-          <TabBar active={tab} onChange={setTab} />
+          <View style={styles.body}>
+            {tab === 'live' ? (
+              <LiveScreen
+                positions={data.positions}
+                orders={data.orders}
+                mids={data.mids}
+                accountValue={data.accountValue}
+                allTimePnl={data.allTimePnl}
+                history={data.history}
+                loading={data.loading}
+                error={data.error}
+                lastUpdate={data.lastUpdate}
+                refreshing={data.refreshing}
+                priceTick={data.priceTick}
+                onRefresh={data.refresh}
+                onOpenHistory={() => setTab('history')}
+              />
+            ) : tab === 'history' ? (
+              <HistoryScreen
+                history={data.history}
+                fills={data.fills}
+                allTimePnl={data.allTimePnl}
+                loading={data.loading}
+                refreshing={data.refreshing}
+                onRefresh={data.refresh}
+              />
+            ) : (
+              <AboutScreen onReplayTour={() => setReplayTour(true)} />
+            )}
+          </View>
 
-          {tab === 'live' ? (
-            <LiveScreen
-              positions={data.positions}
-              orders={data.orders}
-              mids={data.mids}
-              accountValue={data.accountValue}
-              allTimePnl={data.allTimePnl}
-              history={data.history}
-              loading={data.loading}
-              error={data.error}
-              lastUpdate={data.lastUpdate}
-              refreshing={data.refreshing}
-              priceTick={data.priceTick}
-              onRefresh={data.refresh}
-              onOpenHistory={() => setTab('history')}
-            />
-          ) : tab === 'history' ? (
-            <HistoryScreen
-              history={data.history}
-              fills={data.fills}
-              allTimePnl={data.allTimePnl}
-              loading={data.loading}
-              refreshing={data.refreshing}
-              onRefresh={data.refresh}
-            />
-          ) : (
-            <AboutScreen onReplayTour={() => setReplayTour(true)} />
-          )}
+          <TabBar active={tab} onChange={setTab} />
         </SafeAreaView>
         <TerminalTour
           forceShow={replayTour}
@@ -185,7 +212,9 @@ export default function App() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bg },
+  boot: { alignItems: 'center', justifyContent: 'center' },
   safe: { flex: 1 },
+  body: { flex: 1 },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -199,7 +228,7 @@ const styles = StyleSheet.create({
   brand: {
     color: colors.text,
     fontSize: 20,
-    fontWeight: '800',
+    fontFamily: font.extrabold,
     letterSpacing: -0.2,
   },
   liveRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
@@ -207,7 +236,7 @@ const styles = StyleSheet.create({
   liveText: {
     color: colors.textMuted,
     fontSize: 12,
-    fontWeight: '600',
+    fontFamily: font.semibold,
   },
   scopeBar: {
     paddingHorizontal: spacing.lg,

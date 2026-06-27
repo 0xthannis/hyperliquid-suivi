@@ -16,8 +16,8 @@ export const colors = {
   accentMuted: 'rgba(0, 0, 0, 0.06)',
   gold: '#0a0a0b',
   goldLight: '#0a0a0b',
-  green: '#00a878',
-  greenMuted: 'rgba(0, 168, 120, 0.12)',
+  green: '#00935f',
+  greenMuted: 'rgba(0, 147, 95, 0.12)',
   red: '#e5342a',
   redMuted: 'rgba(229, 52, 42, 0.12)',
   white: '#FFFFFF',
@@ -28,6 +28,16 @@ export const mono = Platform.select({
   android: 'monospace',
   default: 'monospace',
 }) as string;
+
+/** Familles Inter (chargées via expo-font dans App.tsx). */
+export const font = {
+  regular: 'Inter_400Regular',
+  medium: 'Inter_500Medium',
+  semibold: 'Inter_600SemiBold',
+  bold: 'Inter_700Bold',
+  extrabold: 'Inter_800ExtraBold',
+  black: 'Inter_900Black',
+};
 
 export const spacing = {
   xs: 4,

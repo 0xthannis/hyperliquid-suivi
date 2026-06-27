@@ -9,7 +9,7 @@ module.exports = () => {
   return {
     expo: {
       ...base,
-      version: '1.1.8',
+      version: '1.1.9',
       android,
       plugins: [
         [
@@ -22,6 +22,7 @@ module.exports = () => {
           },
         ],
         'expo-background-fetch',
+        'expo-font',
       ],
       extra: {
         pushApiUrl:

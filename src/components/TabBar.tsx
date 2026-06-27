@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
-import { colors, spacing } from '../theme';
+import * as Haptics from 'expo-haptics';
+import { colors, spacing, font } from '../theme';
 
 export type TabId = 'live' | 'history' | 'about';
 
@@ -24,9 +25,14 @@ export function TabBar({
         return (
           <Pressable
             key={tab.id}
-            onPress={() => onChange(tab.id)}
-            style={[styles.tab, selected && styles.tabActive]}
+            onPress={() => {
+              Haptics.selectionAsync().catch(() => {});
+              onChange(tab.id);
+            }}
+            style={styles.tab}
+            hitSlop={8}
           >
+            <View style={[styles.indicator, selected && styles.indicatorActive]} />
             <Text style={[styles.label, selected && styles.labelActive]}>
               {tab.label}
             </Text>
@@ -40,32 +46,31 @@ export function TabBar({
 const styles = StyleSheet.create({
   bar: {
     flexDirection: 'row',
-    marginHorizontal: spacing.lg,
-    marginBottom: spacing.md,
-    padding: 4,
-    backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
-    borderRadius: 999,
-    gap: 4,
+    paddingHorizontal: spacing.lg,
+    paddingTop: 10,
+    paddingBottom: 6,
+    backgroundColor: colors.bg,
+    borderTopWidth: 1,
+    borderTopColor: colors.line,
   },
   tab: {
     flex: 1,
     alignItems: 'center',
-    paddingVertical: 9,
-    borderRadius: 999,
+    paddingVertical: 6,
+    gap: 7,
   },
-  tabActive: {
-    backgroundColor: colors.accent,
-    borderWidth: 1,
-    borderColor: 'transparent',
+  indicator: {
+    width: 22,
+    height: 2.5,
+    borderRadius: 2,
+    backgroundColor: 'transparent',
   },
+  indicatorActive: { backgroundColor: colors.accent },
   label: {
-    color: colors.textMuted,
-    fontSize: 11,
-    fontWeight: '600',
-    letterSpacing: 0.8,
-    textTransform: 'uppercase',
+    color: colors.textDim,
+    fontSize: 12,
+    fontFamily: font.semibold,
+    letterSpacing: 0.2,
   },
-  labelActive: { color: '#ffffff', fontWeight: '700' },
+  labelActive: { color: colors.text, fontFamily: font.bold },
 });

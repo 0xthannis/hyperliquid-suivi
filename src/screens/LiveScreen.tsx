@@ -9,7 +9,8 @@ import {
   Pressable,
   Dimensions,
 } from 'react-native';
-import Svg, { Polyline } from 'react-native-svg';
+import Svg, { Path, Defs, LinearGradient, Stop } from 'react-native-svg';
+import * as Haptics from 'expo-haptics';
 import type { TraderSnapshot } from '../hooks/useTraderData';
 import {
   fetchAccountValueHistory,
@@ -25,7 +26,7 @@ import {
 import { computeExitMetrics, formatRiskReward } from '../utils/riskMetrics';
 import { PnlCardSheet } from '../components/PnlCardSheet';
 import type { PnlCardData } from '../utils/pnlCard';
-import { colors, spacing } from '../theme';
+import { colors, spacing, font } from '../theme';
 
 type Props = Pick<
   TraderSnapshot,
@@ -56,19 +57,24 @@ const PERIODS: [Period, string][] = [
 const CHART_W = Dimensions.get('window').width - spacing.lg * 2;
 const CHART_H = 130;
 
-function curvePoints(values: number[]): string {
-  if (values.length < 2) return '';
+function curveCoords(values: number[]): { x: number; y: number }[] {
   const min = Math.min(...values);
   const max = Math.max(...values);
   const span = max - min || 1;
   const pad = CHART_H * 0.14;
-  return values
-    .map((v, i) => {
-      const x = (i / (values.length - 1)) * CHART_W;
-      const y = CHART_H - pad - ((v - min) / span) * (CHART_H - pad * 2);
-      return `${x.toFixed(1)},${y.toFixed(1)}`;
-    })
-    .join(' ');
+  return values.map((v, i) => ({
+    x: (i / (values.length - 1)) * CHART_W,
+    y: CHART_H - pad - ((v - min) / span) * (CHART_H - pad * 2),
+  }));
+}
+
+function lineD(pts: { x: number; y: number }[]): string {
+  return pts.map((p, i) => `${i ? 'L' : 'M'}${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
+}
+
+function areaD(pts: { x: number; y: number }[]): string {
+  if (pts.length < 2) return '';
+  return `${lineD(pts)} L${pts[pts.length - 1].x.toFixed(1)} ${CHART_H} L${pts[0].x.toFixed(1)} ${CHART_H} Z`;
 }
 
 export function LiveScreen({
@@ -168,18 +174,30 @@ export function LiveScreen({
         </Text>
       )}
 
-      {equity.length >= 2 && (
-        <View style={styles.chart}>
-          <Svg width={CHART_W} height={CHART_H}>
-            <Polyline
-              points={curvePoints(equity)}
-              fill="none"
-              stroke={up ? colors.green : colors.red}
-              strokeWidth={2}
-            />
-          </Svg>
-        </View>
-      )}
+      {equity.length >= 2 && (() => {
+        const pts = curveCoords(equity);
+        const stroke = up ? colors.green : colors.red;
+        return (
+          <View style={styles.chart}>
+            <Svg width={CHART_W} height={CHART_H}>
+              <Defs>
+                <LinearGradient id="equityFill" x1="0" y1="0" x2="0" y2="1">
+                  <Stop offset="0" stopColor={stroke} stopOpacity={0.18} />
+                  <Stop offset="1" stopColor={stroke} stopOpacity={0} />
+                </LinearGradient>
+              </Defs>
+              <Path d={areaD(pts)} fill="url(#equityFill)" stroke="none" />
+              <Path
+                d={lineD(pts)}
+                fill="none"
+                stroke={stroke}
+                strokeWidth={2}
+                strokeLinejoin="round"
+              />
+            </Svg>
+          </View>
+        );
+      })()}
 
       <View style={styles.periods}>
         {PERIODS.map(([p, label]) => {
@@ -187,7 +205,10 @@ export function LiveScreen({
           return (
             <Pressable
               key={p}
-              onPress={() => setPeriod(p)}
+              onPress={() => {
+                Haptics.selectionAsync().catch(() => {});
+                setPeriod(p);
+              }}
               style={[styles.period, active && styles.periodActive]}
             >
               <Text style={[styles.periodText, active && styles.periodTextActive]}>
@@ -313,25 +334,25 @@ export function LiveScreen({
 
 const styles = StyleSheet.create({
   scroll: { flex: 1 },
-  content: { paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: 96 },
+  content: { paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: spacing.xl },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 80 },
 
-  heroLabel: { color: colors.textMuted, fontSize: 14, fontWeight: '500' },
+  heroLabel: { color: colors.textMuted, fontSize: 14, fontFamily: font.medium },
   heroValue: {
     color: colors.text,
     fontSize: 46,
-    fontWeight: '800',
+    fontFamily: font.extrabold,
     letterSpacing: -1.2,
     marginTop: 6,
   },
-  heroChange: { fontSize: 15, fontWeight: '700', marginTop: 8 },
+  heroChange: { fontSize: 15, fontFamily: font.bold, marginTop: 8 },
 
   chart: { marginTop: 18, marginBottom: 4 },
 
   periods: { flexDirection: 'row', gap: 6, marginTop: 6, marginBottom: 22 },
   period: { paddingVertical: 7, paddingHorizontal: 16, borderRadius: 999 },
   periodActive: { backgroundColor: '#0a0a0b' },
-  periodText: { color: colors.textMuted, fontSize: 13, fontWeight: '700' },
+  periodText: { color: colors.textMuted, fontSize: 13, fontFamily: font.bold },
   periodTextActive: { color: '#fff' },
 
   stats: {
@@ -345,26 +366,26 @@ const styles = StyleSheet.create({
   },
   stat: { flex: 1 },
   statDivider: { width: 1, alignSelf: 'stretch', backgroundColor: colors.line },
-  statLabel: { color: colors.textDim, fontSize: 11, fontWeight: '500' },
-  statValue: { color: colors.text, fontSize: 17, fontWeight: '700', marginTop: 6 },
+  statLabel: { color: colors.textDim, fontSize: 11, fontFamily: font.medium },
+  statValue: { color: colors.text, fontSize: 17, fontFamily: font.bold, marginTop: 6 },
 
-  error: { color: colors.red, fontSize: 13, marginTop: 16 },
+  error: { color: colors.red, fontSize: 13, fontFamily: font.medium, marginTop: 16 },
 
-  section: { color: colors.text, fontSize: 17, fontWeight: '800', marginTop: 28, marginBottom: 4 },
-  sectionCount: { color: colors.textMuted, fontSize: 14, fontWeight: '700' },
+  section: { color: colors.text, fontSize: 17, fontFamily: font.extrabold, marginTop: 28, marginBottom: 4 },
+  sectionCount: { color: colors.textMuted, fontSize: 14, fontFamily: font.bold },
 
   pos: { paddingVertical: 18, borderBottomWidth: 1, borderBottomColor: colors.line },
   posTop: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between' },
   posId: { flex: 1, paddingRight: 12 },
-  posSym: { color: colors.text, fontSize: 20, fontWeight: '800', letterSpacing: -0.3 },
-  posSub: { color: colors.textMuted, fontSize: 13, fontWeight: '500', marginTop: 4 },
+  posSym: { color: colors.text, fontSize: 20, fontFamily: font.extrabold, letterSpacing: -0.3 },
+  posSub: { color: colors.textMuted, fontSize: 13, fontFamily: font.medium, marginTop: 4 },
   posFig: { alignItems: 'flex-end' },
-  posPnl: { fontSize: 19, fontWeight: '800' },
-  posPct: { fontSize: 13, fontWeight: '600', marginTop: 3 },
+  posPnl: { fontSize: 19, fontFamily: font.extrabold },
+  posPct: { fontSize: 13, fontFamily: font.semibold, marginTop: 3 },
 
   posRisk: { flexDirection: 'row', flexWrap: 'wrap', gap: 14, marginTop: 12 },
-  riskTxt: { color: colors.textDim, fontSize: 12, fontWeight: '500' },
-  riskStrong: { color: colors.textMuted, fontWeight: '700' },
+  riskTxt: { color: colors.textDim, fontSize: 12, fontFamily: font.medium },
+  riskStrong: { color: colors.textMuted, fontFamily: font.bold },
 
   cardBtn: {
     alignSelf: 'flex-start',
@@ -375,13 +396,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.2)',
   },
-  cardBtnText: { color: colors.text, fontSize: 12, fontWeight: '700' },
+  cardBtnText: { color: colors.text, fontSize: 12, fontFamily: font.bold },
 
   empty: { paddingVertical: 40, alignItems: 'center' },
-  emptyTitle: { color: colors.text, fontSize: 17, fontWeight: '700' },
+  emptyTitle: { color: colors.text, fontSize: 17, fontFamily: font.bold },
   emptyText: {
     color: colors.textMuted,
     fontSize: 14,
+    fontFamily: font.regular,
     marginTop: 8,
     textAlign: 'center',
     lineHeight: 21,
@@ -393,5 +415,5 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     backgroundColor: '#0a0a0b',
   },
-  emptyBtnText: { color: '#fff', fontSize: 13, fontWeight: '700' },
+  emptyBtnText: { color: '#fff', fontSize: 13, fontFamily: font.bold },
 });

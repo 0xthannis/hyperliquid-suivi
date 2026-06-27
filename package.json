@@ -15,6 +15,7 @@
     "desktop:dev": "cd desktop && AT_DEV=1 npm start"
   },
   "dependencies": {
+    "@expo-google-fonts/inter": "^0.4.2",
     "@expo/vector-icons": "^15.1.1",
     "@react-native-async-storage/async-storage": "2.2.0",
     "babel-preset-expo": "~54.0.10",
@@ -23,6 +24,7 @@
     "expo-constants": "~18.0.13",
     "expo-device": "~8.0.10",
     "expo-file-system": "~19.0.22",
+    "expo-font": "~14.0.12",
     "expo-haptics": "~15.0.8",
     "expo-linear-gradient": "~15.0.8",
     "expo-linking": "~8.0.12",
