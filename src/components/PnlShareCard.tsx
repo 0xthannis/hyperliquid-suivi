@@ -14,7 +14,11 @@ type Props = {
   width?: number;
 };
 
-const CARD_RATIO = 1.34;
+const CARD_RATIO = 1.4;
+
+function fmtCapital(value: number): string {
+  return value > 1e-6 ? formatUsd(value) : '—';
+}
 
 export function PnlShareCard({ data, width = 360 }: Props) {
   const scale = width / 360;
@@ -72,29 +76,37 @@ export function PnlShareCard({ data, width = 360 }: Props) {
         </Text>
       </View>
 
-      <View style={[styles.grid, { marginTop: s(26), paddingTop: s(18) }]}>
-        <View style={styles.cell}>
+      <View style={[styles.grid, { marginTop: s(24), paddingTop: s(18), rowGap: s(16) }]}>
+        <View style={styles.cell2}>
+          <Text style={[styles.cellLabel, { fontSize: s(10) }]}>Investi</Text>
+          <Text style={[styles.cellVal, { fontSize: s(15), marginTop: s(5) }]}>
+            {fmtCapital(data.riskedUsd)}
+          </Text>
+        </View>
+        <View style={styles.cell2}>
+          <Text style={[styles.cellLabel, { fontSize: s(10) }]}>Sorti</Text>
+          <Text style={[styles.cellVal, { fontSize: s(15), marginTop: s(5) }]}>
+            {fmtCapital(data.exitCapitalUsd)}
+          </Text>
+        </View>
+        <View style={styles.cell2}>
           <Text style={[styles.cellLabel, { fontSize: s(10) }]}>Entrée</Text>
           <Text style={[styles.cellVal, { fontSize: s(15), marginTop: s(5) }]}>
             {formatTradePrice(data.entryPx)}
           </Text>
         </View>
-        <View style={styles.cell}>
+        <View style={styles.cell2}>
           <Text style={[styles.cellLabel, { fontSize: s(10) }]}>Sortie</Text>
           <Text style={[styles.cellVal, { fontSize: s(15), marginTop: s(5) }]}>
             {formatTradePrice(data.exitPx)}
           </Text>
         </View>
-        <View style={styles.cell}>
-          <Text style={[styles.cellLabel, { fontSize: s(10) }]}>Durée</Text>
-          <Text style={[styles.cellVal, { fontSize: s(15), marginTop: s(5) }]}>
-            {data.durationLabel}
-          </Text>
-        </View>
       </View>
 
       <View style={[styles.footer, { marginTop: s(22) }]}>
-        <Text style={[styles.foot, { fontSize: s(10) }]}>{closedLabel}</Text>
+        <Text style={[styles.foot, { fontSize: s(10) }]}>
+          {closedLabel} · {data.durationLabel}
+        </Text>
         <Text style={[styles.foot, { fontSize: s(10) }]}>
           {data.closeProofLabel ? `Clôture HL · ${data.closeProofLabel}` : 'Vérifié on-chain'}
         </Text>
@@ -126,10 +138,12 @@ const styles = StyleSheet.create({
   pct: { fontWeight: '700', fontVariant: ['tabular-nums'], opacity: 0.85 },
   grid: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     borderTopWidth: 1,
     borderTopColor: '#ededed',
   },
   cell: { flex: 1 },
+  cell2: { width: '48%' },
   cellLabel: {
     color: '#9b9b9b',
     fontWeight: '600',

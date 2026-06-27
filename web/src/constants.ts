@@ -7,8 +7,8 @@ export const WS_URL = 'wss://api.hyperliquid.xyz/ws';
 
 export const POLL_BACKUP_MS = 30_000;
 export const MIDS_POLL_MS = 2_000;
-export const BRAND_NAME = 'AT Trading';
-export const TERMINAL_NAME = 'Terminal 277';
+export const BRAND_NAME = 'Thannis';
+export const TERMINAL_NAME = 'Terminal';
 export const APP_NAME = BRAND_NAME;
 export const SITE_URL = 'https://atcapital.up.railway.app';
 export const CONTACT_EMAIL = 'contact@atcapital.fr';

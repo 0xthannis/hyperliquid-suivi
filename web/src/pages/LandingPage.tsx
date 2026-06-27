@@ -84,15 +84,15 @@ const FAQ = [
   },
   {
     q: 'Comment vérifier que c’est réel ?',
-    a: 'Tout est exécuté sur un wallet public, lisible on-chain. Le Terminal 277 affiche exactement ce que la plateforme enregistre : vous recoupez chaque chiffre.',
+    a: 'Tout est exécuté sur un wallet public, lisible on-chain. Le Terminal affiche exactement ce que la plateforme enregistre : vous recoupez chaque chiffre.',
   },
   {
     q: 'C’est payant ?',
-    a: 'Non. Le site et le Terminal 277 sont en accès libre, sans inscription. Aucun signal vendu, aucun capital géré pour des tiers.',
+    a: 'Non. Le site et le Terminal sont en accès libre, sans inscription. Aucun signal vendu, aucun capital géré pour des tiers.',
   },
   {
-    q: 'Pourquoi “277” ?',
-    a: 'C’est une référence personnelle à Annissa & Thanh. Le terminal en porte le nom : notre table de lecture publique, ouverte à tous.',
+    q: 'Puis-je suivre vos trades comme des signaux ?',
+    a: 'Oui. Chaque position s’affiche en temps réel avec entrée, stop, take-profit et levier, et vous pouvez activer les notifications. Vous décidez de copier ou non — Thannis ne gère pas votre argent et ne donne aucun conseil financier.',
   },
 ];
 
@@ -135,22 +135,23 @@ export function LandingPage() {
         <div className="hx-hero-copy">
           <span className="hx-pill">
             <span className="hx-pill-dot" />
-            Maison de trading privée · Annissa &amp; Thanh
+            Société de trading · Actions &amp; matières premières
           </span>
           <h1 className="hx-hero-title">
-            Les marchés réels,
+            Nos positions, publiques
             <br />
-            opérés en <span className="hx-accent">conviction</span>.
+            et en <span className="hx-accent">temps réel</span>.
           </h1>
           <p className="hx-hero-lead">
-            {BRAND_NAME} engage son propre capital sur les matières premières et les
-            actions d’entreprises mondiales. Exécution réelle, risque maîtrisé,
-            chaque position prouvée on-chain. Pas de gestion pour tiers. La donnée
-            parle d’elle-même.
+            {BRAND_NAME} est une société de trading spécialisée dans les actions et
+            les matières premières, fondée par un couple, Thanh &amp; Annissa. Chaque
+            position est publique, transparente et accessible en temps réel, avec les
+            notifications, pour les suivre comme des signaux et profiter avec nous.
+            Ce n’est pas un conseil financier.
           </p>
           <div className="hx-hero-actions">
             <Link to="/app" className="hx-btn hx-btn--primary">
-              Ouvrir le Terminal 277
+              Ouvrir le Terminal
             </Link>
             <a
               href={hyperliquidExplorerUrl(TRADER_WALLET)}

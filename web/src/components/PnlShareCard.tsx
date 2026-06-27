@@ -15,6 +15,10 @@ type Props = {
   forExport?: boolean;
 };
 
+function fmtCapital(value: number): string {
+  return value > 1e-6 ? formatUsd(value) : '—';
+}
+
 export function PnlShareCard({ data, className = '', forExport = false }: Props) {
   const win = data.isWin;
   const closedLabel = new Date(data.closedAt).toLocaleDateString('fr-FR', {
@@ -50,6 +54,14 @@ export function PnlShareCard({ data, className = '', forExport = false }: Props)
 
       <div className="pc-grid">
         <div className="pc-cell">
+          <span>Investi</span>
+          <b className="tabular">{fmtCapital(data.riskedUsd)}</b>
+        </div>
+        <div className="pc-cell">
+          <span>Sorti</span>
+          <b className="tabular">{fmtCapital(data.exitCapitalUsd)}</b>
+        </div>
+        <div className="pc-cell">
           <span>Entrée</span>
           <b className="tabular">{formatTradePrice(data.entryPx)}</b>
         </div>
@@ -57,14 +69,10 @@ export function PnlShareCard({ data, className = '', forExport = false }: Props)
           <span>Sortie</span>
           <b className="tabular">{formatTradePrice(data.exitPx)}</b>
         </div>
-        <div className="pc-cell">
-          <span>Durée</span>
-          <b>{data.durationLabel}</b>
-        </div>
       </div>
 
       <footer className="pc-foot">
-        <span>{closedLabel}</span>
+        <span>{closedLabel} · {data.durationLabel}</span>
         <span>{data.closeProofLabel ? `Clôture HL · ${data.closeProofLabel}` : 'Vérifié on-chain'}</span>
       </footer>
     </article>

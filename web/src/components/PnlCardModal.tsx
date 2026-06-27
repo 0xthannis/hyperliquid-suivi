@@ -105,7 +105,7 @@ export function PnlCardModal({
           Carte PnL
         </h2>
         <p className="pnl-card-modal__sub">
-          Image brandée AT Trading · sans lien · prête pour les réseaux
+          Image brandée Thannis · sans lien · prête pour les réseaux
         </p>
 
         <div className="pnl-card-modal__preview">

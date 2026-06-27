@@ -91,9 +91,9 @@
 
 .pc-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-  margin-top: 26px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px 14px;
+  margin-top: 24px;
   padding-top: 20px;
   border-top: 1px solid #ededed;
 }
@@ -146,7 +146,7 @@
   border: 1px solid var(--line, rgba(255, 255, 255, 0.1));
   border-radius: 22px; padding: 1.5rem; max-height: 94vh; overflow-y: auto;
 }
-.pnl-card-modal__title { font-size: 1.15rem; font-weight: 800; color: #fff; }
+.pnl-card-modal__title { font-size: 1.15rem; font-weight: 800; color: #0a0a0b; }
 .pnl-card-modal__sub { font-size: 0.78rem; color: var(--text-muted, #8a8d93); margin-top: 4px; }
 .pnl-card-modal__preview { display: flex; justify-content: center; margin: 1.4rem 0; overflow: hidden; }
 .pnl-card-modal__loading { color: var(--text-muted, #8a8d93); font-size: 0.85rem; padding: 2rem 0; }
@@ -155,9 +155,9 @@
 .pnl-card-modal__btn {
   flex: 1; padding: 13px; border-radius: 999px; font-weight: 700; font-size: 0.9rem;
   font-family: inherit; cursor: pointer; transition: opacity .15s;
-  border: 1px solid var(--line-strong, rgba(255, 255, 255, 0.22)); background: transparent; color: #fff;
+  border: 1px solid rgba(0,0,0,0.18); background: transparent; color: #0a0a0b;
 }
-.pnl-card-modal__btn--primary { background: #fff; color: #000; border-color: #fff; }
+.pnl-card-modal__btn--primary { background: #0a0a0b; color: #fff; border-color: #0a0a0b; }
 .pnl-card-modal__btn:hover:not(:disabled) { opacity: 0.85; }
 .pnl-card-modal__btn:disabled { opacity: 0.5; cursor: default; }
 @media (max-width: 440px) {

@@ -18,7 +18,7 @@ function createWindow() {
     minWidth: 900,
     minHeight: 640,
     backgroundColor: '#060608',
-    title: 'AT Trading · Terminal 277',
+    title: 'Thannis · Terminal',
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -45,7 +45,7 @@ function createWindow() {
 function buildMenu() {
   const template = [
     {
-      label: 'Terminal 277',
+      label: 'Terminal',
       submenu: [
         { role: 'about' },
         { type: 'separator' },
@@ -89,7 +89,7 @@ function buildMenu() {
       label: 'Aide',
       submenu: [
         {
-          label: 'Terminal 277',
+          label: 'Terminal',
           click: () => shell.openExternal('https://atcapital.up.railway.app'),
         },
         {

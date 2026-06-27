@@ -1,4 +1,4 @@
-# AT Trading · Terminal 277 — Site web
+# Thannis · Terminal — Site web
 
 Version web du suivi Hyperliquid (même données que l'app Android).
 

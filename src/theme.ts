@@ -1,6 +1,6 @@
 import { Platform } from 'react-native';
 
-/** Design system AT Trading — noir & blanc, esprit Trade Republic */
+/** Design system Thannis — noir & blanc, esprit Trade Republic */
 export const colors = {
   bg: '#000000',
   bgElevated: '#0a0a0a',

@@ -58,7 +58,7 @@ export function AboutPage() {
         </section>
 
         <section className="about-block">
-          <h2>Pourquoi le Terminal 277 ?</h2>
+          <h2>Pourquoi le Terminal ?</h2>
           <p>
             Le chiffre <strong>277</strong> est une référence personnelle pour nous deux. Le{' '}
             {TERMINAL_NAME} en porte le nom : c&apos;est notre tableau de bord public, gratuit,

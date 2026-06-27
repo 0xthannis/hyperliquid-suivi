@@ -45,7 +45,7 @@ async function setupNotifications() {
   );
   if (Platform.OS === 'android') {
     await Notifications.setNotificationChannelAsync('trades', {
-      name: 'AT Trading · Terminal 277',
+      name: 'Thannis · Terminal',
       importance: Notifications.AndroidImportance.HIGH,
       vibrationPattern: [0, 250, 120, 250],
       sound: 'default',

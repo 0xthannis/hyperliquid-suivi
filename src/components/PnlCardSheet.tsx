@@ -105,7 +105,7 @@ export function PnlCardSheet({
         <View style={styles.sheet}>
           <Text style={styles.title}>Carte PnL</Text>
           <Text style={styles.subtitle}>
-            Image brandée AT Trading · sans lien · prête pour les réseaux
+            Image brandée Thannis · sans lien · prête pour les réseaux
           </Text>
 
           <View style={styles.preview} collapsable={false}>

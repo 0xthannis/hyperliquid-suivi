@@ -1,43 +1,42 @@
-/* AT Trading — design system noir & blanc, esprit Trade Republic */
+/* Thannis — design system clair (noir sur blanc), esprit Trade Republic */
 :root {
-  /* Surfaces : noir absolu, étagement minimal */
-  --bg: #000000;
-  --bg-2: #0a0a0a;
-  --bg-3: #0e0e0e;
-  --card: #0c0c0c;
-  --card-2: #161616;
-  --card-border: rgba(255, 255, 255, 0.10);
-  --line: rgba(255, 255, 255, 0.08);
-  --line-strong: rgba(255, 255, 255, 0.20);
-  --glass: rgba(12, 12, 12, 0.7);
+  /* Surfaces : blanc, gris très clairs */
+  --bg: #ffffff;
+  --bg-2: #f7f7f8;
+  --bg-3: #f1f1f3;
+  --card: #ffffff;
+  --card-2: #f7f7f8;
+  --card-border: rgba(0, 0, 0, 0.10);
+  --line: rgba(0, 0, 0, 0.08);
+  --line-strong: rgba(0, 0, 0, 0.22);
+  --glass: rgba(255, 255, 255, 0.8);
 
-  /* Texte */
-  --text: #ffffff;
-  --text-muted: #8a8d93;
-  --text-dim: #5a5d63;
-  --text-faint: #3a3d42;
+  /* Texte : noir / gris */
+  --text: #0a0a0b;
+  --text-muted: #6b6f76;
+  --text-dim: #9a9ea4;
+  --text-faint: #c4c7cc;
 
-  /* Accent = blanc (aucune couleur de marque). Alias gold pour compat. */
-  --accent: #ffffff;
-  --accent-2: #ffffff;
-  --accent-soft: rgba(255, 255, 255, 0.10);
-  --accent-line: rgba(255, 255, 255, 0.22);
+  /* Accent = noir (aucune couleur de marque). Alias gold pour compat. */
+  --accent: #0a0a0b;
+  --accent-2: #0a0a0b;
+  --accent-soft: rgba(0, 0, 0, 0.06);
+  --accent-line: rgba(0, 0, 0, 0.18);
   --accent-glow: transparent;
-  --gold: #ffffff;
-  --gold-light: #ffffff;
-  --accent-muted: rgba(255, 255, 255, 0.08);
-  --bg-elevated: #0a0a0a;
+  --gold: #0a0a0b;
+  --gold-light: #0a0a0b;
+  --accent-muted: rgba(0, 0, 0, 0.06);
+  --bg-elevated: #ffffff;
 
-  /* Variations P&L (seule couleur autorisée), tons Trade Republic */
-  --green: #16d195;
-  --red: #ff4d4d;
+  /* Variations P&L (seule couleur), tons Trade Republic, lisibles sur blanc */
+  --green: #00a878;
+  --red: #e5342a;
 
-  /* Pas de profondeur colorée */
   --depth-radial: none;
 
-  --font: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-display: 'Manrope', system-ui, sans-serif;
-  --font-mono: 'Manrope', ui-monospace, monospace;
+  --font: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Inter', system-ui, sans-serif;
+  --font-mono: 'Inter', ui-monospace, monospace;
 
   --text-base: 1rem;
   --text-sm: 0.875rem;

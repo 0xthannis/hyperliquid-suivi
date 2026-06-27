@@ -79,7 +79,7 @@ export function AboutScreen({ onReplayTour }: Props) {
         <Text style={styles.cardName}>Annissa</Text>
         <Text style={styles.cardRole}>Co-fondatrice</Text>
         <Text style={styles.cardText}>
-          Structure AT Trading avec Thanh et transparence publique du terminal.
+          Structure Thannis avec Thanh et transparence publique du terminal.
         </Text>
       </View>
 

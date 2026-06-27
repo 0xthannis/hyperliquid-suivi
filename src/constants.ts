@@ -19,8 +19,8 @@ export const STORAGE_KEY_REMOTE_PUSH = '@at_capital_remote_push_active';
 export const NEAR_STOP_THRESHOLD = 0.22;
 export const NEAR_TP_THRESHOLD = 0.15;
 
-export const BRAND_NAME = 'AT Trading';
-export const TERMINAL_NAME = 'Terminal 277';
+export const BRAND_NAME = 'Thannis';
+export const TERMINAL_NAME = 'Terminal';
 export const APP_NAME = BRAND_NAME;
 export const SITE_URL = 'https://atcapital.up.railway.app';
 /** API push Railway (surveillance wallet 24/7) */

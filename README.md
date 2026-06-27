@@ -1,6 +1,6 @@
-# AT Trading · Terminal 277
+# Thannis · Terminal
 
-Site et app **gratuits** pour suivre en direct les positions Hyperliquid du wallet public (AT Trading).
+Site et app **gratuits** pour suivre en direct les positions Hyperliquid du wallet public (Thannis).
 
 **Site web** : [atcapital.up.railway.app](https://atcapital.up.railway.app) · Déploiement : voir [web/DEPLOY.md](web/DEPLOY.md)
 

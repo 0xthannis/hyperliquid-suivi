@@ -18,5 +18,5 @@ app.get('*', (_req, res) => {
 });
 
 app.listen(port, '0.0.0.0', () => {
-  console.log(`AT Trading · Terminal 277 → http://0.0.0.0:${port}`);
+  console.log(`Thannis · Terminal → http://0.0.0.0:${port}`);
 });
