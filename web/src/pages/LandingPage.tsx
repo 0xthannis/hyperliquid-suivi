@@ -92,7 +92,7 @@ const FAQ = [
   },
   {
     q: 'Puis-je suivre vos trades comme des signaux ?',
-    a: 'Oui. Chaque position s’affiche en temps réel avec entrée, stop, take-profit et levier, et vous pouvez activer les notifications. Vous décidez de copier ou non — Thannis ne gère pas votre argent et ne donne aucun conseil financier.',
+    a: 'Oui. Chaque position s’affiche en temps réel avec entrée, stop, take-profit et levier, et vous pouvez activer les notifications. Vous décidez de copier ou non — THANNIS ne gère pas votre argent et ne donne aucun conseil financier.',
   },
 ];
 
@@ -350,7 +350,7 @@ export function LandingPage() {
         <p className="hx-footer-links">
           <Link to="/about">La maison</Link>
           <span aria-hidden> · </span>
-          <Link to="/methodology">Méthodologie</Link>
+          <Link to="/methodology">Notre approche</Link>
           <span aria-hidden> · </span>
           <Link to="/app">{TERMINAL_NAME}</Link>
           <span aria-hidden> · </span>

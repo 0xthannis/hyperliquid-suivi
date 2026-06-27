@@ -63,23 +63,25 @@ export function AboutScreen({ onReplayTour }: Props) {
     <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
       <Text style={styles.title}>{BRAND_NAME}</Text>
       <Text style={styles.lead}>
-        Structure fondée par Annissa et Thanh. Le {TERMINAL_NAME} affiche l'activité
-        Hyperliquid du trader principal, en lecture seule.
+        Société de trading spécialisée dans les actions et les matières premières, fondée
+        par un couple, Annissa et Thanh. Chaque position est publique et en temps réel —
+        à suivre comme un signal.
       </Text>
 
       <View style={styles.card}>
         <Text style={styles.cardName}>Thanh</Text>
-        <Text style={styles.cardRole}>Trader principal</Text>
+        <Text style={styles.cardRole}>Exécution</Text>
         <Text style={styles.cardText}>
-          Exécute les positions sur le wallet suivi. Données lues depuis l'API Hyperliquid.
+          Prend et gère les positions affichées. Données lues directement on-chain depuis
+          Hyperliquid, sans aucune retouche.
         </Text>
       </View>
 
       <View style={styles.card}>
         <Text style={styles.cardName}>Annissa</Text>
-        <Text style={styles.cardRole}>Co-fondatrice</Text>
+        <Text style={styles.cardRole}>Direction</Text>
         <Text style={styles.cardText}>
-          Structure Thannis avec Thanh et transparence publique du terminal.
+          Pilote {BRAND_NAME} avec Thanh et porte notre engagement de transparence totale.
         </Text>
       </View>
 
@@ -108,9 +110,10 @@ export function AboutScreen({ onReplayTour }: Props) {
         </Text>
       ) : null}
 
-      <Text style={styles.sectionTitle}>Le 277</Text>
+      <Text style={styles.sectionTitle}>Notre conviction</Text>
       <Text style={styles.body}>
-        Référence personnelle pour nous. Le {TERMINAL_NAME} est notre espace de suivi public.
+        Nous montrons tout : entrées, stops, objectifs, pertes comme profits. En direct et
+        vérifiable on-chain. La transparence est notre standard.
       </Text>
 
       <Text style={styles.sectionTitle}>Liens</Text>

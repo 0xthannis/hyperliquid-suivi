@@ -1,18 +1,18 @@
 export const TRADER_WALLET =
   import.meta.env.VITE_TRADER_WALLET ??
-  '0x994Ff80b7dA1174a164e0F93121bDfbb68cf7A3F';
+  '0x5372140d358Dda770690a734798aaa37958Fb927';
 
 export const API_URL = 'https://api.hyperliquid.xyz/info';
 export const WS_URL = 'wss://api.hyperliquid.xyz/ws';
 
 export const POLL_BACKUP_MS = 30_000;
 export const MIDS_POLL_MS = 2_000;
-export const BRAND_NAME = 'Thannis';
+export const BRAND_NAME = 'THANNIS';
 export const TERMINAL_NAME = 'Terminal';
 export const APP_NAME = BRAND_NAME;
-export const SITE_URL = 'https://atcapital.up.railway.app';
-export const CONTACT_EMAIL = 'contact@atcapital.fr';
-export const APK_DOWNLOAD_URL = `${SITE_URL}/AT-Capital-Terminal-277.apk`;
+export const SITE_URL = 'https://thannis.com';
+export const CONTACT_EMAIL = 'contact@thannis.com';
+export const APK_DOWNLOAD_URL = `${SITE_URL}/Thannis.apk`;
 export const ANDROID_PACKAGE = 'com.thanh.suivitrades';
 
 export const DATA_SCOPE =

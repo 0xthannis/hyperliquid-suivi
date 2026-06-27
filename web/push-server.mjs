@@ -23,7 +23,7 @@ const TRADER_WALLET =
   process.env.VITE_TRADER_WALLET ?? '0x5372140d358Dda770690a734798aaa37958Fb927';
 const API_URL = 'https://api.hyperliquid.xyz/info';
 const POLL_MS = Number(process.env.PUSH_POLL_MS) || 25_000;
-const BRAND = 'Thannis';
+const BRAND = 'THANNIS';
 
 let webSubscriptions = [];
 let mobileTokens = [];

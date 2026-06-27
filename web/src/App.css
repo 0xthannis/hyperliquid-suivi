@@ -1204,6 +1204,38 @@
 .tr-pos-actions { display: flex; align-items: center; gap: 14px; margin-top: 14px; flex-wrap: wrap; }
 .tr-pos-actions .tr-pos-card { margin-top: 0; }
 
+/* ===== Track record ===== */
+.trk { padding: 1.75rem 1.25rem 2.5rem; font-family: var(--font-display); max-width: 760px; margin: 0 auto; animation: tr-fade-up .45s cubic-bezier(.22,.61,.36,1) both; }
+.trk .pos { color: var(--green); }
+.trk .neg { color: var(--red); }
+.trk-hero { margin-bottom: 1.75rem; }
+.trk-total { font-size: 2.6rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.05; margin-top: 6px; }
+.trk-hero-sub { display: block; margin-top: 8px; font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
+.trk-kpis { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--radius-md); overflow: hidden; }
+.trk-kpi { background: var(--bg); padding: 1.1rem 1.1rem; display: flex; flex-direction: column; gap: 6px; }
+.trk-kpi span { font-size: 0.7rem; color: var(--text-dim); font-weight: 500; }
+.trk-kpi b { font-size: 1.25rem; font-weight: 800; letter-spacing: -0.01em; }
+.trk-section { margin: 2.25rem 0 1rem; font-size: 0.95rem; font-weight: 700; }
+.trk-months { display: flex; flex-direction: column; gap: 12px; }
+.trk-month { display: grid; grid-template-columns: 64px 1fr 88px; align-items: center; gap: 14px; }
+.trk-month-label { font-size: 0.78rem; color: var(--text-muted); font-weight: 600; text-transform: capitalize; }
+.trk-bar-track { height: 10px; background: var(--bg-2); border-radius: 999px; overflow: hidden; position: relative; }
+.trk-bar { height: 100%; border-radius: 999px; transition: width .4s cubic-bezier(.22,.61,.36,1); }
+.trk-bar.pos { background: var(--green); }
+.trk-bar.neg { background: var(--red); }
+.trk-month-val { font-size: 0.82rem; font-weight: 700; text-align: right; }
+.trk-extremes { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 2rem; }
+.trk-extreme { border: 1px solid var(--line); border-radius: var(--radius-md); padding: 1rem 1.1rem; }
+.trk-extreme-label { font-size: 0.7rem; color: var(--text-dim); font-weight: 500; }
+.trk-extreme-row { display: flex; align-items: baseline; justify-content: space-between; margin-top: 8px; }
+.trk-extreme-row b { font-size: 1.05rem; font-weight: 800; }
+.trk-extreme-row span { font-size: 1.05rem; font-weight: 700; }
+.trk-disclaimer { margin-top: 2rem; font-size: 0.72rem; color: var(--text-dim); line-height: 1.5; }
+@media (max-width: 520px) {
+  .trk-kpis { grid-template-columns: 1fr; }
+  .trk-month { grid-template-columns: 52px 1fr 76px; gap: 10px; }
+}
+
 /* ===== Terminal shell — Trade Republic minimal ===== */
 .trx { min-height: 100vh; background: var(--bg); color: var(--text); font-family: var(--font-display); }
 .trx-nav {

@@ -5,6 +5,7 @@ import { TerminalTour } from '../components/TerminalTour';
 import { useTraderData } from '../hooks/useTraderData';
 import { LiveView } from '../components/LiveView';
 import { HistoryView } from '../components/HistoryView';
+import { TrackRecordView } from '../components/TrackRecordView';
 import {
   BRAND_NAME,
   TRADER_WALLET,
@@ -13,7 +14,7 @@ import {
 import { truncateWallet } from '../lib/wallet';
 import '../App.css';
 
-type Tab = 'live' | 'history';
+type Tab = 'live' | 'history' | 'track';
 
 export function TradesApp() {
   const [tab, setTab] = useState<Tab>('live');
@@ -46,6 +47,13 @@ export function TradesApp() {
         >
           Historique
         </button>
+        <button
+          type="button"
+          className={tab === 'track' ? 'is-active' : ''}
+          onClick={() => setTab('track')}
+        >
+          Track record
+        </button>
       </div>
 
       <main className="trx-main">
@@ -61,10 +69,16 @@ export function TradesApp() {
             error={data.error}
             priceTick={data.priceTick}
           />
-        ) : (
+        ) : tab === 'history' ? (
           <HistoryView
             history={data.history}
             fills={data.fills}
+            allTimePnl={data.allTimePnl}
+            loading={data.loading}
+          />
+        ) : (
+          <TrackRecordView
+            history={data.history}
             allTimePnl={data.allTimePnl}
             loading={data.loading}
           />
@@ -72,7 +86,7 @@ export function TradesApp() {
       </main>
 
       <footer className="trx-foot">
-        <span>Données Hyperliquid · lecture seule · pas un conseil en investissement</span>
+        <span>Données Hyperliquid · pas un conseil en investissement</span>
         <span className="trx-foot-links">
           <a
             href={hyperliquidExplorerUrl(TRADER_WALLET)}
@@ -82,7 +96,7 @@ export function TradesApp() {
             {truncateWallet(TRADER_WALLET)}
           </a>
           <span aria-hidden> · </span>
-          <Link to="/methodology">Méthodologie</Link>
+          <Link to="/methodology">Notre approche</Link>
           <span aria-hidden> · </span>
           <Link to="/about">À propos</Link>
         </span>

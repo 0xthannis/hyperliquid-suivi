@@ -28,59 +28,60 @@ export function AboutPage() {
         <p className="about-eyebrow">À propos</p>
         <h1>{BRAND_NAME}</h1>
         <p className="about-lead">
-          Structure de trading privée fondée par <strong>Annissa</strong> et{' '}
-          <strong>Thanh</strong>. Nous publions notre activité Hyperliquid en lecture
-          seule via le {TERMINAL_NAME}, accessible sur{' '}
-          <a href={SITE_URL}>{SITE_URL.replace('https://', '')}</a>.
+          Société de trading spécialisée dans les <strong>actions</strong> et les{' '}
+          <strong>matières premières</strong>, fondée par un couple,{' '}
+          <strong>Annissa</strong> et <strong>Thanh</strong>. Nous publions chaque
+          position en temps réel sur{' '}
+          <a href={SITE_URL}>{SITE_URL.replace('https://', '')}</a> — pour que vous
+          puissiez la suivre comme un signal.
         </p>
 
         <section className="about-block">
-          <h2>Notre organisation</h2>
+          <h2>Les fondateurs</h2>
           <div className="about-people">
             <article>
               <h3>Thanh</h3>
-              <p className="about-role">Trader principal</p>
+              <p className="about-role">Exécution</p>
               <p>
-                Il exécute les positions affichées sur le terminal. Les données proviennent
-                directement de son wallet Hyperliquid, sans retouche.
+                Il prend et gère les positions affichées. Les données viennent
+                directement de son wallet Hyperliquid, on-chain, sans aucune retouche.
               </p>
             </article>
             <article>
               <h3>Annissa</h3>
-              <p className="about-role">Co-fondatrice</p>
+              <p className="about-role">Direction</p>
               <p>
-                Elle structure {BRAND_NAME} avec Thanh et porte le projet de transparence
-                publique. L&apos;exécution des trades est centralisée sur le trader principal ;
-                la direction de la structure est assurée à deux.
+                Elle pilote {BRAND_NAME} avec Thanh et porte notre engagement de
+                transparence totale. La structure est dirigée à deux.
               </p>
             </article>
           </div>
         </section>
 
         <section className="about-block">
-          <h2>Pourquoi le Terminal ?</h2>
+          <h2>Notre conviction</h2>
           <p>
-            Le chiffre <strong>277</strong> est une référence personnelle pour nous deux. Le{' '}
-            {TERMINAL_NAME} en porte le nom : c&apos;est notre tableau de bord public, gratuit,
-            sans inscription.
+            La plupart des traders ne montrent que leurs gains. Nous montrons{' '}
+            <strong>tout</strong> : entrées, stops, objectifs, pertes comme profits, en
+            direct et vérifiable on-chain. La transparence n&apos;est pas une option, c&apos;est
+            notre standard.
           </p>
         </section>
 
         <section className="about-block">
           <h2>Ce que nous proposons</h2>
           <ul className="about-list">
-            <li>Positions ouvertes en temps réel (long / short, SL, TP, PnL)</li>
-            <li>Historique des opérations fermées sur Hyperliquid</li>
-            <li>Alertes push optionnelles à l&apos;ouverture d&apos;une position</li>
-            <li>Export CSV du journal</li>
+            <li>Chaque position en temps réel (long / short, levier, SL, TP, P&amp;L)</li>
+            <li>Un track record public et vérifiable on-chain</li>
+            <li>Des notifications à chaque ouverture, ajustement et clôture</li>
+            <li>Des signaux à suivre librement — pour profiter avec nous</li>
           </ul>
         </section>
 
         <section className="about-block">
           <h2>Ce que nous ne faisons pas</h2>
           <ul className="about-list about-list--muted">
-            <li>Pas de gestion de capital pour des tiers</li>
-            <li>Pas de signaux payants ni d&apos;abonnement</li>
+            <li>Pas de gestion de capital pour le compte de tiers</li>
             <li>Pas de promesse de performance</li>
             <li>Pas de conseil en investissement</li>
           </ul>
@@ -109,7 +110,7 @@ export function AboutPage() {
         </section>
 
         <div className="about-footer-links">
-          <Link to="/methodology">Méthodologie</Link>
+          <Link to="/methodology">Notre approche</Link>
           <span> · </span>
           <Link to="/app">{TERMINAL_NAME}</Link>
         </div>

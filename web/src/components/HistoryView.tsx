@@ -74,11 +74,6 @@ export function HistoryView({ history, fills, allTimePnl, loading }: Props) {
 
   return (
     <div className="terminal-panel">
-      <p className="panel-intro">
-        PnL All Time issu du portfolio Hyperliquid de ce wallet. L'historique détaillé
-        correspond à l'activité enregistrée sur la plateforme.
-      </p>
-
       {weekly && (
         <div className="weekly-summary">
           <p className="weekly-summary-label">Résumé des 7 derniers jours</p>

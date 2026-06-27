@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 import {
   API_SOURCE_LABEL,
   BRAND_NAME,
-  DATA_SCOPE,
   TERMINAL_NAME,
   TRADER_WALLET,
   hyperliquidExplorerUrl,
@@ -12,28 +11,24 @@ import './MethodologyPage.css';
 
 const SECTIONS = [
   {
-    title: 'Objet du service',
-    body: `${BRAND_NAME} propose le ${TERMINAL_NAME}, un terminal gratuit de lecture. Il affiche l'activité du wallet Hyperliquid indiqué ci-dessous : positions ouvertes, paramètres de sortie et journal des opérations enregistrées par la plateforme.`,
+    title: 'Qui nous sommes',
+    body: `${BRAND_NAME} est une société de trading spécialisée dans les actions et les matières premières, fondée par un couple, Thanh et Annissa. Nous opérons notre propre capital — les positions affichées sont les nôtres.`,
   },
   {
-    title: 'Périmètre des données',
-    body: 'Seules les données exposées par l\'API Hyperliquid pour ce wallet sont affichées. L\'historique détaillé correspond à l\'activité enregistrée sur Hyperliquid (souvent une à quelques semaines). Les années passées sur Binance, Bybit, Bitget ou tout autre exchange ne sont pas importées ni reconstructibles via ce site.',
+    title: 'Transparence totale',
+    body: 'Chaque position que nous prenons est publique et visible en temps réel : sens, levier, point d\'entrée, stop, objectif et P&L. Rien n\'est retouché ni sélectionné après coup — tout est lu directement on-chain.',
   },
   {
-    title: 'Source et fraîcheur',
-    body: 'Les chiffres proviennent de l\'endpoint info Hyperliquid (clearinghouseState, frontendOpenOrders, userFills, portfolio). Les prix de marché utilisent allMids et le WebSocket lorsque disponible. Un polling de secours maintient la cohérence si le flux coupe.',
+    title: 'Suivre nos signaux',
+    body: 'Vous pouvez suivre nos positions comme des signaux et en profiter avec nous. Activez les notifications pour être prévenu à chaque ouverture, ajustement de stop ou d\'objectif, et clôture — au moment où cela se passe.',
   },
   {
-    title: 'Notifications',
-    body: 'Les alertes push web, si activées, signalent l\'ouverture d\'une nouvelle position sur ce wallet. Elles ne constituent pas une recommandation d\'investissement ni un engagement de réactivité en temps réel.',
+    title: 'Des données vérifiables',
+    body: 'Les chiffres proviennent directement de la blockchain Hyperliquid : positions, ordres, historique et portfolio. Vous pouvez tout recouper vous-même via l\'explorateur public, à l\'adresse indiquée ci-dessous. Aucune donnée n\'est saisie à la main.',
   },
   {
-    title: 'Ce que le service n\'est pas',
-    body: `Pas de gestion pour compte tiers. Pas de conseil en investissement. Pas de promesse de performance. Pas de relation contractuelle entre l'utilisateur et ${BRAND_NAME}. L'utilisateur reste seul responsable de ses décisions.`,
-  },
-  {
-    title: 'Réplication',
-    body: 'Toute réplication d\'exécution reste sous la responsabilité du lecteur. Slippage, latence, taille de position et frais peuvent différer. Les scénarios SL/TP affichés reflètent les ordres visibles sur Hyperliquid au moment de la requête.',
+    title: 'Ce que ce n\'est pas',
+    body: `${BRAND_NAME} ne gère pas de capital pour le compte de tiers et ne délivre aucun conseil en investissement. Suivre nos signaux relève de votre seule décision. Les performances passées ne préjugent pas des performances futures.`,
   },
 ];
 
@@ -54,9 +49,12 @@ export function MethodologyPage() {
       </header>
 
       <main className="methodology-main">
-        <p className="methodology-eyebrow">Documentation</p>
-        <h1>Méthodologie</h1>
-        <p className="methodology-lead">{DATA_SCOPE}</p>
+        <p className="methodology-eyebrow">Notre approche</p>
+        <h1>Comment nous opérons</h1>
+        <p className="methodology-lead">
+          Une société de trading qui rend chaque position publique, en temps réel et
+          vérifiable. Voici comment, et ce que cela signifie pour vous.
+        </p>
 
         <div className="methodology-wallet">
           <span className="metric-label">Wallet suivi</span>

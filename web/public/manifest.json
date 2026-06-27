@@ -1,25 +1,19 @@
 {
-  "name": "Thannis · Terminal",
-  "short_name": "Terminal",
-  "description": "Suivi gratuit des positions Hyperliquid · Thannis",
+  "name": "THANNIS · Terminal",
+  "short_name": "THANNIS",
+  "description": "Positions de trading publiques en temps réel · THANNIS",
   "start_url": "/",
   "scope": "/",
-  "id": "https://atcapital.up.railway.app/",
+  "id": "https://thannis.com/",
   "display": "standalone",
-  "background_color": "#060608",
-  "theme_color": "#c9a962",
+  "background_color": "#ffffff",
+  "theme_color": "#0a0a0b",
   "icons": [
     {
       "src": "/icon.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
-    },
-    {
-      "src": "/favicon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
     }
   ]
 }

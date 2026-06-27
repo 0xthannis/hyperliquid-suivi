@@ -19,14 +19,14 @@ export const STORAGE_KEY_REMOTE_PUSH = '@at_capital_remote_push_active';
 export const NEAR_STOP_THRESHOLD = 0.22;
 export const NEAR_TP_THRESHOLD = 0.15;
 
-export const BRAND_NAME = 'Thannis';
+export const BRAND_NAME = 'THANNIS';
 export const TERMINAL_NAME = 'Terminal';
 export const APP_NAME = BRAND_NAME;
-export const SITE_URL = 'https://atcapital.up.railway.app';
-/** API push Railway (surveillance wallet 24/7) */
-export const PUSH_API_BASE = SITE_URL;
-export const CONTACT_EMAIL = 'contact@atcapital.fr';
-export const APK_DOWNLOAD_URL = `${SITE_URL}/AT-Capital-Terminal-277.apk`;
+export const SITE_URL = 'https://thannis.com';
+/** API push Railway (surveillance wallet 24/7) — endpoint infra, distinct du domaine public */
+export const PUSH_API_BASE = 'https://atcapital.up.railway.app';
+export const CONTACT_EMAIL = 'contact@thannis.com';
+export const APK_DOWNLOAD_URL = `${SITE_URL}/Thannis.apk`;
 export const ANDROID_PACKAGE = 'com.thanh.suivitrades';
 
 export const DATA_SCOPE =

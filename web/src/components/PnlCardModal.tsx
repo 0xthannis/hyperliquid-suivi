@@ -94,9 +94,9 @@ export function PnlCardModal({
   }
 
   function shareText(): string {
-    if (!data) return 'Suivez nos signaux de trading en temps réel sur Thannis.';
+    if (!data) return 'Suivez nos signaux de trading en temps réel sur THANNIS.';
     const sign = data.pnlPct >= 0 ? '+' : '';
-    return `${data.coin} ${data.side} ${sign}${data.pnlPct.toFixed(1)}% — chaque position publique et en temps réel sur Thannis. Pas un conseil financier.`;
+    return `${data.coin} ${data.side} ${sign}${data.pnlPct.toFixed(1)}% — chaque position publique et en temps réel sur THANNIS. Pas un conseil financier.`;
   }
 
   async function shareCard() {
@@ -111,7 +111,7 @@ export function PnlCardModal({
         const blob = await (await fetch(dataUrl)).blob();
         const file = new File([blob], pnlCardFilename(data), { type: 'image/png' });
         if (navigator.canShare({ files: [file] })) {
-          await navigator.share({ files: [file], text, title: 'Thannis' });
+          await navigator.share({ files: [file], text, title: 'THANNIS' });
           return;
         }
       }
@@ -141,7 +141,7 @@ export function PnlCardModal({
           Carte PnL
         </h2>
         <p className="pnl-card-modal__sub">
-          Image brandée Thannis · sans lien · prête pour les réseaux
+          Image brandée THANNIS · sans lien · prête pour les réseaux
         </p>
 
         <div className="pnl-card-modal__preview">
