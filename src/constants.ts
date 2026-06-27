@@ -1,4 +1,4 @@
-export const TRADER_WALLET = '0x994Ff80b7dA1174a164e0F93121bDfbb68cf7A3F';
+export const TRADER_WALLET = '0x5372140d358Dda770690a734798aaa37958Fb927';
 
 export const API_URL = 'https://api.hyperliquid.xyz/info';
 export const WS_URL = 'wss://api.hyperliquid.xyz/ws';
