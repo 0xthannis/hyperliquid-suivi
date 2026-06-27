@@ -124,7 +124,7 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <View style={styles.root}>
-        <StatusBar barStyle="light-content" backgroundColor={colors.bg} />
+        <StatusBar barStyle="dark-content" backgroundColor={colors.bg} />
         <SafeAreaView style={styles.safe} edges={['top']}>
           <View style={styles.header}>
             <Text style={styles.brand}>{BRAND_NAME}</Text>

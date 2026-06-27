@@ -1,30 +1,28 @@
 import { Platform } from 'react-native';
 
-/** Design system Thannis — noir & blanc, esprit Trade Republic */
+/** Design system Thannis — clair (noir sur blanc), esprit Trade Republic */
 export const colors = {
-  bg: '#000000',
-  bgElevated: '#0a0a0a',
-  card: '#0c0c0c',
-  card2: '#161616',
-  cardBorder: 'rgba(255, 255, 255, 0.10)',
-  line: 'rgba(255, 255, 255, 0.08)',
-  text: '#ffffff',
-  textMuted: '#8a8d93',
-  textDim: '#5a5d63',
-  // Accent = blanc (aucune couleur de marque). gold/goldLight = alias blanc
-  // pour que les composants existants suivent.
-  accent: '#ffffff',
-  accentMuted: 'rgba(255, 255, 255, 0.10)',
-  gold: '#ffffff',
-  goldLight: '#ffffff',
-  green: '#16d195',
-  greenMuted: 'rgba(22, 209, 149, 0.12)',
-  red: '#ff4d4d',
-  redMuted: 'rgba(255, 77, 77, 0.12)',
+  bg: '#ffffff',
+  bgElevated: '#f7f7f8',
+  card: '#ffffff',
+  card2: '#f7f7f8',
+  cardBorder: 'rgba(0, 0, 0, 0.10)',
+  line: 'rgba(0, 0, 0, 0.08)',
+  text: '#0a0a0b',
+  textMuted: '#6b6f76',
+  textDim: '#9a9ea4',
+  // Accent = noir. gold/goldLight = alias noir pour compat.
+  accent: '#0a0a0b',
+  accentMuted: 'rgba(0, 0, 0, 0.06)',
+  gold: '#0a0a0b',
+  goldLight: '#0a0a0b',
+  green: '#00a878',
+  greenMuted: 'rgba(0, 168, 120, 0.12)',
+  red: '#e5342a',
+  redMuted: 'rgba(229, 52, 42, 0.12)',
   white: '#FFFFFF',
 };
 
-/** Police mono pour les chiffres (feel terminal). */
 export const mono = Platform.select({
   ios: 'Menlo',
   android: 'monospace',

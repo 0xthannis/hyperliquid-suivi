@@ -146,7 +146,7 @@ export function LiveScreen({
   if (loading && positions.length === 0 && equity.length === 0) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="small" color="#fff" />
+        <ActivityIndicator size="small" color="#0a0a0b" />
       </View>
     );
   }
@@ -156,7 +156,7 @@ export function LiveScreen({
       style={styles.scroll}
       contentContainerStyle={styles.content}
       refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#fff" />
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#0a0a0b" />
       }
     >
       <Text style={styles.heroLabel}>Valeur du compte</Text>
@@ -330,9 +330,9 @@ const styles = StyleSheet.create({
 
   periods: { flexDirection: 'row', gap: 6, marginTop: 6, marginBottom: 22 },
   period: { paddingVertical: 7, paddingHorizontal: 16, borderRadius: 999 },
-  periodActive: { backgroundColor: '#fff' },
+  periodActive: { backgroundColor: '#0a0a0b' },
   periodText: { color: colors.textMuted, fontSize: 13, fontWeight: '700' },
-  periodTextActive: { color: '#000' },
+  periodTextActive: { color: '#fff' },
 
   stats: {
     flexDirection: 'row',
@@ -373,7 +373,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.22)',
+    borderColor: 'rgba(0,0,0,0.2)',
   },
   cardBtnText: { color: colors.text, fontSize: 12, fontWeight: '700' },
 
@@ -391,7 +391,7 @@ const styles = StyleSheet.create({
     paddingVertical: 11,
     paddingHorizontal: 22,
     borderRadius: 999,
-    backgroundColor: '#fff',
+    backgroundColor: '#0a0a0b',
   },
-  emptyBtnText: { color: '#000', fontSize: 13, fontWeight: '700' },
+  emptyBtnText: { color: '#fff', fontSize: 13, fontWeight: '700' },
 });

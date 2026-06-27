@@ -56,9 +56,9 @@ const styles = StyleSheet.create({
     borderRadius: 999,
   },
   tabActive: {
-    backgroundColor: colors.accentMuted,
+    backgroundColor: colors.accent,
     borderWidth: 1,
-    borderColor: 'rgba(124, 156, 255, 0.4)',
+    borderColor: 'transparent',
   },
   label: {
     color: colors.textMuted,

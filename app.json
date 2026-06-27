@@ -5,13 +5,13 @@
     "version": "1.1.8",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "dark",
+    "userInterfaceStyle": "light",
     "scheme": "atcapital",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#05060a"
+      "backgroundColor": "#ffffff"
     },
     "ios": {
       "supportsTablet": true,
@@ -25,7 +25,7 @@
       "package": "com.thanh.suivitrades",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#05060a"
+        "backgroundColor": "#ffffff"
       },
       "permissions": [
         "RECEIVE_BOOT_COMPLETED",
@@ -58,7 +58,7 @@
         "expo-notifications",
         {
           "icon": "./assets/icon.png",
-          "color": "#7c9cff",
+          "color": "#0a0a0b",
           "sounds": []
         }
       ],
