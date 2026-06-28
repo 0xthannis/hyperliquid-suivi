@@ -1,7 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { biasLabel, useWatchlist, type WatchBias } from '../hooks/useWatchlist';
+import { useWatchlist, type WatchBias } from '../hooks/useWatchlist';
 import { colors, font } from '../theme';
+import { useLang } from '../i18n';
+import { getCopy } from '../i18n/strings';
 
 function biasColors(bias: WatchBias) {
   if (bias === 'long') return { fg: colors.green, bg: 'rgba(0,147,95,0.1)' };
@@ -11,12 +13,14 @@ function biasColors(bias: WatchBias) {
 
 export function WatchlistSection() {
   const { items, loading } = useWatchlist();
+  const [lang] = useLang();
+  const t = getCopy(lang).watch;
 
   if (loading || items.length === 0) return null;
 
   return (
     <View style={styles.wrap}>
-      <Text style={styles.section}>Ce qu'on surveille</Text>
+      <Text style={styles.section}>{t.title}</Text>
       {items.map((it, i) => {
         const c = biasColors(it.bias);
         return (
@@ -24,7 +28,7 @@ export function WatchlistSection() {
             <View style={styles.top}>
               <Text style={styles.sym}>{it.symbol}</Text>
               <View style={[styles.badge, { backgroundColor: c.bg }]}>
-                <Text style={[styles.badgeText, { color: c.fg }]}>{biasLabel(it.bias)}</Text>
+                <Text style={[styles.badgeText, { color: c.fg }]}>{t.bias(it.bias)}</Text>
               </View>
             </View>
             <Text style={styles.note}>{it.note}</Text>

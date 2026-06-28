@@ -22,6 +22,8 @@ import {
   remotePushErrorMessage,
 } from '../services/remotePush';
 import { colors, spacing, radius } from '../theme';
+import { useLang } from '../i18n';
+import { getCopy } from '../i18n/strings';
 
 type Props = {
   onReplayTour: () => void;
@@ -30,21 +32,25 @@ type Props = {
 export function AboutScreen({ onReplayTour }: Props) {
   const [installing, setInstalling] = useState(false);
   const [pushStatus, setPushStatus] = useState<string | null>(null);
+  const [pushOk, setPushOk] = useState(false);
   const [pushLoading, setPushLoading] = useState(false);
+  const [lang] = useLang();
+  const t = getCopy(lang).about;
 
   const syncServerPush = useCallback(async () => {
     setPushLoading(true);
     try {
       const r = await registerRemotePush();
+      setPushOk(r.ok);
       if (r.ok) {
-        setPushStatus(`Alertes serveur actives (${r.kind.toUpperCase()}).`);
+        setPushStatus(`${getCopy(lang).live_.alertsOk} (${r.kind.toUpperCase()})`);
       } else {
         setPushStatus(remotePushErrorMessage(r.reason));
       }
     } finally {
       setPushLoading(false);
     }
-  }, []);
+  }, [lang]);
 
   useEffect(() => {
     void syncServerPush();
@@ -62,61 +68,41 @@ export function AboutScreen({ onReplayTour }: Props) {
   return (
     <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
       <Text style={styles.title}>{BRAND_NAME}</Text>
-      <Text style={styles.lead}>
-        Société de trading spécialisée dans les actions et les matières premières, fondée
-        par un couple, Annissa et Thanh. Chaque position est publique et en temps réel,
-        à suivre comme un signal.
-      </Text>
+      <Text style={styles.lead}>{t.lead}</Text>
 
       <View style={styles.card}>
         <Text style={styles.cardName}>Thanh</Text>
-        <Text style={styles.cardRole}>Exécution</Text>
-        <Text style={styles.cardText}>
-          Prend et gère les positions affichées. Données lues directement on-chain depuis
-          Hyperliquid, sans aucune retouche.
-        </Text>
+        <Text style={styles.cardRole}>{t.thanhRole}</Text>
+        <Text style={styles.cardText}>{t.thanhText}</Text>
       </View>
 
       <View style={styles.card}>
         <Text style={styles.cardName}>Annissa</Text>
-        <Text style={styles.cardRole}>Direction</Text>
-        <Text style={styles.cardText}>
-          Pilote {BRAND_NAME} avec Thanh et porte notre engagement de transparence totale.
-        </Text>
+        <Text style={styles.cardRole}>{t.annissaRole}</Text>
+        <Text style={styles.cardText}>{t.annissaText}</Text>
       </View>
 
-      <Text style={styles.sectionTitle}>Notifications (app fermée)</Text>
-      <Text style={styles.body}>
-        Les alertes passent par {SITE_URL}. Appuyez ci-dessous pour enregistrer ce
-        téléphone sur le serveur.
-      </Text>
+      <Text style={styles.sectionTitle}>{t.notifTitle}</Text>
+      <Text style={styles.body}>{t.notifText(SITE_URL)}</Text>
       <Pressable
         style={styles.secondaryBtn}
         onPress={() => void syncServerPush()}
         disabled={pushLoading}
       >
         <Text style={styles.secondaryBtnText}>
-          {pushLoading ? 'Enregistrement…' : 'Activer les alertes serveur'}
+          {pushLoading ? t.registering : t.alertsServerBtn}
         </Text>
       </Pressable>
       {pushStatus ? (
-        <Text
-          style={[
-            styles.pushStatus,
-            pushStatus.includes('actives') ? styles.pushOk : styles.pushErr,
-          ]}
-        >
+        <Text style={[styles.pushStatus, pushOk ? styles.pushOk : styles.pushErr]}>
           {pushStatus}
         </Text>
       ) : null}
 
-      <Text style={styles.sectionTitle}>Notre conviction</Text>
-      <Text style={styles.body}>
-        Nous montrons tout : entrées, stops, objectifs, pertes comme profits. En direct et
-        vérifiable on-chain. La transparence est notre standard.
-      </Text>
+      <Text style={styles.sectionTitle}>{t.convictionTitle}</Text>
+      <Text style={styles.body}>{t.convictionText}</Text>
 
-      <Text style={styles.sectionTitle}>Liens</Text>
+      <Text style={styles.sectionTitle}>{t.linksTitle}</Text>
       <Pressable style={styles.linkBtn} onPress={() => Linking.openURL(SITE_URL)}>
         <Text style={styles.linkText}>{SITE_URL}</Text>
       </Pressable>
@@ -132,15 +118,13 @@ export function AboutScreen({ onReplayTour }: Props) {
 
       <Pressable style={styles.primaryBtn} onPress={openApkDownload}>
         <Text style={styles.primaryBtnText}>
-          {installing ? 'Ouverture…' : 'Télécharger la dernière APK'}
+          {installing ? t.opening : t.downloadApk}
         </Text>
       </Pressable>
-      <Text style={styles.hint}>
-        Partagez ce lien pour installer l'app Android ({TERMINAL_NAME}).
-      </Text>
+      <Text style={styles.hint}>{t.hint(TERMINAL_NAME)}</Text>
 
       <Pressable style={styles.secondaryBtn} onPress={onReplayTour}>
-        <Text style={styles.secondaryBtnText}>Revoir le guide de démarrage</Text>
+        <Text style={styles.secondaryBtnText}>{t.replayTour}</Text>
       </Pressable>
     </ScrollView>
   );

@@ -12,6 +12,8 @@ import Svg, { Path, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { formatUsd, type HistoryEvent } from '../utils/calculations';
 import { displaySymbol } from '../api/hyperliquid';
 import { colors, spacing, font } from '../theme';
+import { useLang } from '../i18n';
+import { getCopy } from '../i18n/strings';
 
 type Props = {
   history: HistoryEvent[];
@@ -53,6 +55,8 @@ export function TrackRecordScreen({
   refreshing,
   onRefresh,
 }: Props) {
+  const [lang] = useLang();
+  const t = getCopy(lang).track;
   const stats = useMemo(() => {
     const closed = history.filter((e) => e.isClose).sort((a, b) => a.time - b.time);
     const count = closed.length;
@@ -127,10 +131,8 @@ export function TrackRecordScreen({
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#0a0a0b" />
         }
       >
-        <Text style={styles.emptyTitle}>Aucun trade clôturé pour l'instant</Text>
-        <Text style={styles.emptyText}>
-          Le track record se construit à chaque position fermée, public et vérifiable.
-        </Text>
+        <Text style={styles.emptyTitle}>{t.emptyTitle}</Text>
+        <Text style={styles.emptyText}>{t.emptyText}</Text>
       </ScrollView>
     );
   }
@@ -147,13 +149,11 @@ export function TrackRecordScreen({
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#0a0a0b" />
       }
     >
-      <Text style={styles.heroLabel}>Performance cumulée · net</Text>
+      <Text style={styles.heroLabel}>{t.label}</Text>
       <Text style={[styles.heroValue, { color: cumUp ? colors.green : colors.red }]}>
         {formatUsd(allTimePnl, true)}
       </Text>
-      <Text style={styles.heroSub}>
-        {stats.count} trades clôturés · {stats.winRate}% de réussite
-      </Text>
+      <Text style={styles.heroSub}>{t.sub(stats.count, stats.winRate ?? 0)}</Text>
 
       {curve && (
         <View style={styles.chart}>
@@ -172,32 +172,32 @@ export function TrackRecordScreen({
 
       <View style={styles.kpis}>
         <View style={styles.kpi}>
-          <Text style={styles.kpiLabel}>Profit factor</Text>
+          <Text style={styles.kpiLabel}>{t.profitFactor}</Text>
           <Text style={styles.kpiValue}>
             {stats.profitFactor != null ? stats.profitFactor.toFixed(2) : 'n/a'}
           </Text>
         </View>
         <View style={styles.kpi}>
-          <Text style={styles.kpiLabel}>Gain moyen</Text>
+          <Text style={styles.kpiLabel}>{t.avgWin}</Text>
           <Text style={[styles.kpiValue, { color: colors.green }]}>
             {formatUsd(stats.avgWin, true)}
           </Text>
         </View>
         <View style={styles.kpi}>
-          <Text style={styles.kpiLabel}>Perte moyenne</Text>
+          <Text style={styles.kpiLabel}>{t.avgLoss}</Text>
           <Text style={[styles.kpiValue, { color: colors.red }]}>
             {formatUsd(-stats.avgLoss, true)}
           </Text>
         </View>
         <View style={styles.kpi}>
-          <Text style={styles.kpiLabel}>Drawdown max</Text>
+          <Text style={styles.kpiLabel}>{t.drawdown}</Text>
           <Text style={[styles.kpiValue, { color: colors.red }]}>
             {formatUsd(-stats.maxDd, true)}
           </Text>
         </View>
       </View>
 
-      <Text style={styles.section}>Résultat mensuel</Text>
+      <Text style={styles.section}>{t.monthly}</Text>
       {stats.monthly.map((m) => {
         const w = Math.max(4, (Math.abs(m.pnl) / stats.monthlyMax) * 100);
         const pos = m.pnl >= 0;
@@ -222,7 +222,7 @@ export function TrackRecordScreen({
       <View style={styles.extremes}>
         {stats.best && (
           <View style={styles.extreme}>
-            <Text style={styles.extremeLabel}>Meilleur trade</Text>
+            <Text style={styles.extremeLabel}>{t.best}</Text>
             <View style={styles.extremeRow}>
               <Text style={styles.extremeSym}>{displaySymbol(stats.best.coin)}</Text>
               <Text style={[styles.extremeVal, { color: colors.green }]}>
@@ -233,7 +233,7 @@ export function TrackRecordScreen({
         )}
         {stats.worst && (
           <View style={styles.extreme}>
-            <Text style={styles.extremeLabel}>Pire trade</Text>
+            <Text style={styles.extremeLabel}>{t.worst}</Text>
             <View style={styles.extremeRow}>
               <Text style={styles.extremeSym}>{displaySymbol(stats.worst.coin)}</Text>
               <Text style={[styles.extremeVal, { color: colors.red }]}>
@@ -244,10 +244,7 @@ export function TrackRecordScreen({
         )}
       </View>
 
-      <Text style={styles.disclaimer}>
-        Les performances passées ne préjugent pas des performances futures. Ceci n'est pas
-        un conseil en investissement.
-      </Text>
+      <Text style={styles.disclaimer}>{t.disclaimer}</Text>
     </ScrollView>
   );
 }

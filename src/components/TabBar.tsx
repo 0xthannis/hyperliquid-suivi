@@ -2,15 +2,12 @@ import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { colors, spacing, font } from '../theme';
+import { useLang } from '../i18n';
+import { getCopy } from '../i18n/strings';
 
 export type TabId = 'live' | 'history' | 'track' | 'about';
 
-const TABS: { id: TabId; label: string }[] = [
-  { id: 'live', label: 'Positions' },
-  { id: 'history', label: 'Historique' },
-  { id: 'track', label: 'Track' },
-  { id: 'about', label: 'À propos' },
-];
+const TAB_IDS: TabId[] = ['live', 'history', 'track', 'about'];
 
 export function TabBar({
   active,
@@ -19,6 +16,16 @@ export function TabBar({
   active: TabId;
   onChange: (id: TabId) => void;
 }) {
+  const [lang] = useLang();
+  const t = getCopy(lang).tabs;
+  const labels: Record<TabId, string> = {
+    live: t.positions,
+    history: t.history,
+    track: t.track,
+    about: t.about,
+  };
+  const TABS: { id: TabId; label: string }[] = TAB_IDS.map((id) => ({ id, label: labels[id] }));
+
   return (
     <View style={styles.bar}>
       {TABS.map((tab) => {

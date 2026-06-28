@@ -19,6 +19,8 @@ import {
   type PnlCardData,
 } from '../utils/pnlCard';
 import { colors, spacing, radius } from '../theme';
+import { useLang } from '../i18n';
+import { getCopy } from '../i18n/strings';
 
 type Props = {
   event?: HistoryEvent | null;
@@ -38,6 +40,8 @@ export function PnlCardSheet({
   const [data, setData] = useState<PnlCardData | null>(prebuilt);
   const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [lang] = useLang();
+  const t = getCopy(lang).card;
 
   useEffect(() => {
     if (prebuilt) {
@@ -103,10 +107,8 @@ export function PnlCardSheet({
     >
       <View style={styles.backdrop}>
         <View style={styles.sheet}>
-          <Text style={styles.title}>Carte PnL</Text>
-          <Text style={styles.subtitle}>
-            Image brandée Thannis · sans lien · prête pour les réseaux
-          </Text>
+          <Text style={styles.title}>{t.title}</Text>
+          <Text style={styles.subtitle}>{t.subtitle}</Text>
 
           <View style={styles.preview} collapsable={false}>
             {loading && (
@@ -128,11 +130,11 @@ export function PnlCardSheet({
               {busy ? (
                 <ActivityIndicator color={colors.bg} size="small" />
               ) : (
-                <Text style={styles.btnPrimaryText}>Télécharger / Partager</Text>
+                <Text style={styles.btnPrimaryText}>{t.downloadShare}</Text>
               )}
             </Pressable>
             <Pressable style={styles.btn} onPress={onClose} disabled={busy}>
-              <Text style={styles.btnText}>Fermer</Text>
+              <Text style={styles.btnText}>{t.close}</Text>
             </Pressable>
           </View>
         </View>

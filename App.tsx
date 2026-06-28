@@ -46,6 +46,8 @@ import {
 } from './src/constants';
 import { truncateWallet } from './src/utils/wallet';
 import { colors, spacing, typography, font } from './src/theme';
+import { useLang } from './src/i18n';
+import { getCopy } from './src/i18n/strings';
 
 const LEGACY_WATCH_NOTIFICATION_ID = 'at-capital-watch-service';
 
@@ -92,6 +94,8 @@ export default function App() {
     Inter_800ExtraBold,
     Inter_900Black,
   });
+  const [lang, setLang] = useLang();
+  const t = getCopy(lang);
 
   const handleDeepLink = useCallback((url: string | null) => {
     const next = tabFromDeepLink(url);
@@ -154,18 +158,27 @@ export default function App() {
         <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
           <View style={styles.header}>
             <Text style={styles.brand}>{BRAND_NAME}</Text>
-            <View style={styles.liveRow}>
-              <View
-                style={[
-                  styles.dot,
-                  { backgroundColor: data.wsConnected ? colors.green : colors.textDim },
-                ]}
-              />
-              <Text
-                style={[styles.liveText, data.wsConnected && { color: colors.green }]}
+            <View style={styles.headerRight}>
+              <View style={styles.liveRow}>
+                <View
+                  style={[
+                    styles.dot,
+                    { backgroundColor: data.wsConnected ? colors.green : colors.textDim },
+                  ]}
+                />
+                <Text
+                  style={[styles.liveText, data.wsConnected && { color: colors.green }]}
+                >
+                  {data.wsConnected ? t.live : t.sync}
+                </Text>
+              </View>
+              <Pressable
+                style={styles.langBtn}
+                onPress={() => setLang(lang === 'fr' ? 'en' : 'fr')}
+                hitSlop={8}
               >
-                {data.wsConnected ? 'En direct' : 'Synchro'}
-              </Text>
+                <Text style={styles.langBtnText}>{lang === 'fr' ? 'EN' : 'FR'}</Text>
+              </Pressable>
             </View>
           </View>
 
@@ -240,6 +253,7 @@ const styles = StyleSheet.create({
     fontFamily: font.extrabold,
     letterSpacing: -0.2,
   },
+  headerRight: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   liveRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   dot: { width: 7, height: 7, borderRadius: 4 },
   liveText: {
@@ -247,6 +261,14 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: font.semibold,
   },
+  langBtn: {
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
+  },
+  langBtnText: { color: colors.textMuted, fontSize: 11, fontFamily: font.bold, letterSpacing: 0.5 },
   scopeBar: {
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm,

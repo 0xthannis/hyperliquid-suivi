@@ -28,6 +28,8 @@ import { PnlCardSheet } from '../components/PnlCardSheet';
 import { WatchlistSection } from '../components/WatchlistSection';
 import { registerRemotePush } from '../services/remotePush';
 import { useCountUp } from '../hooks/useCountUp';
+import { useLang } from '../i18n';
+import { getCopy } from '../i18n/strings';
 import type { PnlCardData } from '../utils/pnlCard';
 import { colors, spacing, font } from '../theme';
 
@@ -99,16 +101,14 @@ export function LiveScreen({
   const [cardData, setCardData] = useState<PnlCardData | null>(null);
   const [alertBusy, setAlertBusy] = useState(false);
   const [alertMsg, setAlertMsg] = useState<string | null>(null);
+  const [lang] = useLang();
+  const t = getCopy(lang).live_;
 
   async function enableAlerts() {
     setAlertBusy(true);
     try {
       const r = await registerRemotePush();
-      setAlertMsg(
-        r.ok
-          ? 'Alertes activées. Vous serez prévenu à chaque mouvement.'
-          : 'Autorisez les notifications dans les réglages du téléphone.'
-      );
+      setAlertMsg(r.ok ? t.alertsOk : t.alertsKo);
     } finally {
       setAlertBusy(false);
     }
@@ -204,7 +204,7 @@ export function LiveScreen({
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#0a0a0b" />
       }
     >
-      <Text style={styles.heroLabel}>Valeur du compte</Text>
+      <Text style={styles.heroLabel}>{t.accountValue}</Text>
       <Text style={styles.heroValue}>{formatUsd(animAccount)}</Text>
       {changeAbs != null && (
         <Text style={[styles.heroChange, { color: up ? colors.green : colors.red }]}>
@@ -239,7 +239,7 @@ export function LiveScreen({
       })()}
 
       <View style={styles.periods}>
-        {PERIODS.map(([p, label]) => {
+        {PERIODS.map(([p]) => {
           const active = period === p;
           return (
             <Pressable
@@ -251,7 +251,7 @@ export function LiveScreen({
               style={[styles.period, active && styles.periodActive]}
             >
               <Text style={[styles.periodText, active && styles.periodTextActive]}>
-                {label}
+                {t.periods[p]}
               </Text>
             </Pressable>
           );
@@ -260,7 +260,7 @@ export function LiveScreen({
 
       <View style={styles.stats}>
         <View style={styles.stat}>
-          <Text style={styles.statLabel}>PnL ouvert</Text>
+          <Text style={styles.statLabel}>{t.pnlOpen}</Text>
           <Text
             style={[
               styles.statValue,
@@ -274,24 +274,24 @@ export function LiveScreen({
         </View>
         <View style={styles.statDivider} />
         <View style={styles.stat}>
-          <Text style={styles.statLabel}>PnL total</Text>
+          <Text style={styles.statLabel}>{t.pnlTotal}</Text>
           <Text style={[styles.statValue, { color: allTimePnl >= 0 ? colors.green : colors.red }]}>
             {formatUsd(animAllTime, true)}
           </Text>
         </View>
         <View style={styles.statDivider} />
         <View style={styles.stat}>
-          <Text style={styles.statLabel}>Réussite</Text>
+          <Text style={styles.statLabel}>{t.winRate}</Text>
           <Text style={styles.statValue}>{winRate}</Text>
         </View>
       </View>
 
       <View style={styles.riskLine}>
         <Text style={styles.riskText}>
-          Exposition <Text style={styles.riskLineStrong}>{formatUsd(exposure)}</Text>
+          {t.exposure} <Text style={styles.riskLineStrong}>{formatUsd(exposure)}</Text>
         </Text>
         <Text style={styles.riskText}>
-          Drawdown max{' '}
+          {t.maxDrawdown}{' '}
           <Text style={[styles.riskLineStrong, { color: colors.red }]}>
             {maxDd != null ? formatPct(-maxDd) : 'n/a'}
           </Text>
@@ -301,17 +301,15 @@ export function LiveScreen({
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
       <Text style={styles.section}>
-        Positions <Text style={styles.sectionCount}>{positions.length}</Text>
+        {t.positions} <Text style={styles.sectionCount}>{positions.length}</Text>
       </Text>
 
       {positions.length === 0 ? (
         <View style={styles.empty}>
-          <Text style={styles.emptyTitle}>Aucune position ouverte</Text>
-          <Text style={styles.emptyText}>
-            Dès qu'une position s'ouvre, elle apparaît ici en temps réel.
-          </Text>
+          <Text style={styles.emptyTitle}>{t.emptyTitle}</Text>
+          <Text style={styles.emptyText}>{t.emptyText}</Text>
           <Pressable style={styles.emptyBtn} onPress={onOpenHistory}>
-            <Text style={styles.emptyBtnText}>Voir l'historique</Text>
+            <Text style={styles.emptyBtnText}>{t.seeHistory}</Text>
           </Pressable>
         </View>
       ) : (
@@ -335,7 +333,7 @@ export function LiveScreen({
                 <View style={styles.posId}>
                   <Text style={styles.posSym}>{displaySymbol(p.coin)}</Text>
                   <Text style={styles.posSub}>
-                    {p.isLong ? 'Long' : 'Short'} · {p.leverage}× · entrée {p.entryPx}
+                    {p.isLong ? t.long : t.short} · {p.leverage}× · {t.entry} {p.entryPx}
                   </Text>
                 </View>
                 <View style={styles.posFig}>
@@ -369,7 +367,7 @@ export function LiveScreen({
               )}
 
               <Pressable style={styles.cardBtn} onPress={() => setCardData(buildCard(p, px))}>
-                <Text style={styles.cardBtnText}>Carte PnL ↗</Text>
+                <Text style={styles.cardBtnText}>{t.pnlCard}</Text>
               </Pressable>
             </View>
           );
@@ -379,11 +377,8 @@ export function LiveScreen({
       <WatchlistSection />
 
       <View style={styles.alertCard}>
-        <Text style={styles.alertTitle}>Activez les alertes</Text>
-        <Text style={styles.alertText}>
-          Recevez chaque signal, ouverture, SL/TP et clôture, en temps réel, dès qu'une
-          position bouge.
-        </Text>
+        <Text style={styles.alertTitle}>{t.alertsTitle}</Text>
+        <Text style={styles.alertText}>{t.alertsText}</Text>
         <Pressable
           style={[styles.alertBtn, alertBusy && styles.alertBtnDisabled]}
           onPress={() => {
@@ -393,7 +388,7 @@ export function LiveScreen({
           disabled={alertBusy}
         >
           <Text style={styles.alertBtnText}>
-            {alertBusy ? 'Activation' : 'Activer les alertes'}
+            {alertBusy ? t.alertsEnabling : t.alertsBtn}
           </Text>
         </Pressable>
         {alertMsg ? <Text style={styles.alertNote}>{alertMsg}</Text> : null}

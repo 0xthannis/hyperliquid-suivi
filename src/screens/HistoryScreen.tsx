@@ -19,6 +19,8 @@ import {
 } from '../utils/calculations';
 import { shareHistoryCsv } from '../utils/exportCsv';
 import { colors, spacing, radius } from '../theme';
+import { useLang } from '../i18n';
+import { getCopy } from '../i18n/strings';
 
 type Props = {
   history: HistoryEvent[];
@@ -41,6 +43,8 @@ export function HistoryScreen({
 }: Props) {
   const [periodDays, setPeriodDays] = useState<PeriodFilter>(7);
   const [pnlCardEvent, setPnlCardEvent] = useState<HistoryEvent | null>(null);
+  const [lang] = useLang();
+  const t = getCopy(lang).hist;
 
   const filtered = useMemo(
     () => filterHistoryByDays(history, periodDays),
@@ -88,7 +92,7 @@ export function HistoryScreen({
                     periodDays === d && styles.periodBtnTextActive,
                   ]}
                 >
-                  {d}j
+                  {d}{t.daySuffix}
                 </Text>
               </Pressable>
             ))}
@@ -105,7 +109,7 @@ export function HistoryScreen({
 
         <View style={styles.statsRow}>
           <View style={styles.stat}>
-            <Text style={styles.statLabel}>PnL fermé</Text>
+            <Text style={styles.statLabel}>{t.pnlClosed}</Text>
             <Text
               style={[
                 styles.statValue,
@@ -117,7 +121,7 @@ export function HistoryScreen({
           </View>
           <View style={styles.statDivider} />
           <View style={styles.stat}>
-            <Text style={styles.statLabel}>{periodDays}j</Text>
+            <Text style={styles.statLabel}>{periodDays}{t.daySuffix}</Text>
             <Text
               style={[
                 styles.statValue,
@@ -129,10 +133,10 @@ export function HistoryScreen({
           </View>
           <View style={styles.statDivider} />
           <View style={styles.stat}>
-            <Text style={styles.statLabel}>Réussite</Text>
+            <Text style={styles.statLabel}>{t.winRate}</Text>
             <Text style={styles.statValue}>{winRate}%</Text>
             <Text style={styles.statHint}>
-              {summary.closedCount} op. · {summary.winCount}G/{summary.lossCount}P
+              {t.opsHint(summary.closedCount, summary.winCount, summary.lossCount)}
             </Text>
           </View>
         </View>
@@ -160,11 +164,8 @@ export function HistoryScreen({
         }
         ListEmptyComponent={
           <View style={styles.empty}>
-            <Text style={styles.emptyTitle}>Aucune opération</Text>
-            <Text style={styles.emptyText}>
-              Aucun trade sur {periodDays} jours. Essayez 30j ou attendez une
-              nouvelle clôture.
-            </Text>
+            <Text style={styles.emptyTitle}>{t.emptyTitle}</Text>
+            <Text style={styles.emptyText}>{t.emptyText(periodDays)}</Text>
           </View>
         }
       />
