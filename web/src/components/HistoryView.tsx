@@ -14,7 +14,8 @@ import {
   formatWeeklySummaryLine,
 } from '../lib/weeklySummary';
 import { PnlCardModal } from './PnlCardModal';
-import { TermLabel } from './TermLabel';
+import { useLang } from '../i18n';
+import { getTerminalCopy } from '../i18n/terminal';
 import './PnlShareCard.css';
 
 type Props = {
@@ -38,6 +39,8 @@ export function HistoryView({ history, fills, allTimePnl, loading }: Props) {
   const [period, setPeriod] = useState<PeriodFilter>('all');
   const [search, setSearch] = useState('');
   const [pnlCardEvent, setPnlCardEvent] = useState<HistoryEvent | null>(null);
+  const [lang] = useLang();
+  const t = getTerminalCopy(lang);
 
   const coins = useMemo(() => {
     const set = new Set(history.map((e) => e.coin));
@@ -77,15 +80,15 @@ export function HistoryView({ history, fills, allTimePnl, loading }: Props) {
     <div className="terminal-panel">
       {weekly && (
         <div className="weekly-summary">
-          <p className="weekly-summary-label">Résumé des 7 derniers jours</p>
-          <p className="weekly-summary-value tabular">{formatWeeklySummaryLine(weekly)}</p>
+          <p className="weekly-summary-label">{t.histWeekly}</p>
+          <p className="weekly-summary-value tabular">{formatWeeklySummaryLine(weekly, lang)}</p>
         </div>
       )}
 
       {summary.closedCount > 0 && (
         <section className="metrics-row metrics-row--triple">
           <div className="metric-panel">
-            <TermLabel term="pnlAllTime" className="metric-label" />
+            <span className="metric-label">{t.histMetricPnl}</span>
             <span
               className={`metric-value tabular ${summary.allTimePnl >= 0 ? 'positive' : 'negative'}`}
             >
@@ -93,21 +96,21 @@ export function HistoryView({ history, fills, allTimePnl, loading }: Props) {
             </span>
           </div>
           <div className="metric-panel">
-            <TermLabel term="tauxReussite" className="metric-label" />
+            <span className="metric-label">{t.histMetricWin}</span>
             <span className="metric-value tabular">{winRate}%</span>
             <span className="metric-hint">
-              {summary.winCount}G / {summary.lossCount}P
+              {summary.winCount}{t.histWinShort} / {summary.lossCount}{t.histLossShort}
             </span>
           </div>
           <div className="metric-panel">
-            <TermLabel term="operationsFermees" className="metric-label" />
+            <span className="metric-label">{t.histMetricClosed}</span>
             <span className="metric-value tabular">{summary.closedCount}</span>
           </div>
         </section>
       )}
 
       <div className="panel-head">
-        <h2 className="panel-title">Journal des opérations</h2>
+        <h2 className="panel-title">{t.histJournal}</h2>
         <div className="panel-head-actions">
           <span className="panel-badge">{filtered.length}</span>
           {history.length > 0 && (
@@ -116,7 +119,7 @@ export function HistoryView({ history, fills, allTimePnl, loading }: Props) {
               className="btn-export"
               onClick={() => exportHistoryCsv(filtered)}
             >
-              Export CSV
+              {t.histExport}
             </button>
           )}
         </div>
@@ -127,18 +130,18 @@ export function HistoryView({ history, fills, allTimePnl, loading }: Props) {
           <input
             type="search"
             className="history-filter-input"
-            placeholder="Rechercher actif ou opération…"
+            placeholder={t.histSearch}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            aria-label="Rechercher dans le journal"
+            aria-label={t.histSearch}
           />
           <select
             className="history-filter-select"
             value={coinFilter}
             onChange={(e) => setCoinFilter(e.target.value)}
-            aria-label="Filtrer par actif"
+            aria-label={t.histThAsset}
           >
-            <option value="all">Tous les actifs</option>
+            <option value="all">{t.histAllAssets}</option>
             {coins.map((c) => (
               <option key={c} value={c}>
                 {displaySymbol(c)}
@@ -149,29 +152,24 @@ export function HistoryView({ history, fills, allTimePnl, loading }: Props) {
             className="history-filter-select"
             value={period}
             onChange={(e) => setPeriod(e.target.value as PeriodFilter)}
-            aria-label="Filtrer par période"
+            aria-label={t.histAllPeriod}
           >
-            <option value="all">Toute la période</option>
-            <option value="7d">7 derniers jours</option>
-            <option value="30d">30 derniers jours</option>
+            <option value="all">{t.histAllPeriod}</option>
+            <option value="7d">{t.histLast7}</option>
+            <option value="30d">{t.histLast30}</option>
           </select>
         </div>
       )}
 
       {history.length === 0 ? (
         <div className="terminal-empty">
-          <p className="terminal-empty-title">Historique vide</p>
-          <p className="terminal-empty-text">
-            Les opérations enregistrées par Hyperliquid s'afficheront ici dès qu'une
-            activité sera disponible sur le wallet suivi.
-          </p>
+          <p className="terminal-empty-title">{t.histEmptyTitle}</p>
+          <p className="terminal-empty-text">{t.histEmptyText}</p>
         </div>
       ) : filtered.length === 0 ? (
         <div className="terminal-empty">
-          <p className="terminal-empty-title">Aucun résultat</p>
-          <p className="terminal-empty-text">
-            Modifiez les filtres ou la recherche pour afficher d'autres opérations.
-          </p>
+          <p className="terminal-empty-title">{t.histNoResultTitle}</p>
+          <p className="terminal-empty-text">{t.histNoResultText}</p>
         </div>
       ) : (
         <>
@@ -179,11 +177,11 @@ export function HistoryView({ history, fills, allTimePnl, loading }: Props) {
             <table className="journal-table">
               <thead>
                 <tr>
-                  <th>Date</th>
-                  <th>Actif</th>
-                  <th>Opération</th>
-                  <th className="journal-th-right">PnL net</th>
-                  <th className="journal-th-actions" aria-label="Carte PnL" />
+                  <th>{t.histThDate}</th>
+                  <th>{t.histThAsset}</th>
+                  <th>{t.histThOp}</th>
+                  <th className="journal-th-right">{t.histThPnl}</th>
+                  <th className="journal-th-actions" aria-label="PnL" />
                 </tr>
               </thead>
               <tbody>

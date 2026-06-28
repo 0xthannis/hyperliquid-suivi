@@ -29,6 +29,14 @@ export function computeWeeklySummary(history: HistoryEvent[]): WeeklySummary | n
   };
 }
 
-export function formatWeeklySummaryLine(summary: WeeklySummary): string {
-  return `${summary.closedCount} clôture${summary.closedCount > 1 ? 's' : ''} · ${formatUsd(summary.netPnl, true)} · ${summary.winRatePct.toFixed(0)} % de réussite`;
+export function formatWeeklySummaryLine(
+  summary: WeeklySummary,
+  lang: 'fr' | 'en' = 'fr'
+): string {
+  const pnl = formatUsd(summary.netPnl, true);
+  const win = summary.winRatePct.toFixed(0);
+  if (lang === 'en') {
+    return `${summary.closedCount} close${summary.closedCount > 1 ? 's' : ''} · ${pnl} · ${win}% win rate`;
+  }
+  return `${summary.closedCount} clôture${summary.closedCount > 1 ? 's' : ''} · ${pnl} · ${win} % de réussite`;
 }

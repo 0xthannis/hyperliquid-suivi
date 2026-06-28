@@ -53,6 +53,28 @@ export type TerminalCopy = {
   trkDisclaimer: string;
   trkEmptyTitle: string;
   trkEmptyText: string;
+  // History
+  histWeekly: string;
+  histMetricPnl: string;
+  histMetricWin: string;
+  histMetricClosed: string;
+  histWinShort: string;
+  histLossShort: string;
+  histJournal: string;
+  histExport: string;
+  histSearch: string;
+  histAllAssets: string;
+  histAllPeriod: string;
+  histLast7: string;
+  histLast30: string;
+  histEmptyTitle: string;
+  histEmptyText: string;
+  histNoResultTitle: string;
+  histNoResultText: string;
+  histThDate: string;
+  histThAsset: string;
+  histThOp: string;
+  histThPnl: string;
 };
 
 const FR: TerminalCopy = {
@@ -108,6 +130,27 @@ const FR: TerminalCopy = {
   trkDisclaimer: "Les performances passées ne préjugent pas des performances futures. Ceci n'est pas un conseil en investissement.",
   trkEmptyTitle: "Aucun trade clôturé pour l'instant",
   trkEmptyText: 'Le track record se construit à chaque position fermée, public et vérifiable.',
+  histWeekly: 'Résumé des 7 derniers jours',
+  histMetricPnl: 'PnL All Time',
+  histMetricWin: 'Taux de réussite',
+  histMetricClosed: 'Opérations fermées',
+  histWinShort: 'G',
+  histLossShort: 'P',
+  histJournal: 'Journal des opérations',
+  histExport: 'Export CSV',
+  histSearch: 'Rechercher actif ou opération…',
+  histAllAssets: 'Tous les actifs',
+  histAllPeriod: 'Toute la période',
+  histLast7: '7 derniers jours',
+  histLast30: '30 derniers jours',
+  histEmptyTitle: 'Historique vide',
+  histEmptyText: "Les opérations enregistrées par Hyperliquid s'afficheront ici dès qu'une activité sera disponible sur le wallet suivi.",
+  histNoResultTitle: 'Aucun résultat',
+  histNoResultText: "Modifiez les filtres ou la recherche pour afficher d'autres opérations.",
+  histThDate: 'Date',
+  histThAsset: 'Actif',
+  histThOp: 'Opération',
+  histThPnl: 'PnL net',
 };
 
 const EN: TerminalCopy = {
@@ -163,6 +206,27 @@ const EN: TerminalCopy = {
   trkDisclaimer: 'Past performance does not guarantee future results. This is not investment advice.',
   trkEmptyTitle: 'No closed trade yet',
   trkEmptyText: 'The track record builds with every closed position, public and verifiable.',
+  histWeekly: 'Last 7 days summary',
+  histMetricPnl: 'All-time PnL',
+  histMetricWin: 'Win rate',
+  histMetricClosed: 'Closed trades',
+  histWinShort: 'W',
+  histLossShort: 'L',
+  histJournal: 'Operations journal',
+  histExport: 'Export CSV',
+  histSearch: 'Search asset or operation…',
+  histAllAssets: 'All assets',
+  histAllPeriod: 'All time',
+  histLast7: 'Last 7 days',
+  histLast30: 'Last 30 days',
+  histEmptyTitle: 'Empty history',
+  histEmptyText: 'Operations recorded by Hyperliquid will show here as soon as there is activity on the tracked wallet.',
+  histNoResultTitle: 'No result',
+  histNoResultText: 'Change the filters or the search to show other operations.',
+  histThDate: 'Date',
+  histThAsset: 'Asset',
+  histThOp: 'Operation',
+  histThPnl: 'Net PnL',
 };
 
 export function getTerminalCopy(lang: Lang): TerminalCopy {
