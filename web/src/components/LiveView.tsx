@@ -25,18 +25,21 @@ import { getTerminalCopy } from '../i18n/terminal';
 /** Carte PnL pour une position encore ouverte (snapshot du PnL courant). */
 function openPositionCard(p: AssetPosition, price: number): PnlCardData {
   const net = pnlAtPrice(p, price);
+  const size = Math.abs(p.size);
+  // Marge engagée = notional d'entrée / levier (le capital réellement immobilisé).
+  const margin = p.leverage > 0 ? (p.entryPx * size) / p.leverage : p.entryPx * size;
   return {
     coin: p.coin,
     side: p.isLong ? 'LONG' : 'SHORT',
     entryPx: p.entryPx,
     exitPx: price,
     size: p.size,
-    riskedUsd: 0,
-    exitCapitalUsd: 0,
+    riskedUsd: margin,
+    exitCapitalUsd: margin + net,
     grossPnl: net,
     totalFees: 0,
     netPnl: net,
-    pnlPct: pnlPercent(p, price),
+    pnlPct: margin > 1e-6 ? (net / margin) * 100 : pnlPercent(p, price),
     leverage: p.leverage,
     durationMs: null,
     durationLabel: 'En cours',
