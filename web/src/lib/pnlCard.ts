@@ -87,6 +87,88 @@ function findOpenTimeMs(
 }
 
 
+function findOpenOid(
+  fills: Fill[],
+  coin: string,
+  closeTimeMs: number,
+  isLong: boolean
+): number | null {
+  const needle = isLong ? 'Open Long' : 'Open Short';
+  let best: Fill | null = null;
+  for (const f of fills) {
+    if (f.coin !== coin || !f.dir.includes(needle)) continue;
+    const t = normalizeEventTimeMs(f.time);
+    if (t > closeTimeMs) continue;
+    if (!best || t > normalizeEventTimeMs(best.time)) best = f;
+  }
+  return best?.oid ?? null;
+}
+
+function stopPxFromOrder(order: HistoricalOrder['order']): number | null {
+  const t = parseFloat(order.triggerPx);
+  if (order.isTrigger && order.orderType.toLowerCase().includes('stop') && t > 0) {
+    return t;
+  }
+  for (const ch of order.children ?? []) {
+    const px = stopPxFromOrder(ch);
+    if (px != null) return px;
+  }
+  return null;
+}
+
+function findStopPx(
+  coin: string,
+  openTimeMs: number,
+  closeTimeMs: number,
+  openOid: number | null,
+  orders: HistoricalOrder[]
+): number | null {
+  if (openOid != null) {
+    for (const row of orders) {
+      const o = row.order;
+      if (o.coin !== coin || o.oid !== openOid) continue;
+      const px = stopPxFromOrder(o);
+      if (px != null) return px;
+    }
+  }
+
+  let best: { px: number; ts: number } | null = null;
+  for (const row of orders) {
+    const o = row.order;
+    if (o.coin !== coin) continue;
+    const px = stopPxFromOrder(o);
+    if (px == null) continue;
+    const ts = o.timestamp;
+    if (ts < openTimeMs - 120_000 || ts > closeTimeMs + 60_000) continue;
+    if (!best || Math.abs(ts - openTimeMs) < Math.abs(best.ts - openTimeMs)) {
+      best = { px, ts };
+    }
+  }
+  return best?.px ?? null;
+}
+
+/** Perte en $ si le stop-loss était touché (distance entrée→SL × taille). */
+export function riskUsdAtStop(
+  isLong: boolean,
+  entryPx: number,
+  stopPx: number,
+  size: number
+): number {
+  if (stopPx <= 0 || size <= 0) return 0;
+  if (isLong) return Math.max(0, (entryPx - stopPx) * size);
+  return Math.max(0, (stopPx - entryPx) * size);
+}
+
+/** Repli quand aucun SL : marge engagée (notional / levier). */
+export function marginUsd(
+  entryPx: number,
+  size: number,
+  leverage: number | null | undefined
+): number {
+  const notional = Math.abs(entryPx * size);
+  return leverage && leverage > 0 ? notional / leverage : notional;
+}
+
 function closeMetaFromFills(
   fills: Fill[],
   coin: string,
@@ -120,22 +202,23 @@ export function historyEventToPnlCard(
 
   const closedAt = normalizeEventTimeMs(event.time);
   const openMs = findOpenTimeMs(fills, event.coin, closedAt, isLong);
+  const openOid =
+    openMs != null ? findOpenOid(fills, event.coin, closedAt, isLong) : null;
+  const orders = ctx.historicalOrders ?? [];
+  const stopPx =
+    openMs != null
+      ? findStopPx(event.coin, openMs, closedAt, openOid, orders)
+      : null;
 
-  // Marge engagée = notional d'entrée / levier (capital réellement immobilisé).
-  // Levier au temps du trade non stocké par HL → on approxime avec le levier courant.
-  const leverage = ctx.leverage && ctx.leverage > 0 ? ctx.leverage : null;
-  const entryNotional = Math.abs(entryPx * size);
-  let riskedUsd = leverage != null ? entryNotional / leverage : entryNotional;
-
-  if (riskedUsd < 1e-6 && event.netPnl < 0) {
-    riskedUsd = Math.abs(event.netPnl);
+  // Capital risqué = perte au SL ; repli sur la marge engagée si pas de SL.
+  let riskedUsd = stopPx != null ? riskUsdAtStop(isLong, entryPx, stopPx, size) : 0;
+  if (riskedUsd < 1e-6) {
+    riskedUsd = marginUsd(entryPx, size, ctx.leverage);
   }
 
-  const exitCapitalUsd =
-    riskedUsd > 1e-6 ? riskedUsd + event.netPnl : 0;
+  const exitCapitalUsd = riskedUsd > 1e-6 ? riskedUsd + event.netPnl : 0;
 
-  const pnlPct =
-    riskedUsd > 1e-6 ? (event.netPnl / riskedUsd) * 100 : 0;
+  const pnlPct = riskedUsd > 1e-6 ? (event.netPnl / riskedUsd) * 100 : 0;
 
   const durationMs = openMs != null ? Math.max(0, closedAt - openMs) : null;
   const { hash, tid } = closeMetaFromFills(fills, event.coin, closedAt, isLong);

@@ -17,29 +17,34 @@ import {
 import { computeExitMetrics, formatRiskReward } from '../lib/riskMetrics';
 import { getPushSupport, requestPushPermission, type PushState } from '../lib/push';
 import { PnlCardModal } from './PnlCardModal';
-import type { PnlCardData } from '../lib/pnlCard';
+import { riskUsdAtStop, marginUsd, type PnlCardData } from '../lib/pnlCard';
 import { TRADER_WALLET, hyperliquidExplorerUrl } from '../constants';
 import { useLang } from '../i18n';
 import { getTerminalCopy } from '../i18n/terminal';
 
 /** Carte PnL pour une position encore ouverte (snapshot du PnL courant). */
-function openPositionCard(p: AssetPosition, price: number): PnlCardData {
+function openPositionCard(
+  p: AssetPosition,
+  price: number,
+  stopPx: number | null
+): PnlCardData {
   const net = pnlAtPrice(p, price);
   const size = Math.abs(p.size);
-  // Marge engagée = notional d'entrée / levier (le capital réellement immobilisé).
-  const margin = p.leverage > 0 ? (p.entryPx * size) / p.leverage : p.entryPx * size;
+  // Capital risqué = perte au SL ; repli sur la marge engagée si pas de SL.
+  let risked = stopPx != null ? riskUsdAtStop(p.isLong, p.entryPx, stopPx, size) : 0;
+  if (risked < 1e-6) risked = marginUsd(p.entryPx, p.size, p.leverage);
   return {
     coin: p.coin,
     side: p.isLong ? 'LONG' : 'SHORT',
     entryPx: p.entryPx,
     exitPx: price,
     size: p.size,
-    riskedUsd: margin,
-    exitCapitalUsd: margin + net,
+    riskedUsd: risked,
+    exitCapitalUsd: risked + net,
     grossPnl: net,
     totalFees: 0,
     netPnl: net,
-    pnlPct: margin > 1e-6 ? (net / margin) * 100 : pnlPercent(p, price),
+    pnlPct: risked > 1e-6 ? (net / risked) * 100 : pnlPercent(p, price),
     leverage: p.leverage,
     durationMs: null,
     durationLabel: 'En cours',
@@ -411,7 +416,9 @@ export function LiveView({
                   <button
                     type="button"
                     className="tr-pos-card"
-                    onClick={() => setCard(openPositionCard(p, px))}
+                    onClick={() =>
+                      setCard(openPositionCard(p, px, stopLoss?.triggerPx ?? null))
+                    }
                   >
                     {t.pnlCard}
                   </button>

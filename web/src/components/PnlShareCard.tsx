@@ -54,11 +54,11 @@ export function PnlShareCard({ data, className = '', forExport = false }: Props)
 
       <div className="pc-grid">
         <div className="pc-cell">
-          <span>Investi</span>
+          <span>Risqué</span>
           <b className="tabular">{fmtCapital(data.riskedUsd)}</b>
         </div>
         <div className="pc-cell">
-          <span>Sorti</span>
+          <span>Récupéré</span>
           <b className="tabular">{fmtCapital(data.exitCapitalUsd)}</b>
         </div>
         <div className="pc-cell">

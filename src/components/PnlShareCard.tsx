@@ -78,13 +78,13 @@ export function PnlShareCard({ data, width = 360 }: Props) {
 
       <View style={[styles.grid, { marginTop: s(24), paddingTop: s(18), rowGap: s(16) }]}>
         <View style={styles.cell2}>
-          <Text style={[styles.cellLabel, { fontSize: s(10) }]}>Investi</Text>
+          <Text style={[styles.cellLabel, { fontSize: s(10) }]}>Risqué</Text>
           <Text style={[styles.cellVal, { fontSize: s(15), marginTop: s(5) }]}>
             {fmtCapital(data.riskedUsd)}
           </Text>
         </View>
         <View style={styles.cell2}>
-          <Text style={[styles.cellLabel, { fontSize: s(10) }]}>Sorti</Text>
+          <Text style={[styles.cellLabel, { fontSize: s(10) }]}>Récupéré</Text>
           <Text style={[styles.cellVal, { fontSize: s(15), marginTop: s(5) }]}>
             {fmtCapital(data.exitCapitalUsd)}
           </Text>

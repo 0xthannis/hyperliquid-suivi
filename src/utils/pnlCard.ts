@@ -146,7 +146,8 @@ function findStopPx(
   return best?.px ?? null;
 }
 
-function riskUsdAtStop(
+/** Perte en $ si le stop-loss était touché (distance entrée→SL × taille). */
+export function riskUsdAtStop(
   isLong: boolean,
   entryPx: number,
   stopPx: number,
@@ -155,6 +156,16 @@ function riskUsdAtStop(
   if (stopPx <= 0 || size <= 0) return 0;
   if (isLong) return Math.max(0, (entryPx - stopPx) * size);
   return Math.max(0, (stopPx - entryPx) * size);
+}
+
+/** Repli quand aucun SL : marge engagée (notional / levier). */
+export function marginUsd(
+  entryPx: number,
+  size: number,
+  leverage: number | null | undefined
+): number {
+  const notional = Math.abs(entryPx * size);
+  return leverage && leverage > 0 ? notional / leverage : notional;
 }
 
 function closeMetaFromFills(
@@ -190,17 +201,18 @@ export function historyEventToPnlCard(
 
   const closedAt = normalizeEventTimeMs(event.time);
   const openMs = findOpenTimeMs(fills, event.coin, closedAt, isLong);
+  const openOid =
+    openMs != null ? findOpenOid(fills, event.coin, closedAt, isLong) : null;
+  const orders = ctx.historicalOrders ?? [];
+  const stopPx =
+    openMs != null
+      ? findStopPx(event.coin, openMs, closedAt, openOid, orders)
+      : null;
 
-  // Marge engagée = notional d'entrée / levier (capital réellement immobilisé).
-  // Levier au temps du trade non stocké par HL → approximé avec le levier courant.
-  const leverage = ctx.leverage && ctx.leverage > 0 ? ctx.leverage : null;
-  const entryNotional = Math.abs(entryPx * size);
-  let riskedUsd = leverage != null ? entryNotional / leverage : entryNotional;
-
+  // Capital risqué = perte au SL ; repli sur la marge engagée si pas de SL.
+  let riskedUsd = stopPx != null ? riskUsdAtStop(isLong, entryPx, stopPx, size) : 0;
   if (riskedUsd < 1e-6) {
-    if (event.netPnl < 0) {
-      riskedUsd = Math.abs(event.netPnl);
-    }
+    riskedUsd = marginUsd(entryPx, size, ctx.leverage);
   }
 
   const exitCapitalUsd =

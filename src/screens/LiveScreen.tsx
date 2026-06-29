@@ -27,6 +27,7 @@ import { computeExitMetrics, formatRiskReward } from '../utils/riskMetrics';
 import { PnlCardSheet } from '../components/PnlCardSheet';
 import { WatchlistSection } from '../components/WatchlistSection';
 import { registerRemotePush } from '../services/remotePush';
+import { riskUsdAtStop, marginUsd } from '../utils/pnlCard';
 import { useCountUp } from '../hooks/useCountUp';
 import { useLang } from '../i18n';
 import { getCopy } from '../i18n/strings';
@@ -163,23 +164,28 @@ export function LiveScreen({
     return dd * 100;
   })();
 
-  function buildCard(p: (typeof positions)[number], price: number): PnlCardData {
+  function buildCard(
+    p: (typeof positions)[number],
+    price: number,
+    stopPx: number | null
+  ): PnlCardData {
     const net = pnlAtPrice(p, price);
     const size = Math.abs(p.size);
-    // Marge engagée = notional d'entrée / levier (capital réellement immobilisé).
-    const margin = p.leverage > 0 ? (p.entryPx * size) / p.leverage : p.entryPx * size;
+    // Capital risqué = perte au SL ; repli sur la marge engagée si pas de SL.
+    let risked = stopPx != null ? riskUsdAtStop(p.isLong, p.entryPx, stopPx, size) : 0;
+    if (risked < 1e-6) risked = marginUsd(p.entryPx, p.size, p.leverage);
     return {
       coin: p.coin,
       side: p.isLong ? 'LONG' : 'SHORT',
       entryPx: p.entryPx,
       exitPx: price,
       size: p.size,
-      riskedUsd: margin,
-      exitCapitalUsd: margin + net,
+      riskedUsd: risked,
+      exitCapitalUsd: risked + net,
       grossPnl: net,
       totalFees: 0,
       netPnl: net,
-      pnlPct: margin > 1e-6 ? (net / margin) * 100 : pnlPercent(p, price),
+      pnlPct: risked > 1e-6 ? (net / risked) * 100 : pnlPercent(p, price),
       leverage: p.leverage,
       durationMs: null,
       durationLabel: 'En cours',
@@ -369,7 +375,10 @@ export function LiveScreen({
                 </View>
               )}
 
-              <Pressable style={styles.cardBtn} onPress={() => setCardData(buildCard(p, px))}>
+              <Pressable
+                style={styles.cardBtn}
+                onPress={() => setCardData(buildCard(p, px, stopLoss?.triggerPx ?? null))}
+              >
                 <Text style={styles.cardBtnText}>{t.pnlCard}</Text>
               </Pressable>
             </View>
