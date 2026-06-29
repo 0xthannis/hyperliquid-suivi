@@ -155,7 +155,8 @@ export function useTraderData() {
       positions,
       orders,
       mids,
-      accountValue,
+      // Équité totale (spot + perp) ; repli sur la marge perp.
+      portfolio.totalAccountValue || accountValue,
       fills,
       portfolio.perpAllTimePnl
     );

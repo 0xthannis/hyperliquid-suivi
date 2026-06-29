@@ -70,7 +70,7 @@ export function useLandingSnapshot(): LandingSnapshot {
         const [{ positions, accountValue }, fills, pnl, equity] = await Promise.all([
           fetchPositions(),
           fetchFills(),
-          fetchPortfolioPnl().catch(() => ({ perpAllTimePnl: 0 })),
+          fetchPortfolioPnl().catch(() => ({ perpAllTimePnl: 0, totalAccountValue: 0 })),
           fetchAccountValueHistory('allTime').catch(() => [] as number[]),
         ]);
         if (cancelled) return;
@@ -104,7 +104,7 @@ export function useLandingSnapshot(): LandingSnapshot {
           openCoins: positions.map((p) => displaySymbol(p.coin)),
           lastActivityTs: latest?.time ?? null,
           lastActivityLabel: latest?.dir ?? null,
-          accountValue,
+          accountValue: pnl.totalAccountValue || accountValue,
           allTimePnl: pnl.perpAllTimePnl,
           winRate,
           closedCount: closed.length,

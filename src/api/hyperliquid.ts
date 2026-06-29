@@ -237,6 +237,7 @@ export async function fetchMids(coins: string[]): Promise<Record<string, number>
 export async function fetchPortfolioPnl(): Promise<{
   perpAllTimePnl: number;
   allTimePnl: number;
+  totalAccountValue: number;
 }> {
   const data = await postInfo<
     Array<
@@ -244,6 +245,7 @@ export async function fetchPortfolioPnl(): Promise<{
         string,
         {
           pnlHistory?: Array<[number, string]>;
+          accountValueHistory?: Array<[number, string]>;
         },
       ]
     >
@@ -254,15 +256,22 @@ export async function fetchPortfolioPnl(): Promise<{
 
   let perpAllTimePnl = 0;
   let allTimePnl = 0;
+  let totalAccountValue = 0;
 
   for (const [period, block] of data) {
     const hist = block.pnlHistory ?? [];
     const last = hist.length > 0 ? parseFloat(hist[hist.length - 1][1]) : 0;
     if (period === 'perpAllTime') perpAllTimePnl = last;
     if (period === 'allTime') allTimePnl = last;
+
+    // accountValueHistory des périodes non-perp = équité totale (spot + perp).
+    if (period === 'allTime') {
+      const avHist = block.accountValueHistory ?? [];
+      if (avHist.length > 0) totalAccountValue = parseFloat(avHist[avHist.length - 1][1]);
+    }
   }
 
-  return { perpAllTimePnl, allTimePnl };
+  return { perpAllTimePnl, allTimePnl, totalAccountValue };
 }
 
 /** Courbe de valeur du compte (équité) pour le sparkline du terminal. */

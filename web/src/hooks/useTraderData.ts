@@ -57,7 +57,8 @@ export function useTraderData() {
     setPositions(pos);
     setOrders(ord);
     setMids({ ...midsRef.current });
-    setAccountValue(av);
+    // Équité totale (spot + perp) depuis le portfolio ; repli sur la marge perp.
+    setAccountValue(portfolio.totalAccountValue || av);
     setFills(fills);
     setHistory(groupFillsToHistory(fills));
     setAllTimePnl(portfolio.perpAllTimePnl);
